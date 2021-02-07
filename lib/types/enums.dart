@@ -107,6 +107,11 @@ enum ItemComponentType {
   row,
 }
 
+enum QuestionType {
+  author,
+  reference,
+}
+
 enum QuotePageType {
   favourites,
   list,

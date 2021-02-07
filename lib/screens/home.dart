@@ -1,26 +1,29 @@
 import 'dart:convert';
-import 'dart:math';
 
-import 'package:auto_route/auto_route.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:disfigstyle/components/animated_app_icon.dart';
 import 'package:disfigstyle/components/desktop_app_bar.dart';
+import 'package:disfigstyle/components/fade_in_x.dart';
+import 'package:disfigstyle/components/fade_in_y.dart';
 import 'package:disfigstyle/components/footer.dart';
-import 'package:disfigstyle/router/app_router.gr.dart';
+import 'package:disfigstyle/components/image_card.dart';
 import 'package:disfigstyle/state/colors.dart';
+import 'package:disfigstyle/state/topics_colors.dart';
 import 'package:disfigstyle/types/author.dart';
+import 'package:disfigstyle/types/enums.dart';
+import 'package:disfigstyle/types/game_answer_response.dart';
+import 'package:disfigstyle/types/game_question_response.dart';
 import 'package:disfigstyle/types/quote.dart';
 import 'package:disfigstyle/types/reference.dart';
 import 'package:disfigstyle/utils/api_keys.dart';
-import 'package:flutter/gestures.dart';
+import 'package:disfigstyle/utils/constants.dart';
+import 'package:disfigstyle/utils/snack.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_syntax_view/flutter_syntax_view.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pretty_json/pretty_json.dart';
 import 'package:supercharged/supercharged.dart';
+import 'package:http/http.dart' as http;
 import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
   @override
@@ -28,37 +31,59 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  Author author;
-
-  bool isLoadingQuotidian = false;
-  bool isLoadingAuthorPropCard = false;
-  bool isLoadingSearch = false;
+  bool isLoading = false;
   bool isFabVisible = false;
+  bool hasChosenAnswer = false;
+  bool isCompleted = false;
+  bool isCheckingAnswer = false;
+  bool isCurrentQuestionCompleted = false;
 
-  Color _imageBackgroundColor = Colors.blue.shade800;
+  Color accentColor = Colors.blue;
 
   final _scrollController = ScrollController();
-  final quotesHeader = <Quote>[];
-  final quotidianEndpoint = "https://api.fig.style/v1/quotidian";
-  final searchQuotesEndpoint = "https://api.fig.style/v1/search/quotes?q=";
-  final _searchInputFocusNode = FocusNode();
 
-  Reference referenceHeader;
+  int currentQuestion = 0;
+  int maxQuestions = 10;
+  int correctAnswers = 0;
+  int score = 0;
 
-  String quotidianJson = '';
-  String searchJson = '';
-  String searchQuery = '';
+  final questionEndpoint = "https://api.fig.style/v1/dis/random";
+  final answerEndpoint = "https://api.fig.style/v1/dis/check";
+  final quoteEndpoint = "https://api.fig.style/v1/quotes/";
+  final referenceEndpoint = "https://api.fig.style/v1/references/";
+
+  GameAnswerResponse answerResponse;
+  GameQuestionResponse questionResponse;
+
+  GameState gameState = GameState.stopped;
+
+  List<Author> authors = [];
+  List<Reference> references = [];
+  List<Reference> referencesPresentation = [];
+  List<Quote> quotesPresentation = [];
+
+  List<String> quotesIds = [
+    "0EUE8cUP09nQkO4A70oa",
+    "0JWVqrrOcx2iKzJrQL6C",
+  ];
+
+  List<String> referencesIds = [
+    "EDRwqgBONNg8cAaAhg8q", // La Révolution
+    "F2Li6Usbb6EH4qVFU1zD", // Chilling avdventure of Sabrina
+  ];
+
+  String quoteName = '';
+  String questionType = 'author';
+  String selectedId = '';
 
   @override
   void initState() {
     super.initState();
-    fetchQuotesHeader();
-    fetchHeaderReference();
+    fetchPresentationData();
   }
 
   @override
   dispose() {
-    _searchInputFocusNode.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -108,11 +133,7 @@ class _HomeState extends State<Home> {
                 );
               },
             ),
-            header(),
-            about(),
-            features(),
-            techStack(),
-            plan(),
+            body(),
             footer(),
           ],
         ),
@@ -120,468 +141,95 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget about() {
+  Widget answerResultBlock() {
+    if (!isCurrentQuestionCompleted) {
+      return Container();
+    }
+
+    return Container();
+  }
+
+  Widget authorsRow() {
+    int index = 0;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: questionResponse.authorProposals.values.map(
+        (proposal) {
+          index++;
+          return FadeInX(
+            beginX: 20.0,
+            delay: Duration(milliseconds: 200 * index),
+            child: ImageCard(
+              name: proposal.name,
+              imageUrl: proposal.urls.image,
+              selected: selectedId == proposal.id,
+              onTap: () {
+                if (hasChosenAnswer) {
+                  return;
+                }
+
+                setState(() {
+                  hasChosenAnswer = true;
+                  selectedId = proposal.id;
+                });
+
+                checkAnswer(proposal.id);
+              },
+            ),
+          );
+        },
+      ).toList(),
+    );
+  }
+
+  Widget body() {
+    if (gameState == GameState.stopped) {
+      return notStartedView();
+    }
+
+    if (gameState == GameState.finished) {
+      return finishedView();
+    }
+
+    return runningGameView();
+  }
+
+  Widget checkingAnswerBlock() {
+    if (isCheckingAnswer) {
+      return Wrap(
+        spacing: 16.0,
+        children: [
+          Text("Checking answer..."),
+          AnimatedAppIcon(),
+        ],
+      );
+    }
+
+    return Container();
+  }
+
+  Widget finishedView() {
     return SliverList(
       delegate: SliverChildListDelegate.fixed([
-        Container(
-          color: stateColors.primary,
-          width: 600.0,
-          padding: const EdgeInsets.symmetric(
-            vertical: 60.0,
-            horizontal: 80.0,
+        gameTitle(),
+        Text(
+          "Thank you for playing with us! ❤️",
+          style: TextStyle(
+            fontSize: 32.0,
           ),
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 40.0,
-            children: [
-              Text(
-                "About us",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 40.0,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              SizedBox(
-                width: 400.0,
-                child: Opacity(
-                  opacity: 0.6,
-                  child: Text(
-                    "Because, there wasn't any robust API "
-                    "to consume diversified quotes, we created one"
-                    " easy to use, with a generous plan, "
-                    "and with an open sourced code.",
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+        ),
+        Opacity(
+          opacity: 0.7,
+          child: Text(
+            "With a total of $score, you got $correctAnswers good answers "
+            "out of $maxQuestions",
+            style: TextStyle(
+              fontSize: 24.0,
+            ),
           ),
         ),
       ]),
-    );
-  }
-
-  Widget authorPropCard() {
-    final content = <Widget>[];
-
-    if (isLoadingAuthorPropCard) {
-      content.add(AnimatedAppIcon(size: 50.0));
-    } else if (author == null) {
-      content.add(
-        Icon(UniconsLine.question),
-      );
-    } else {
-      content.addAll([
-        Padding(
-          padding: const EdgeInsets.only(bottom: 4.0),
-          child: Opacity(
-            opacity: 0.6,
-            child: RichText(
-              overflow: TextOverflow.ellipsis,
-              text: TextSpan(
-                text: "name: ",
-                style: TextStyle(
-                  color: stateColors.foreground,
-                  fontWeight: FontWeight.w300,
-                ),
-                children: [
-                  TextSpan(
-                    style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                    ),
-                    text: author.name,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        if (author.job != null && author.job.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 4.0),
-            child: Opacity(
-              opacity: 0.6,
-              child: RichText(
-                overflow: TextOverflow.ellipsis,
-                text: TextSpan(
-                  text: "job: ",
-                  style: TextStyle(
-                    color: stateColors.foreground,
-                    fontWeight: FontWeight.w300,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: author.job,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        if (author.urls.wikipedia != null && author.urls.wikipedia.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 4.0),
-            child: Opacity(
-              opacity: 0.6,
-              child: RichText(
-                overflow: TextOverflow.ellipsis,
-                text: TextSpan(
-                  text: "wikipedia url",
-                  style: TextStyle(
-                    color: stateColors.foreground,
-                    decoration: TextDecoration.underline,
-                    fontWeight: FontWeight.w300,
-                  ),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () => launch(author.urls.wikipedia),
-                ),
-              ),
-            ),
-          ),
-        Opacity(
-          opacity: 0.6,
-          child: Text(
-            "...",
-            style: TextStyle(
-              fontWeight: FontWeight.w300,
-            ),
-          ),
-        ),
-      ]);
-    }
-
-    return SizedBox(
-      width: 220.0,
-      height: 150.0,
-      child: Card(
-        child: InkWell(
-          onTap: fetchAuthorPropCard,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: 8.0,
-                  left: 8.0,
-                  right: 8.0,
-                ),
-                child: Text(
-                  "Author",
-                  style: TextStyle(
-                    color: Colors.pink,
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-              Divider(
-                thickness: 1.0,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12.0,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: content,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget cardFreePlan() {
-    return Container(
-      width: 400.0,
-      padding: const EdgeInsets.all(20.0),
-      child: Card(
-        elevation: 0.0,
-        color: stateColors.softBackground,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-          side: BorderSide(
-            width: 2.0,
-            color: stateColors.foreground.withOpacity(0.2),
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(40.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Free",
-                style: TextStyle(
-                  fontSize: 24.0,
-                  color: stateColors.secondary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  text: "0€",
-                  style: TextStyle(
-                    fontSize: 60.0,
-                    fontWeight: FontWeight.w600,
-                    color: stateColors.foreground.withOpacity(0.8),
-                  ),
-                  children: [
-                    TextSpan(
-                      text: " /month",
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        color: stateColors.foreground.withOpacity(0.4),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 32.0,
-                ),
-                child: Opacity(
-                  opacity: 0.5,
-                  child: Text(
-                    "Free plan is the perfect to start designing"
-                    ", developing, and testing APIs.",
-                  ),
-                ),
-              ),
-              planCardFeature(title: "Query quote of the day"),
-              planCardFeature(title: "Query quotes, authors and references"),
-              planCardFeature(title: "Use search API"),
-              planCardFeature(title: "API rates limit at 1k request per day"),
-              Padding(
-                padding: const EdgeInsets.only(top: 30.0),
-                child: ElevatedButton(
-                  onPressed: () {},
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Start free",
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget cardPremiumPlan() {
-    return Container(
-      width: 400.0,
-      padding: const EdgeInsets.all(20.0),
-      child: Card(
-        elevation: 0.0,
-        // color: Colors.blue,
-        color: Colors.pink,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(40.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Premium",
-                style: TextStyle(
-                  fontSize: 24.0,
-                  color: stateColors.secondary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  text: "1€",
-                  style: TextStyle(
-                    fontSize: 60.0,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white.withOpacity(0.8),
-                  ),
-                  children: [
-                    TextSpan(
-                      text: " / 5k requests",
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        color: Colors.white.withOpacity(0.4),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 32.0,
-                ),
-                child: Opacity(
-                  opacity: 0.5,
-                  child: Text(
-                    "Pay as you go plan when you are ready to release"
-                    " your app, while keeping an eye on your expenses.",
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-              planCardFeature(
-                title: "Everything in free plan",
-                titleColor: Colors.white,
-              ),
-              planCardFeature(
-                title: "Personal support",
-                titleColor: Colors.white,
-              ),
-              planCardFeature(
-                title: "No API rates limit",
-                titleColor: Colors.white,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 40.0),
-                child: OutlinedButton(
-                  onPressed: () {},
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Soon...",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget easyToUseFeature() {
-    return Container(
-      width: 600.0,
-      padding: const EdgeInsets.symmetric(
-        vertical: 40.0,
-      ),
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 40.0,
-        children: [
-          quotidianMiniPlayground(),
-          SizedBox(
-            width: 400.0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Opacity(
-                  opacity: 0.8,
-                  child: Text(
-                    "Easy to use",
-                    style: TextStyle(
-                      fontSize: 32.0,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    top: 8.0,
-                  ),
-                  child: Opacity(
-                    opacity: 0.6,
-                    child: Text(
-                      "You can start to use the API right away "
-                      "for simple usages. Create an account "
-                      "to perform more advanced queries.",
-                      style: TextStyle(
-                        fontSize: 18.0,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget features() {
-    return SliverPadding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 60.0,
-        horizontal: 80.0,
-      ),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
-          Padding(
-            padding: const EdgeInsets.only(
-              bottom: 40.0,
-            ),
-            child: Column(
-              children: [
-                Opacity(
-                  opacity: 0.8,
-                  child: Text(
-                    "Features",
-                    style: TextStyle(
-                      fontSize: 70.0,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: GoogleFonts.pacifico().fontFamily,
-                    ),
-                  ),
-                ),
-                Opacity(
-                  opacity: 0.5,
-                  child: Text(
-                    "we crafted for you",
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.w200,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          easyToUseFeature(),
-          richDataFeature(),
-          searchFeature(),
-        ]),
-      ),
     );
   }
 
@@ -593,15 +241,51 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget header() {
+  Widget gameTitle() {
+    return Text(
+      "Did I Say?",
+      style: TextStyle(
+        fontSize: 60.0,
+        fontFamily: GoogleFonts.pacifico().fontFamily,
+      ),
+    );
+  }
+
+  Widget notStartedView() {
     return SliverList(
       delegate: SliverChildListDelegate.fixed([
+        Padding(
+          padding: const EdgeInsets.all(80.0),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                notStartedHeader(),
+                FadeInY(
+                  beginY: 20.0,
+                  delay: 600.milliseconds,
+                  child: basicRules(),
+                ),
+                shareGameButtons(),
+              ],
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
+
+  Widget notStartedHeader() {
+    return Column(
+      children: [
         Container(
-          height: MediaQuery.of(context).size.height - 130.0,
-          padding: const EdgeInsets.only(
-            left: 80.0,
-            right: 80.0,
-            top: 100.0,
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height - 200.0,
+          padding: const EdgeInsets.symmetric(
+            horizontal: 40.0,
           ),
           child: Wrap(
             alignment: WrapAlignment.spaceBetween,
@@ -611,124 +295,86 @@ class _HomeState extends State<Home> {
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: IconButton(
-            onPressed: () {
-              _scrollController.animateTo(
-                MediaQuery.of(context).size.height * 1.5,
-                curve: Curves.bounceOut,
-                duration: 250.milliseconds,
-              );
-            },
-            icon: Icon(UniconsLine.arrow_down),
-          ),
-        ),
-      ]),
-    );
-  }
-
-  Widget headerLeft() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Opacity(
-          opacity: 0.8,
-          child: RichText(
-            text: TextSpan(
-              text: "dev",
-              style: TextStyle(
-                fontSize: 80.0,
-                color: stateColors.foreground,
-                fontFamily: GoogleFonts.pacifico().fontFamily,
-              ),
-              children: [
-                TextSpan(
-                  text: ".",
-                  style: TextStyle(
-                    color: stateColors.secondary,
-                  ),
-                ),
-                TextSpan(
-                  text: "fig",
-                ),
-                TextSpan(
-                  text: ".",
-                  style: TextStyle(
-                    color: stateColors.primary,
-                  ),
-                ),
-                TextSpan(
-                  text: "style",
-                ),
-              ],
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(
-            top: 8.0,
-          ),
-          child: Opacity(
-            opacity: 0.5,
-            child: Text(
-              "Quotes for developers",
-              style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.w200,
-              ),
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(
-            top: 60.0,
-          ),
-          child: Wrap(
-            spacing: 20.0,
-            children: [
-              ElevatedButton(
-                onPressed: () => context.router,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "Get started",
-                      ),
-                      Icon(UniconsLine.arrow_right),
-                    ],
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: () => context.router.push(AboutRoute()),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    "Read the docs",
-                    style: TextStyle(),
-                  ),
-                ),
-              ),
-            ],
-          ),
+        IconButton(
+          onPressed: () {
+            _scrollController.animateTo(
+              MediaQuery.of(context).size.height * 1.0,
+              curve: Curves.bounceOut,
+              duration: 250.milliseconds,
+            );
+          },
+          icon: Icon(UniconsLine.arrow_down),
         ),
       ],
     );
   }
 
+  Widget headerLeft() {
+    return Padding(
+      padding: const EdgeInsets.only(right: 32.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FadeInY(
+            beginY: 20.0,
+            delay: 100.milliseconds,
+            child: gameTitle(),
+          ),
+          FadeInY(
+            beginY: 20.0,
+            delay: 300.milliseconds,
+            child: Opacity(
+              opacity: 0.6,
+              child: Text(
+                "This is a quotes game",
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.w200,
+                ),
+              ),
+            ),
+          ),
+          FadeInY(
+            beginY: 20.0,
+            delay: 600.milliseconds,
+            child: notStartedButtons(),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget headerRight() {
+    if (referencesPresentation.isEmpty || quotesPresentation.isEmpty) {
+      return Container();
+    }
+
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        headerVerticalCard(),
         SizedBox(
           width: 300.0,
-          child: Wrap(
-            children: quotesHeader.map((quote) {
-              return headerCard(quote);
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: referencesPresentation.map((reference) {
+              return ImageCard(
+                width: 300.0,
+                height: 150.0,
+                name: reference.name,
+                imageUrl: reference.urls.image,
+                padding: EdgeInsets.zero,
+              );
+            }).toList(),
+          ),
+        ),
+        SizedBox(
+          width: 150.0,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: quotesPresentation.map((quote) {
+              return miniQuoteCard(quote);
             }).toList(),
           ),
         ),
@@ -736,7 +382,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget headerCard(Quote quote) {
+  Widget miniQuoteCard(Quote quote) {
     final size = 150.0;
 
     return SizedBox(
@@ -759,513 +405,388 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget headerVerticalCard() {
-    if (referenceHeader == null) {
-      return Container();
-    }
+  Widget basicRules() {
+    final titleFontSize = 60.0;
+    final textFontSize = 16.0;
 
-    return Container(
-      width: 180.0,
-      height: 300.0,
-      padding: const EdgeInsets.only(right: 20.0),
-      child: Card(
-        elevation: 4.0,
-        child: Stack(
-          children: [
-            Stack(
-              children: [
-                verticalCardImage(),
-                Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Opacity(
-                    opacity: 0.6,
-                    child: Text(
-                      referenceHeader.name,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget plan() {
-    return SliverPadding(
-      padding: const EdgeInsets.all(40.0),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
-          Column(
-            children: [
-              Text(
-                "Plan",
-                style: TextStyle(
-                  fontSize: 70.0,
-                  fontFamily: GoogleFonts.pacifico().fontFamily,
-                ),
-              ),
-              Opacity(
-                opacity: 0.4,
-                child: Text(
-                  "Choose your plan. Start free. Pay as you go.",
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
-                ),
-              ),
-              planCards(),
-            ],
-          ),
-        ]),
-      ),
-    );
-  }
-
-  Widget planCards() {
-    return Container(
-      height: 600.0,
-      padding: const EdgeInsets.all(40.0),
-      child: ListView(
-        shrinkWrap: true,
-        scrollDirection: Axis.horizontal,
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          cardFreePlan(),
-          cardPremiumPlan(),
+          Text(
+            "Rules",
+            style: TextStyle(
+              color: stateColors.secondary,
+              fontSize: titleFontSize,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 16.0,
+              bottom: 24.0,
+            ),
+            child: Opacity(
+              opacity: 0.6,
+              child: RichText(
+                text: TextSpan(
+                  text:
+                      "Each round, you have to guess the author or the reference "
+                      "of the displayed quote. The question type alternate randomly."
+                      "For example, on the 1st round, you must guess the author, "
+                      "and on the next 2nd round, you must guess the reference.",
+                  style: TextStyle(
+                    color: stateColors.foreground,
+                    fontSize: textFontSize,
+                    fontWeight: FontWeight.w100,
+                  ),
+                  children: [],
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+              bottom: 24.0,
+            ),
+            child: Opacity(
+              opacity: 0.6,
+              child: RichText(
+                text: TextSpan(
+                  text: "For each good answer, you earn 10 points. "
+                      "Wrong answers make you loose 5 points."
+                      "1 point is used if you skip one question.",
+                  style: TextStyle(
+                    color: stateColors.foreground,
+                    fontSize: textFontSize,
+                    fontWeight: FontWeight.w100,
+                  ),
+                  children: [],
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+              bottom: 24.0,
+            ),
+            child: Opacity(
+              opacity: 0.6,
+              child: RichText(
+                text: TextSpan(
+                  text: "You can choose a game in 5 questions, "
+                      "10 questions or 20 questions.",
+                  style: TextStyle(
+                    color: stateColors.foreground,
+                    fontSize: textFontSize,
+                    fontWeight: FontWeight.w100,
+                  ),
+                  children: [],
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+              bottom: 24.0,
+            ),
+            child: Opacity(
+              opacity: 0.6,
+              child: RichText(
+                text: TextSpan(
+                  text: "Save your progress and your games "
+                      "by connecting to your account. Or create one "
+                      "if you didn't already.",
+                  style: TextStyle(
+                    color: stateColors.foreground,
+                    fontSize: textFontSize,
+                    fontWeight: FontWeight.w100,
+                  ),
+                  children: [],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget planCardFeature({String title, Color titleColor, Widget icon}) {
-    if (icon == null) {
-      icon = Icon(
-        UniconsLine.check,
-        color: stateColors.secondary,
-      );
-    }
+  Widget notStartedButtons() {
+    final questionsText = "questions";
 
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        icon,
         Padding(
           padding: const EdgeInsets.only(
-            left: 12.0,
+            top: 16.0,
+            bottom: 16.0,
           ),
-          child: Opacity(
-            opacity: 0.8,
-            child: titleColor != null
-                ? Text(title, style: TextStyle(color: titleColor))
-                : Text(title),
+          child: Wrap(
+            spacing: 16.0,
+            children: [
+              OutlinedButton(
+                onPressed: () {
+                  setState(() {
+                    maxQuestions = 5;
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0,
+                    vertical: 8.0,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (maxQuestions == 5) Icon(UniconsLine.check),
+                      Text("5 $questionsText"),
+                    ],
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  primary: maxQuestions == 5
+                      ? stateColors.secondary
+                      : stateColors.foreground,
+                ),
+              ),
+              OutlinedButton(
+                onPressed: () {
+                  setState(() {
+                    maxQuestions = 10;
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0,
+                    vertical: 8.0,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (maxQuestions == 10) Icon(UniconsLine.check),
+                      Text("10 $questionsText"),
+                    ],
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  primary: maxQuestions == 10
+                      ? stateColors.secondary
+                      : stateColors.foreground,
+                ),
+              ),
+              OutlinedButton(
+                onPressed: () {
+                  setState(() {
+                    maxQuestions = 20;
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0,
+                    vertical: 8.0,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (maxQuestions == 5) Icon(UniconsLine.check),
+                      Text("20 $questionsText"),
+                    ],
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  primary: maxQuestions == 20
+                      ? stateColors.secondary
+                      : stateColors.foreground,
+                ),
+              ),
+            ],
+          ),
+        ),
+        ElevatedButton(
+          onPressed: startGame,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 16.0,
+            ),
+            child: Wrap(
+              spacing: 8.0,
+              children: [
+                Text(
+                  "Start game",
+                  style: TextStyle(
+                    fontSize: 18.0,
+                  ),
+                ),
+                Icon(UniconsLine.arrow_right),
+              ],
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget quotePropCard() {
-    return SizedBox(
-      width: 100.0,
-      height: 150.0,
-      child: Card(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 8.0,
-                left: 8.0,
-                right: 8.0,
-              ),
-              child: Text(
-                "Quote",
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-            Divider(
-              thickness: 1.0,
-            ),
-            Opacity(
-              opacity: 0.6,
-              child: Text(
-                "name",
-                style: TextStyle(
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: fetchAuthorPropCard,
-              child: Text(
-                "author",
-                style: TextStyle(
-                  color: Colors.pink,
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            Opacity(
-              opacity: 0.6,
-              child: Text(
-                "...",
-                style: TextStyle(
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget quotidianMiniPlayground() {
-    return SizedBox(
-      width: 400.0,
-      height: 300.0,
-      child: Card(
-        elevation: 3.0,
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              color: stateColors.primary,
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: Icon(
-                      UniconsLine.angle_right,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Expanded(
-                    child: RichText(
-                      text: TextSpan(
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.4),
-                          fontSize: 16.0,
-                        ),
-                        text: "curl ",
-                        children: [
-                          TextSpan(
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w100,
-                            ),
-                            text: "https://api.fig.style/",
-                          ),
-                          TextSpan(
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            text: "v1/quotidian",
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ConstrainedBox(
-              constraints: BoxConstraints(minHeight: 200.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [quotidianCodeBlock()],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget quotidianCodeBlock() {
-    if (isLoadingQuotidian) {
-      return AnimatedAppIcon();
+  Widget proposalsBlock() {
+    if (questionType == 'author') {
+      return authorsRow();
     }
 
-    if (quotidianJson.isEmpty) {
-      return OutlinedButton(
-        onPressed: fetchQuotidian,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16.0,
-            vertical: 8.0,
+    return referencesRow();
+  }
+
+  Widget quoteBlock() {
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: 700.0),
+      child: Opacity(
+        opacity: 0.8,
+        child: Text(
+          quoteName,
+          style: TextStyle(
+            fontSize: 42.0,
+            fontWeight: FontWeight.w300,
+            decoration: TextDecoration.underline,
+            decorationColor: accentColor.withOpacity(0.2),
           ),
-          child: Text("Run"),
         ),
-      );
-    }
-
-    return SizedBox(
-      height: 236.0,
-      width: 390.0,
-      child: SyntaxView(
-        code: quotidianJson,
-        syntaxTheme: stateColors.background == Colors.black
-            ? SyntaxTheme.obsidian()
-            : SyntaxTheme.gravityLight(),
-        syntax: Syntax.JAVASCRIPT,
       ),
     );
   }
 
-  Widget richDataFeature() {
+  Widget referencesRow() {
+    int index = 0;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: questionResponse.referenceProposals.values.map(
+        (proposal) {
+          index++;
+
+          return FadeInX(
+            beginX: 20.0,
+            delay: Duration(milliseconds: 200 * index),
+            child: ImageCard(
+              name: proposal.name,
+              imageUrl: proposal.urls.image,
+              selected: selectedId == proposal.id,
+              onTap: () {
+                if (hasChosenAnswer) {
+                  return;
+                }
+
+                setState(() {
+                  hasChosenAnswer = true;
+                  selectedId = proposal.id;
+                });
+
+                checkAnswer(proposal.id);
+              },
+            ),
+          );
+        },
+      ).toList(),
+    );
+  }
+
+  Widget resultBlock() {
+    final message = answerResponse.isCorrect
+        ? "🎉 Yay! This was the correct answer! 🎉"
+        : "🙁 Sorry, this was not the correct answer. "
+            "It was ${answerResponse.correction.name}";
+
     return Container(
       width: 600.0,
-      padding: const EdgeInsets.symmetric(
-        vertical: 40.0,
-      ),
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 40.0,
+      padding: const EdgeInsets.only(bottom: 40.0),
+      child: Column(
         children: [
-          SizedBox(
-            width: 400.0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Opacity(
-                  opacity: 0.8,
-                  child: Text(
-                    "More than quotes",
-                    style: TextStyle(
-                      fontSize: 32.0,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    top: 8.0,
-                  ),
-                  child: Opacity(
-                    opacity: 0.6,
-                    child: Text(
-                      "We give maximum context to our data "
-                      "so you can often get an author or a reference "
-                      "alongside a quote. Authors and references "
-                      "have their own data.",
-                      style: TextStyle(
-                        fontSize: 18.0,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+          Text(
+            message,
+            style: TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.w400,
             ),
           ),
-          richDataDiagram(),
-        ],
-      ),
-    );
-  }
-
-  Widget richDataDiagram() {
-    return SizedBox(
-      width: 450.0,
-      height: 300.0,
-      child: Row(
-        children: [
-          quotePropCard(),
-          Icon(UniconsLine.arrow_right),
-          authorPropCard(),
-        ],
-      ),
-    );
-  }
-
-  Widget searchFeature() {
-    return Container(
-      width: 600.0,
-      padding: const EdgeInsets.symmetric(
-        vertical: 40.0,
-      ),
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 40.0,
-        children: [
-          searchMiniPlayground(),
-          SizedBox(
-            width: 400.0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Opacity(
-                  opacity: 0.8,
-                  child: Text(
-                    "Search",
-                    style: TextStyle(
-                      fontSize: 32.0,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    top: 8.0,
-                  ),
-                  child: Opacity(
-                    opacity: 0.6,
-                    child: Text(
-                      "There's a search endpoint "
-                      "to find quotes by keywords, topics, or language. "
-                      "You can also look for authors or references "
-                      "by names.",
-                      style: TextStyle(
-                        fontSize: 18.0,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          Wrap(
+            spacing: 20.0,
+            children: [
+              ElevatedButton(
+                onPressed: quitGame,
+                child: Text("Quit"),
+              ),
+              ElevatedButton(
+                onPressed: nextQuestion,
+                child: Text("Next question"),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget searchMiniPlayground() {
-    return SizedBox(
-      width: 400.0,
-      height: 300.0,
-      child: Card(
-        elevation: 3.0,
-        child: Column(
-          children: [
-            Container(
-              height: 60.0,
-              padding: const EdgeInsets.all(16.0),
-              color: stateColors.primary,
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: Icon(
-                      UniconsLine.angle_right,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 4.0),
-                    child: InkWell(
-                      onTap: () => _searchInputFocusNode.requestFocus(),
-                      child: Text(
-                        "v1/search/quotes?q=",
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.4),
-                          fontSize: 16.0,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: 100.0,
-                    padding: const EdgeInsets.only(right: 24.0),
-                    child: TextFormField(
-                      autofocus: false,
-                      focusNode: _searchInputFocusNode,
-                      textInputAction: TextInputAction.go,
-                      keyboardType: TextInputType.text,
-                      style: TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        hintText: 'révolution',
-                        hintStyle: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
-                        ),
-                        isDense: true,
-                      ),
-                      onChanged: (value) {
-                        searchQuery = value;
-                      },
-                      onFieldSubmitted: (value) => searchQuotes(),
-                    ),
-                  ),
-                  OutlinedButton(
-                    onPressed: searchQuotes,
-                    child: Text(
-                      "Run",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ConstrainedBox(
-              constraints: BoxConstraints(minHeight: 200.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [searchCodeBlock()],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget searchCodeBlock() {
-    if (isLoadingSearch) {
-      return AnimatedAppIcon();
+  Widget runningGameView() {
+    if (isLoading) {
+      return runningLoadingView();
     }
 
-    if (searchJson.isEmpty) {
-      return OutlinedButton(
-        onPressed: searchQuotes,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16.0,
-            vertical: 8.0,
-          ),
-          child: Text("Run"),
-        ),
-      );
-    }
-
-    return SizedBox(
-      height: 230.0,
-      width: 390.0,
-      child: SyntaxView(
-        code: searchJson,
-        syntaxTheme: stateColors.background == Colors.black
-            ? SyntaxTheme.obsidian()
-            : SyntaxTheme.gravityLight(),
-        syntax: Syntax.JAVASCRIPT,
-      ),
-    );
-  }
-
-  Widget techStack() {
     return SliverList(
       delegate: SliverChildListDelegate.fixed([
-        Container(
-          color: Color.fromRGBO(0, 0, 0, 0.05),
-          width: 600.0,
-          padding: const EdgeInsets.symmetric(
-            vertical: 60.0,
-            horizontal: 80.0,
+        Padding(
+          padding: const EdgeInsets.all(80.0),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height,
+            ),
+            child: Column(
+              children: [
+                checkingAnswerBlock(),
+                answerResultBlock(),
+                FadeInY(
+                  beginY: 20.0,
+                  delay: 100.milliseconds,
+                  child: quoteBlock(),
+                ),
+                FadeInY(
+                  beginY: 20.0,
+                  delay: 300.milliseconds,
+                  child: subtitleBlock(),
+                ),
+                FadeInY(
+                  beginY: 20.0,
+                  delay: 600.milliseconds,
+                  child: proposalsBlock(),
+                ),
+                FadeInY(
+                  beginY: 20.0,
+                  delay: 900.milliseconds,
+                  child: skipButton(),
+                ),
+                basicRules(),
+              ],
+            ),
           ),
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 40.0,
+        ),
+      ]),
+    );
+  }
+
+  Widget runningLoadingView() {
+    return SliverList(
+      delegate: SliverChildListDelegate.fixed([
+        SizedBox(
+          height: MediaQuery.of(context).size.height - 100.0,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              techStackLeft(),
-              teckStackRight(),
+              AnimatedAppIcon(),
+              Text(
+                "Loading...",
+                style: TextStyle(
+                  fontSize: 18.0,
+                ),
+              ),
             ],
           ),
         ),
@@ -1273,287 +794,228 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget techStackLeft() {
-    final logoSize = 60.0;
-
-    return Padding(
-      padding: const EdgeInsets.only(right: 10.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: Text(
-              "Tech Stack",
-              style: TextStyle(
-                fontSize: 40.0,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              InkWell(
-                onTap: () => launch("https://cloud.google.com/firestore"),
-                child: Image.asset(
-                  "assets/images/firestore_logo.png",
-                  width: logoSize + 10.0,
-                  height: logoSize + 10.0,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8.0,
-                ),
-                child: Icon(UniconsLine.plus),
-              ),
-              InkWell(
-                onTap: () =>
-                    launch("https://firebase.google.com/products/functions"),
-                child: Image.asset(
-                  "assets/images/firebase_cloud_functions_logo.png",
-                  width: logoSize,
-                  height: logoSize,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8.0,
-                ),
-                child: Icon(UniconsLine.plus),
-              ),
-              InkWell(
-                onTap: () => launch("https://algolia.com/"),
-                child: Image.asset(
-                  "assets/images/algolia_logo.png",
-                  width: logoSize,
-                  height: logoSize,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget teckStackRight() {
-    return SizedBox(
-      width: 400.0,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Opacity(
-            opacity: 0.6,
-            child: Text(
-              "We built our API on robust technologies",
-              style: TextStyle(
-                fontSize: 24.0,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Opacity(
-              opacity: 0.4,
-              child: Text(
-                "• Firestore as a NoSQL database, for speed and flexibility.",
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w200,
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Opacity(
-              opacity: 0.4,
-              child: Text(
-                "• Firebase Cloud Functions for the REST API brings optimized usage. ",
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w200,
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Opacity(
-              opacity: 0.4,
-              child: Text(
-                "• Algolia to build a custom search system.",
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w200,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget verticalCardImage() {
-    Widget imgWidget = Container();
-    final imageUrl = referenceHeader.urls.image;
-
-    if (imageUrl != null && imageUrl.isNotEmpty) {
-      imgWidget = Opacity(
-        opacity: 0.3,
-        child: Image.network(
-          imageUrl,
-          fit: BoxFit.cover,
-          width: 180.0,
-          height: 300.0,
-        ),
-      );
-    }
-
-    return Stack(
+  Widget shareGameButtons() {
+    return Wrap(
+      spacing: 24.0,
       children: [
-        imgWidget,
-        Positioned.fill(
-          child: Opacity(
-            opacity: 0.4,
-            child: Container(
-              color: _imageBackgroundColor,
-            ),
-          ),
+        TextButton.icon(
+          onPressed: () {
+            launch("${Constants.baseTwitterShareUrl}This game is fun!"
+                "${Constants.twitterShareHashtags}"
+                "&url=https://dis.fig.style");
+          },
+          icon: Icon(UniconsLine.twitter),
+          label: Text("Share on Twitter"),
+        ),
+        IconButton(
+          tooltip: "Copy link",
+          onPressed: () {
+            Clipboard.setData(
+              ClipboardData(text: Constants.disUrl),
+            );
+
+            showSnack(
+              context: context,
+              type: SnackType.info,
+              message: "Link successfully copied!",
+            );
+          },
+          icon: Icon(UniconsLine.link),
         ),
       ],
     );
   }
 
-  void fetchAuthorPropCard() async {
-    setState(() => isLoadingAuthorPropCard = true);
-
-    final today = DateTime.now();
-    final createdAt = today.subtract(Duration(days: Random().nextInt(265)));
-
-    try {
-      QuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection('authors')
-          .where('createdAt', isGreaterThan: createdAt)
-          .limit(1)
-          .get();
-
-      if (snapshot.size == 0) {
-        snapshot = await FirebaseFirestore.instance
-            .collection('authors')
-            .where('createdAt', isLessThan: createdAt)
-            .limit(1)
-            .get();
-      }
-
-      if (snapshot.size == 0) {
-        return;
-      }
-
-      final firstDoc = snapshot.docs.first;
-      final data = firstDoc.data();
-      data['id'] = firstDoc.id;
-
-      setState(() {
-        isLoadingAuthorPropCard = false;
-        author = Author.fromJSON(data);
-      });
-    } catch (error) {
-      setState(() => isLoadingAuthorPropCard = false);
-      debugPrint(error.toString());
-    }
+  Widget skipButton() {
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: 16.0,
+      ),
+      child: TextButton(
+        onPressed: skipQuestion,
+        child: Text(
+          "Skip that one...",
+        ),
+      ),
+    );
   }
 
-  void fetchQuotidian() async {
-    setState(() => isLoadingQuotidian = true);
+  Widget subtitleBlock() {
+    String helpText = questionType == 'author'
+        ? "Who, among these 3 authors, said that quote?"
+        : "What's that quote reference?";
 
-    try {
-      final response = await http.get(quotidianEndpoint);
-      final Map<String, dynamic> jsonObj = jsonDecode(response.body);
-
-      setState(() {
-        isLoadingQuotidian = false;
-        quotidianJson = prettyJson(jsonObj);
-      });
-    } catch (error) {
-      setState(() => isLoadingQuotidian = false);
-      debugPrint(error.toString());
-    }
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: 16.0,
+        bottom: 32.0,
+      ),
+      child: Opacity(
+        opacity: 0.5,
+        child: Text(
+          helpText,
+          style: TextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
   }
 
-  void fetchQuotesHeader() async {
-    try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('quotes')
-          .where('topics.motivation', isEqualTo: true)
-          .where('lang', isEqualTo: 'en')
-          .limit(3)
-          .get();
-
-      if (snapshot.size < 1) {
-        return;
-      }
-
-      snapshot.docs.forEach((element) {
-        final data = element.data();
-        data['id'] = element.id;
-        final quote = Quote.fromJSON(data);
-        quotesHeader.add(quote);
-      });
-
-      setState(() {});
-    } catch (error) {
-      debugPrint(error.toString());
-    }
-  }
-
-  void fetchHeaderReference() async {
-    try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('references')
-          .doc('6j6mk58xtcmANWo7FAQI')
-          .get();
-
-      if (!snapshot.exists) {
-        return;
-      }
-
-      final data = snapshot.data();
-      data['id'] = snapshot.id;
-
-      setState(() {
-        referenceHeader = Reference.fromJSON(data);
-      });
-    } catch (error) {
-      debugPrint(error.toString());
-    }
-  }
-
-  void searchQuotes() async {
+  void checkAnswer(String proposalId) async {
     setState(() {
-      isLoadingSearch = true;
-      searchQuery = searchQuery.isEmpty ? 'révolution' : searchQuery;
+      isCheckingAnswer = true;
     });
 
     try {
-      final response = await http.get(
-        '$searchQuotesEndpoint$searchQuery&limit=3',
+      final response = await http.post(
+        '$answerEndpoint',
         headers: {
           'authorization': ApiKeys.figStyle,
+        },
+        body: {
+          'answerProposalId': proposalId,
+          'guessType': questionType,
+          'quoteId': questionResponse.question.quote.id,
         },
       );
 
       final Map<String, dynamic> jsonObj = jsonDecode(response.body);
 
       setState(() {
-        isLoadingSearch = false;
-        searchJson = prettyJson(jsonObj);
+        answerResponse = GameAnswerResponse.fromJSON(jsonObj['response']);
+        isCheckingAnswer = false;
+        isCurrentQuestionCompleted = true;
+      });
+
+      print('checinkg answer done');
+
+      if (answerResponse.isCorrect) {
+        correctAnswers++;
+        return;
+      }
+    } catch (error) {
+      setState(() => isLoading = false);
+      debugPrint(error.toString());
+    }
+  }
+
+  void fetchQuestion() async {
+    setState(() {
+      isLoading = true;
+      isCheckingAnswer = false;
+      isCurrentQuestionCompleted = false;
+    });
+
+    try {
+      final response = await http.get(
+        '$questionEndpoint',
+        headers: {
+          'authorization': ApiKeys.figStyle,
+        },
+      );
+
+      final Map<String, dynamic> jsonObj = jsonDecode(response.body);
+      questionResponse = GameQuestionResponse.fromJSON(jsonObj['response']);
+
+      final topicName =
+          questionResponse.question.quote.topics.firstOrElse(() => "fun");
+
+      setState(() {
+        isLoading = false;
+
+        questionType = questionResponse.question.guessType;
+        quoteName = questionResponse.question.quote.name;
+        accentColor = appTopicsColors.getColorFor(topicName);
       });
     } catch (error) {
-      setState(() => isLoadingSearch = false);
+      setState(() => isLoading = false);
+      debugPrint(error.toString());
+    }
+  }
+
+  void nextQuestion() {
+    setState(() {
+      currentQuestion++;
+    });
+
+    fetchQuestion();
+  }
+
+  void quitGame() {
+    setState(() {
+      gameState = GameState.stopped;
+      currentQuestion = 0;
+    });
+  }
+
+  void skipQuestion() async {
+    setState(() {
+      currentQuestion++;
+      isCompleted = currentQuestion >= maxQuestions;
+      isLoading = !isCompleted;
+    });
+
+    fetchQuestion();
+  }
+
+  void startGame() {
+    setState(() {
+      currentQuestion = 0;
+      score = 0;
+      gameState = GameState.running;
+    });
+
+    fetchQuestion();
+  }
+
+  void fetchPresentationData() async {
+    final quotesFutures = <Future>[];
+    final referencesFutures = <Future>[];
+
+    for (var id in quotesIds) {
+      quotesFutures.add(fetchSingleQuote(id));
+    }
+
+    for (var id in referencesIds) {
+      referencesFutures.add(fetchSingleReference(id));
+    }
+
+    await Future.wait([...quotesFutures, ...referencesFutures]);
+    setState(() {});
+  }
+
+  Future fetchSingleQuote(String quoteId) async {
+    try {
+      final response = await http.get(
+        '$quoteEndpoint$quoteId',
+        headers: {
+          'authorization': ApiKeys.figStyle,
+        },
+      );
+
+      final Map<String, dynamic> jsonObj = jsonDecode(response.body);
+      final quote = Quote.fromJSON(jsonObj['response']);
+      quotesPresentation.add(quote);
+    } catch (error) {
+      debugPrint(error.toString());
+    }
+  }
+
+  Future fetchSingleReference(String referenceId) async {
+    try {
+      final response = await http.get(
+        '$referenceEndpoint$referenceId',
+        headers: {
+          'authorization': ApiKeys.figStyle,
+        },
+      );
+
+      final Map<String, dynamic> jsonObj = jsonDecode(response.body);
+      final reference = Reference.fromJSON(jsonObj['response']);
+      referencesPresentation.add(reference);
+    } catch (error) {
       debugPrint(error.toString());
     }
   }
