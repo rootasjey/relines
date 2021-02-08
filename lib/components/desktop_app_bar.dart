@@ -111,10 +111,27 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
                         padding: const EdgeInsets.only(left: 10.0),
                         onTap: widget.onTapIconHeader,
                       ),
-                    if (useGroupedDropdown)
-                      groupedDropdown()
-                    else
-                      ...separateDropdowns(),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16.0,
+                        right: 32.0,
+                      ),
+                      child: Text(
+                        "Beta",
+                        style: TextStyle(
+                          color: Colors.pink,
+                        ),
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: () {},
+                      icon: Icon(UniconsLine.bug),
+                      label: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text("Signal a bug"),
+                      ),
+                    ),
+                    if (useGroupedDropdown) groupedDropdown(),
                     if (widget.showCloseButton) closeButton(),
                   ],
                 ),
@@ -232,55 +249,6 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
       onPressed: context.router.pop,
       color: Theme.of(context).iconTheme.color,
       icon: Icon(Icons.close),
-    );
-  }
-
-  Widget developersDropdown() {
-    return PopupMenuButton<PageRouteInfo>(
-      tooltip: 'Developers',
-      child: Opacity(
-        opacity: 0.6,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 8.0,
-            vertical: 5.0,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              useIconButton
-                  ? Icon(Icons.computer, color: stateColors.foreground)
-                  : Text(
-                      'developers',
-                      style: TextStyle(
-                        color: stateColors.foreground,
-                        fontSize: 16.0,
-                      ),
-                    ),
-              Icon(
-                Icons.keyboard_arrow_down,
-                color: stateColors.foreground,
-              ),
-            ],
-          ),
-        ),
-      ),
-      itemBuilder: (_) => <PopupMenuEntry<PageRouteInfo>>[
-        developerEntry(
-          value: GitHubRoute(),
-          icon: Icon(
-            UniconsLine.github,
-            color: stateColors.foreground.withOpacity(0.6),
-          ),
-          textData: 'GitHub',
-        ),
-      ],
-      onSelected: (value) {
-        if (value.routeName == GitHubRoute.name) {
-          launch('https://github.com/rootasjey/fig.style');
-          return;
-        }
-      },
     );
   }
 
@@ -470,65 +438,6 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
     );
   }
 
-  Widget resourcesDropdown() {
-    return PopupMenuButton<PageRouteInfo>(
-      tooltip: 'Resources',
-      child: Opacity(
-        opacity: 0.6,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              useIconButton
-                  ? Icon(Icons.menu_book, color: stateColors.foreground)
-                  : Text(
-                      'resources',
-                      style: TextStyle(
-                        color: stateColors.foreground,
-                        fontSize: 16.0,
-                      ),
-                    ),
-              Icon(
-                Icons.keyboard_arrow_down,
-                color: stateColors.foreground,
-              ),
-            ],
-          ),
-        ),
-      ),
-      itemBuilder: (_) => <PopupMenuEntry<PageRouteInfo>>[
-        resourcesEntry(
-          value: AboutRoute(),
-          icon: Icon(
-            Icons.help_outline,
-            color: stateColors.foreground.withOpacity(0.6),
-          ),
-          textData: 'about',
-        ),
-        resourcesEntry(
-          value: ContactRoute(),
-          icon: Icon(
-            Icons.sms_outlined,
-            color: stateColors.foreground.withOpacity(0.6),
-          ),
-          textData: 'contact',
-        ),
-        resourcesEntry(
-          value: TosRoute(),
-          icon: Icon(
-            Icons.privacy_tip_outlined,
-            color: stateColors.foreground.withOpacity(0.6),
-          ),
-          textData: 'Privacy Terms',
-        ),
-      ],
-      onSelected: (value) {
-        context.router.root.push(value);
-      },
-    );
-  }
-
   Widget resourcesEntry({
     @required Widget icon,
     @required PageRouteInfo value,
@@ -560,19 +469,6 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
         ),
       ),
     );
-  }
-
-  List<Widget> separateDropdowns() {
-    return [
-      Padding(
-        padding: const EdgeInsets.only(left: 16.0),
-        child: developersDropdown(),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(left: 16.0),
-        child: resourcesDropdown(),
-      ),
-    ];
   }
 
   Widget settingsButton() {
