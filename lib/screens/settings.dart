@@ -14,7 +14,6 @@ import 'package:disfigstyle/utils/app_storage.dart';
 import 'package:disfigstyle/utils/brightness.dart';
 import 'package:disfigstyle/utils/constants.dart';
 import 'package:disfigstyle/utils/snack.dart';
-import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -66,8 +65,27 @@ class _SettingsState extends State<Settings> {
     checkAuth();
 
     isThemeAuto = appStorage.getAutoBrightness();
-    currentBrightness = DynamicTheme.of(context).brightness;
+
+    initBrightness();
+
     showAppBar = widget.showAppBar ?? false;
+  }
+
+  void initBrightness() {
+    final autoBrightness = appStorage.getAutoBrightness();
+
+    if (!autoBrightness) {
+      currentBrightness = appStorage.getBrightness();
+    } else {
+      Brightness brightness = Brightness.light;
+      final now = DateTime.now();
+
+      if (now.hour < 6 || now.hour > 17) {
+        brightness = Brightness.dark;
+      }
+
+      currentBrightness = brightness;
+    }
   }
 
   @override

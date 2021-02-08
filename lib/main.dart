@@ -1,3 +1,4 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:disfigstyle/router/app_router.gr.dart';
 import 'package:disfigstyle/router/auth_guard.dart';
 import 'package:disfigstyle/router/no_auth_guard.dart';
@@ -6,7 +7,6 @@ import 'package:disfigstyle/state/topics_colors.dart';
 import 'package:disfigstyle/state/user.dart';
 import 'package:disfigstyle/types/topic_color.dart';
 import 'package:disfigstyle/utils/app_storage.dart';
-import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -43,18 +43,29 @@ class _AppState extends State<App> {
     final brightness = getBrightness();
     stateColors.refreshTheme(brightness);
 
-    return DynamicTheme(
-      defaultBrightness: brightness,
-      data: (brightness) => ThemeData(
+    return AdaptiveTheme(
+      light: ThemeData(
+        brightness: Brightness.light,
+        primarySwatch: Colors.red,
+        accentColor: Colors.amber,
         fontFamily: GoogleFonts.ptSans().fontFamily,
-        brightness: brightness,
       ),
-      themedWidgetBuilder: (context, theme) {
+      dark: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.red,
+        accentColor: Colors.amber,
+        fontFamily: GoogleFonts.ptSans().fontFamily,
+      ),
+      initial: brightness == Brightness.light
+          ? AdaptiveThemeMode.light
+          : AdaptiveThemeMode.dark,
+      builder: (theme, darkTheme) {
         stateColors.themeData = theme;
 
         return MaterialApp.router(
           title: 'Did I Say?',
           theme: stateColors.themeData,
+          darkTheme: darkTheme,
           debugShowCheckedModeBanner: false,
           routerDelegate: appRouter.delegate(),
           routeInformationParser: appRouter.defaultRouteParser(),

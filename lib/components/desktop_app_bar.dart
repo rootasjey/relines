@@ -1,3 +1,4 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:disfigstyle/components/app_icon.dart';
 import 'package:disfigstyle/router/app_router.gr.dart';
@@ -7,7 +8,6 @@ import 'package:disfigstyle/types/enums.dart';
 import 'package:disfigstyle/utils/app_storage.dart';
 import 'package:disfigstyle/utils/brightness.dart';
 import 'package:disfigstyle/utils/navigation_helper.dart';
-import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:unicons/unicons.dart';
@@ -174,7 +174,12 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
               value == 'dark' ? Brightness.dark : Brightness.light;
 
           setBrightness(context, brightness);
-          DynamicTheme.of(context).setBrightness(brightness);
+
+          if (brightness == Brightness.dark) {
+            AdaptiveTheme.of(context).setDark();
+          } else {
+            AdaptiveTheme.of(context).setLight();
+          }
         },
         itemBuilder: (context) {
           final autoBrightness = appStorage.getAutoBrightness();
