@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:disfigstyle/types/app_rights.dart';
 import 'package:disfigstyle/types/app_stats.dart';
 import 'package:disfigstyle/types/app_urls.dart';
@@ -35,7 +34,7 @@ class UserApp {
 
   factory UserApp.fromJSON(Map<String, dynamic> data) {
     return UserApp(
-      createdAt: (data['createdAt'] as Timestamp)?.toDate(),
+      createdAt: (data['createdAt'])?.toDate(),
       description: data['description'] ?? '',
       id: data['id'],
       keys: AppKeys.fromJSON(data['keys']),
@@ -43,7 +42,7 @@ class UserApp {
       plan: data['plan'],
       rights: AppRights.fromJSON(data['rights']),
       stats: AppStats.fromJSON(data['stats']),
-      updatedAt: (data['createdAt'] as Timestamp)?.toDate(),
+      updatedAt: (data['createdAt'])?.toDate(),
       urls: AppUrls.fromJSON(data['urls']),
       user: PartialUser.fromJSON(data['user']),
     );

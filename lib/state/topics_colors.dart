@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'dart:ui';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:disfigstyle/types/topic_color.dart';
+import 'package:disfigstyle/utils/api_keys.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:mobx/mobx.dart';
 
 part 'topics_colors.g.dart';
@@ -14,21 +17,27 @@ abstract class TopicsColorsBase with Store {
 
   @action
   Future fetchTopicsColors() async {
-    final snapshot =
-        await FirebaseFirestore.instance.collection('topics').get();
+    try {
+      final response = await http.get(
+        'https://api.fig.style/v1/topics',
+        headers: {
+          'authorization': ApiKeys.figStyle,
+        },
+      );
 
-    if (snapshot.docs.isEmpty) {
-      return;
+      final Map<String, dynamic> jsonObj = jsonDecode(response.body);
+      final List<dynamic> rawList = jsonObj['response'];
+      final List<TopicColor> list = [];
+
+      rawList.forEach((element) {
+        final topicColor = TopicColor.fromJSON(element);
+        list.add(topicColor);
+      });
+
+      topicsColors = list;
+    } catch (error) {
+      debugPrint(error.toString());
     }
-
-    final List<TopicColor> list = [];
-
-    snapshot.docs.forEach((doc) {
-      final topicColor = TopicColor.fromJSON(doc.data());
-      list.add(topicColor);
-    });
-
-    topicsColors = list;
   }
 
   TopicColor find(String topic) {

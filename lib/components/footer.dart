@@ -1,6 +1,5 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:disfigstyle/router/app_router.gr.dart';
-import 'package:disfigstyle/state/user.dart';
 import 'package:disfigstyle/types/enums.dart';
 import 'package:disfigstyle/utils/constants.dart';
 import 'package:disfigstyle/utils/snack.dart';
@@ -229,15 +228,6 @@ class _FooterState extends State<Footer> {
   void onBeforeNav() {
     if (widget.closeModalOnNav) {
       context.router.pop();
-    }
-  }
-
-  void updateUserAccountLang() async {
-    final userAuth = stateUser.userAuth;
-
-    if (userAuth == null) {
-      notifyLangSuccess();
-      return;
     }
   }
 }

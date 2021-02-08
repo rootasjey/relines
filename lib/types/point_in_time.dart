@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class PointInTime {
   bool beforeJC;
   String country;
@@ -14,14 +12,7 @@ class PointInTime {
   });
 
   factory PointInTime.fromJSON(Map<String, dynamic> json) {
-    DateTime date;
-
-    if (json['date'].runtimeType == Timestamp) {
-      date = (json['date'] as Timestamp)?.toDate();
-    } else if (json['date'] != null && json['date']['_seconds'] != null) {
-      date =
-          DateTime.fromMillisecondsSinceEpoch(json['date']['_seconds'] * 1000);
-    }
+    final date = (json['date'])?.toDate();
 
     return PointInTime(
       beforeJC: json['beforeJC'],

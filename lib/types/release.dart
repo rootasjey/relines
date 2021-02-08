@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Release {
   /// Original release.
   DateTime original;
@@ -20,12 +18,14 @@ class Release {
       );
     }
 
-    if (json['original'].runtimeType != Timestamp) {
-      original = DateTime.fromMillisecondsSinceEpoch(
-          json['original']['_seconds'] * 1000);
-    } else {
-      original = (json['original'] as Timestamp)?.toDate();
-    }
+    original = DateTime.fromMillisecondsSinceEpoch(
+        json['original']['_seconds'] * 1000);
+    // if (json['original'].runtimeType != Timestamp) {
+    //   original = DateTime.fromMillisecondsSinceEpoch(
+    //       json['original']['_seconds'] * 1000);
+    // } else {
+    //   original = (json['original'] as Timestamp)?.toDate();
+    // }
 
     return Release(
       original: original,
