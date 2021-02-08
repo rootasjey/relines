@@ -1,4 +1,3 @@
-import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:disfigstyle/components/app_icon.dart';
 import 'package:disfigstyle/router/app_router.gr.dart';
@@ -124,7 +123,12 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
                       ),
                     ),
                     TextButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        launch(
+                          "https://github.com/rootasjey/dis.fig.style/"
+                          "issues",
+                        );
+                      },
                       icon: Icon(UniconsLine.bug),
                       label: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -174,12 +178,6 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
               value == 'dark' ? Brightness.dark : Brightness.light;
 
           setBrightness(context, brightness);
-
-          if (brightness == Brightness.dark) {
-            AdaptiveTheme.of(context).setDark();
-          } else {
-            AdaptiveTheme.of(context).setLight();
-          }
         },
         itemBuilder: (context) {
           final autoBrightness = appStorage.getAutoBrightness();
