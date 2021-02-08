@@ -64,7 +64,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
 
         return Observer(
           builder: (_) {
-            final userSectionWidgets = <Widget>[];
+            final userSectionWidgets = <Widget>[brightnessButton()];
 
             final mustShowNavBack = widget.automaticallyImplyLeading &&
                 context.router.root.stack.length > 1;
