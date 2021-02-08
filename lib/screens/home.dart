@@ -34,7 +34,6 @@ class _HomeState extends State<Home> {
   bool isLoading = false;
   bool isFabVisible = false;
   bool hasChosenAnswer = false;
-  bool isCompleted = false;
   bool isCheckingAnswer = false;
   bool isCurrentQuestionCompleted = false;
 
@@ -146,7 +145,95 @@ class _HomeState extends State<Home> {
       return Container();
     }
 
-    return Container();
+    Widget textMessageWidget = Text("");
+
+    if (answerResponse.isCorrect) {
+      textMessageWidget = Text(
+        "🎉 Yay! This was the correct answer! 🎉",
+        style: TextStyle(
+          fontSize: 16.0,
+          fontWeight: FontWeight.w400,
+        ),
+      );
+    } else {
+      textMessageWidget = RichText(
+        text: TextSpan(
+          text: "🙁  Sorry, this was not the correct answer. It was ",
+          style: TextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.w400,
+            color: stateColors.foreground,
+          ),
+          children: [
+            TextSpan(
+              text: answerResponse.correction.name,
+              style: TextStyle(
+                color: Colors.green,
+                fontSize: 16.0,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      width: 600.0,
+      padding: const EdgeInsets.only(bottom: 40.0),
+      child: Card(
+        elevation: 2.0,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: textMessageWidget,
+              ),
+              Wrap(
+                spacing: 20.0,
+                children: [
+                  OutlinedButton(
+                    onPressed: quitGame,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 12.0,
+                      ),
+                      child: Text("Quit"),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: nextQuestion,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 8.0,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            currentQuestion > maxQuestions
+                                ? "See results"
+                                : "Next question",
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Icon(UniconsLine.arrow_right),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget authorsRow() {
@@ -199,9 +286,15 @@ class _HomeState extends State<Home> {
     if (isCheckingAnswer) {
       return Wrap(
         spacing: 16.0,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          Text("Checking answer..."),
-          AnimatedAppIcon(),
+          Text(
+            "Checking answer...",
+            style: TextStyle(
+              fontSize: 16.0,
+            ),
+          ),
+          AnimatedAppIcon(size: 70.0),
         ],
       );
     }
@@ -212,21 +305,140 @@ class _HomeState extends State<Home> {
   Widget finishedView() {
     return SliverList(
       delegate: SliverChildListDelegate.fixed([
-        gameTitle(),
-        Text(
-          "Thank you for playing with us! ❤️",
-          style: TextStyle(
-            fontSize: 32.0,
-          ),
-        ),
-        Opacity(
-          opacity: 0.7,
-          child: Text(
-            "With a total of $score, you got $correctAnswers good answers "
-            "out of $maxQuestions",
-            style: TextStyle(
-              fontSize: 24.0,
-            ),
+        Container(
+          width: 700.0,
+          height: MediaQuery.of(context).size.height,
+          padding: const EdgeInsets.all(80.0),
+          child: Column(
+            children: [
+              gameTitle(),
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Opacity(
+                    opacity: 0.6,
+                    child: Text(
+                      "Thank you for playing with us!",
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.w100,
+                        decoration: TextDecoration.underline,
+                        decorationColor:
+                            stateColors.foreground.withOpacity(0.4),
+                        decorationStyle: TextDecorationStyle.solid,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Icon(
+                      UniconsLine.heart,
+                      color: Colors.pink,
+                    ),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 24.0),
+                child: Wrap(
+                  spacing: 12.0,
+                  children: [
+                    TextButton.icon(
+                      onPressed: () {
+                        setState(() => gameState = GameState.stopped);
+                      },
+                      icon: Icon(UniconsLine.home),
+                      label: Text("Return home"),
+                      style: TextButton.styleFrom(
+                        primary: stateColors.foreground.withOpacity(0.5),
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: startGame,
+                      icon: Icon(UniconsLine.refresh),
+                      label: Text("Play again"),
+                      style: TextButton.styleFrom(
+                        primary: stateColors.foreground.withOpacity(0.5),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 500.0,
+                padding: const EdgeInsets.only(top: 60.0),
+                child: Card(
+                  elevation: 4.0,
+                  color: Colors.transparent,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Wrap(
+                            spacing: 8.0,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Icon(
+                                UniconsLine.award,
+                                color: Colors.yellow.shade800,
+                              ),
+                              Text(
+                                "Result",
+                                style: TextStyle(
+                                  color: Colors.yellow.shade800,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        RichText(
+                          text: TextSpan(
+                            text: "You made a total of ",
+                            children: [
+                              TextSpan(
+                                text: "$score points, ",
+                                style: TextStyle(
+                                  fontSize: 24.0,
+                                  color: Colors.yellow.shade800,
+                                ),
+                              ),
+                              TextSpan(
+                                text: "you got ",
+                              ),
+                              TextSpan(
+                                text: "$correctAnswers good answers ",
+                                style: TextStyle(
+                                  fontSize: 24.0,
+                                  color: Colors.green.shade300,
+                                ),
+                              ),
+                              TextSpan(
+                                text: "out of ",
+                              ),
+                              TextSpan(
+                                text: "$maxQuestions in total.",
+                                style: TextStyle(
+                                  fontSize: 24.0,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ],
+                            style: TextStyle(
+                              fontSize: 24.0,
+                              color: stateColors.foreground.withOpacity(0.6),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              shareScoreButtons(),
+            ],
           ),
         ),
       ]),
@@ -247,6 +459,85 @@ class _HomeState extends State<Home> {
       style: TextStyle(
         fontSize: 60.0,
         fontFamily: GoogleFonts.pacifico().fontFamily,
+      ),
+    );
+  }
+
+  Widget hud() {
+    return Container(
+      width: 180.0,
+      child: Card(
+        elevation: 0.0,
+        color: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4.0),
+          side: BorderSide(
+            color: stateColors.primary,
+            width: 2.0,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Wrap(
+                  children: [
+                    Icon(
+                      UniconsLine.award,
+                      color: Colors.yellow.shade800,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4.0),
+                      child: Text("$score points"),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Wrap(
+                  children: [
+                    Icon(
+                      UniconsLine.question,
+                      color: Colors.green,
+                    ),
+                    Text("question $currentQuestion / $maxQuestions"),
+                  ],
+                ),
+              ),
+              Wrap(
+                alignment: WrapAlignment.start,
+                children: [
+                  TextButton(
+                    onPressed: quitGame,
+                    child: Wrap(
+                      children: [
+                        Text("Quit"),
+                      ],
+                    ),
+                    style: TextButton.styleFrom(
+                      primary: Colors.pink,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: skipQuestion,
+                    child: Wrap(
+                      children: [
+                        Text("Skip"),
+                      ],
+                    ),
+                    style: TextButton.styleFrom(
+                      primary: Colors.orange,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -350,6 +641,8 @@ class _HomeState extends State<Home> {
       return Container();
     }
 
+    int index = 0;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -359,12 +652,18 @@ class _HomeState extends State<Home> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: referencesPresentation.map((reference) {
-              return ImageCard(
-                width: 300.0,
-                height: 150.0,
-                name: reference.name,
-                imageUrl: reference.urls.image,
-                padding: EdgeInsets.zero,
+              index++;
+
+              return FadeInY(
+                beginY: 20.0,
+                delay: 100.milliseconds * index,
+                child: ImageCard(
+                  width: 300.0,
+                  height: 150.0,
+                  name: reference.name,
+                  imageUrl: reference.urls.image,
+                  padding: EdgeInsets.zero,
+                ),
               );
             }).toList(),
           ),
@@ -374,7 +673,10 @@ class _HomeState extends State<Home> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: quotesPresentation.map((quote) {
-              return miniQuoteCard(quote);
+              return FadeInY(
+                  beginY: 20.0,
+                  delay: 100.milliseconds * index,
+                  child: miniQuoteCard(quote));
             }).toList(),
           ),
         ),
@@ -690,42 +992,6 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget resultBlock() {
-    final message = answerResponse.isCorrect
-        ? "🎉 Yay! This was the correct answer! 🎉"
-        : "🙁 Sorry, this was not the correct answer. "
-            "It was ${answerResponse.correction.name}";
-
-    return Container(
-      width: 600.0,
-      padding: const EdgeInsets.only(bottom: 40.0),
-      child: Column(
-        children: [
-          Text(
-            message,
-            style: TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          Wrap(
-            spacing: 20.0,
-            children: [
-              ElevatedButton(
-                onPressed: quitGame,
-                child: Text("Quit"),
-              ),
-              ElevatedButton(
-                onPressed: nextQuestion,
-                child: Text("Next question"),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget runningGameView() {
     if (isLoading) {
       return runningLoadingView();
@@ -739,31 +1005,47 @@ class _HomeState extends State<Home> {
             constraints: BoxConstraints(
               minHeight: MediaQuery.of(context).size.height,
             ),
-            child: Column(
+            child: Stack(
               children: [
-                checkingAnswerBlock(),
-                answerResultBlock(),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 100.milliseconds,
-                  child: quoteBlock(),
+                Column(
+                  children: [
+                    checkingAnswerBlock(),
+                    answerResultBlock(),
+                    FadeInY(
+                      beginY: 20.0,
+                      delay: 100.milliseconds,
+                      child: quoteBlock(),
+                    ),
+                    FadeInY(
+                      beginY: 20.0,
+                      delay: 300.milliseconds,
+                      child: subtitleBlock(),
+                    ),
+                    FadeInY(
+                      beginY: 20.0,
+                      delay: 600.milliseconds,
+                      child: proposalsBlock(),
+                    ),
+                    FadeInY(
+                      beginY: 20.0,
+                      delay: 900.milliseconds,
+                      child: skipButton(),
+                    ),
+                    FadeInY(
+                      beginY: 20.0,
+                      delay: 1200.milliseconds,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 200.0),
+                        child: basicRules(),
+                      ),
+                    ),
+                  ],
                 ),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 300.milliseconds,
-                  child: subtitleBlock(),
+                Positioned(
+                  top: 0.0,
+                  right: 0.0,
+                  child: hud(),
                 ),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 600.milliseconds,
-                  child: proposalsBlock(),
-                ),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 900.milliseconds,
-                  child: skipButton(),
-                ),
-                basicRules(),
               ],
             ),
           ),
@@ -826,6 +1108,51 @@ class _HomeState extends State<Home> {
     );
   }
 
+  Widget shareScoreButtons() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 60.0),
+      child: Wrap(
+        spacing: 24.0,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          TextButton.icon(
+            onPressed: () {
+              launch(
+                "${Constants.baseTwitterShareUrl}I made a score of "
+                "$score points, answering right "
+                "to $correctAnswers out of $maxQuestions."
+                "${Constants.twitterShareHashtags}"
+                "&url=https://dis.fig.style",
+              );
+            },
+            icon: Icon(UniconsLine.twitter),
+            label: Text("Share on Twitter"),
+          ),
+          IconButton(
+            tooltip: "Copy result message",
+            onPressed: () {
+              Clipboard.setData(
+                ClipboardData(
+                  text: "I made a score of "
+                      "$score points, answering right "
+                      "to $correctAnswers out of $maxQuestions. "
+                      "Can you do more? (${Constants.disUrl})",
+                ),
+              );
+
+              showSnack(
+                context: context,
+                type: SnackType.info,
+                message: "Link successfully copied!",
+              );
+            },
+            icon: Icon(UniconsLine.link),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget skipButton() {
     return Padding(
       padding: const EdgeInsets.only(
@@ -864,6 +1191,12 @@ class _HomeState extends State<Home> {
   }
 
   void checkAnswer(String proposalId) async {
+    _scrollController.animateTo(
+      0,
+      curve: Curves.bounceOut,
+      duration: 250.milliseconds,
+    );
+
     setState(() {
       isCheckingAnswer = true;
     });
@@ -889,15 +1222,32 @@ class _HomeState extends State<Home> {
         isCurrentQuestionCompleted = true;
       });
 
-      print('checinkg answer done');
-
       if (answerResponse.isCorrect) {
-        correctAnswers++;
+        setState(() {
+          correctAnswers++;
+          score += 10;
+        });
         return;
       }
+
+      setState(() {
+        score -= 5;
+      });
     } catch (error) {
       setState(() => isLoading = false);
       debugPrint(error.toString());
+      debugPrint(
+        "This was the quote to answer: "
+        "${questionResponse.question.quote.id}",
+      );
+      debugPrint(
+        "This was the proposed answer: "
+        "$proposalId",
+      );
+      debugPrint(
+        "This was the guess type: "
+        "$questionType",
+      );
     }
   }
 
@@ -938,32 +1288,51 @@ class _HomeState extends State<Home> {
   void nextQuestion() {
     setState(() {
       currentQuestion++;
+      gameState = currentQuestion > maxQuestions
+          ? GameState.finished
+          : GameState.running;
+      hasChosenAnswer = false;
     });
+
+    if (gameState == GameState.finished) {
+      return;
+    }
 
     fetchQuestion();
   }
 
   void quitGame() {
     setState(() {
-      gameState = GameState.stopped;
+      score = 0;
       currentQuestion = 0;
+      hasChosenAnswer = false;
+      gameState = GameState.stopped;
     });
   }
 
   void skipQuestion() async {
     setState(() {
       currentQuestion++;
-      isCompleted = currentQuestion >= maxQuestions;
-      isLoading = !isCompleted;
+      hasChosenAnswer = false;
+      gameState = currentQuestion > maxQuestions
+          ? GameState.finished
+          : GameState.running;
+      isLoading = false;
+      score -= 1;
     });
+
+    if (gameState == GameState.finished) {
+      return;
+    }
 
     fetchQuestion();
   }
 
   void startGame() {
     setState(() {
-      currentQuestion = 0;
       score = 0;
+      currentQuestion = 1;
+      hasChosenAnswer = false;
       gameState = GameState.running;
     });
 
