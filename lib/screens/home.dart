@@ -851,7 +851,7 @@ class _HomeState extends State<Home> {
                 style: OutlinedButton.styleFrom(
                   primary: maxQuestions == 5
                       ? stateColors.secondary
-                      : stateColors.foreground,
+                      : Theme.of(context).textTheme.bodyText1.color,
                 ),
               ),
               OutlinedButton(
