@@ -1,3 +1,5 @@
+import 'package:disfigstyle/state/colors.dart';
+import 'package:disfigstyle/types/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
 
@@ -11,6 +13,7 @@ class ImageCard extends StatefulWidget {
   final bool selected;
   final Color selectionColor;
   final EdgeInsets padding;
+  final ImageCardType type;
 
   const ImageCard({
     Key key,
@@ -23,6 +26,7 @@ class ImageCard extends StatefulWidget {
     this.imageBackgroundColor = Colors.black,
     this.selected = false,
     this.selectionColor = Colors.blue,
+    this.type = ImageCardType.compact,
   }) : super(key: key);
 
   @override
@@ -73,6 +77,14 @@ class _ImageCardState extends State<ImageCard> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.type == ImageCardType.compact) {
+      return compactLayout();
+    }
+
+    return extendedLayout();
+  }
+
+  Widget compactLayout() {
     return Container(
       width: widget.width,
       height: widget.height,
@@ -105,34 +117,90 @@ class _ImageCardState extends State<ImageCard> with TickerProviderStateMixin {
             },
             child: Stack(
               children: [
-                Stack(
-                  children: [
-                    background(),
-                    Positioned(
-                      bottom: 0.0,
-                      left: 0.0,
-                      child: Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: Opacity(
-                          opacity: 0.8,
-                          child: Text(
-                            widget.name,
-                            maxLines: 6,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
+                background(),
+                Positioned(
+                  bottom: 0.0,
+                  left: 0.0,
+                  child: Container(
+                    width: widget.width,
+                    padding: const EdgeInsets.all(8.0),
+                    child: Opacity(
+                      opacity: 0.8,
+                      child: Text(
+                        widget.name,
+                        maxLines: 6,
+                        softWrap: true,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget extendedLayout() {
+    return Container(
+      width: widget.width,
+      padding: const EdgeInsets.only(right: 20.0),
+      child: Column(
+        children: [
+          ScaleTransition(
+            scale: scaleAnimation,
+            child: Card(
+              elevation: elevation,
+              shape: widget.selected
+                  ? RoundedRectangleBorder(
+                      side: BorderSide(
+                        color: widget.selectionColor,
+                        width: 3.0,
+                      ),
+                    )
+                  : null,
+              child: InkWell(
+                onTap: widget.onTap,
+                onHover: (isHover) {
+                  if (isHover) {
+                    scaleAnimationController.forward();
+                  } else {
+                    scaleAnimationController.reverse();
+                  }
+
+                  setState(() {
+                    elevation = isHover ? hoverElevation : initialElevation;
+                    imgBgColor = isHover ? hoverImgBgColor : initialImgBgColor;
+                  });
+                },
+                child: background(),
+              ),
+            ),
+          ),
+          Container(
+            // width: widget.width,
+            padding: const EdgeInsets.all(8.0),
+            child: Opacity(
+              opacity: 0.8,
+              child: Text(
+                widget.name,
+                softWrap: true,
+                // textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: stateColors.foreground,
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -158,7 +226,7 @@ class _ImageCardState extends State<ImageCard> with TickerProviderStateMixin {
         imgWidget,
         Positioned.fill(
           child: Opacity(
-            opacity: 0.4,
+            opacity: 0.5,
             child: Container(
               color: imgBgColor,
             ),

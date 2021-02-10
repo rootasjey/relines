@@ -258,6 +258,7 @@ class _HomeState extends State<Home> {
             delay: Duration(milliseconds: 200 * index),
             child: ImageCard(
               name: proposal.name,
+              type: ImageCardType.extended,
               imageUrl: proposal.urls.image,
               selected: selectedId == proposal.id,
               onTap: () {
@@ -980,6 +981,7 @@ class _HomeState extends State<Home> {
             delay: Duration(milliseconds: 200 * index),
             child: ImageCard(
               name: proposal.name,
+              type: ImageCardType.extended,
               imageUrl: proposal.urls.image,
               selected: selectedId == proposal.id,
               onTap: () {
