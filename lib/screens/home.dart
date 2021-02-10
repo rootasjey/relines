@@ -60,6 +60,7 @@ class _HomeState extends State<Home> {
   List<Reference> references = [];
   List<Reference> referencesPresentation = [];
   List<Quote> quotesPresentation = [];
+  List<String> previousQuestionsIds = [];
 
   List<String> quotesIds = [
     "0EUE8cUP09nQkO4A70oa",
@@ -1199,6 +1200,7 @@ class _HomeState extends State<Home> {
 
     setState(() {
       isCheckingAnswer = true;
+      previousQuestionsIds.add(proposalId);
     });
 
     try {
@@ -1259,10 +1261,13 @@ class _HomeState extends State<Home> {
     });
 
     try {
-      final response = await http.get(
+      final response = await http.post(
         '$questionEndpoint',
         headers: {
           'authorization': ApiKeys.figStyle,
+        },
+        body: {
+          'previousQuestionsIds': jsonEncode(previousQuestionsIds),
         },
       );
 
