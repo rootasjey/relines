@@ -15,9 +15,9 @@ class PointInTime {
     var date = DateTime.now();
 
     if (json['date'] != null) {
-      if (json['date']['_seconds']) {
+      if (json['date']['_seconds'] != null) {
         date = DateTime.fromMillisecondsSinceEpoch(
-            json['original']['_seconds'] * 1000);
+            json['date']['_seconds'] * 1000);
       } else {
         date = (json['date']).toDate();
       }
