@@ -183,19 +183,20 @@ class _ImageCardState extends State<ImageCard> with TickerProviderStateMixin {
               ),
             ),
           ),
-          Container(
-            // width: widget.width,
-            padding: const EdgeInsets.all(8.0),
-            child: Opacity(
-              opacity: 0.8,
-              child: Text(
-                widget.name,
-                softWrap: true,
-                // textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: stateColors.foreground,
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.w800,
+          InkWell(
+            onTap: widget.onTap,
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              child: Opacity(
+                opacity: 0.8,
+                child: Text(
+                  widget.name,
+                  softWrap: true,
+                  style: TextStyle(
+                    color: stateColors.foreground,
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
             ),
@@ -206,7 +207,11 @@ class _ImageCardState extends State<ImageCard> with TickerProviderStateMixin {
   }
 
   Widget background() {
-    Widget imgWidget = Container();
+    Widget imgWidget = Container(
+      width: widget.width,
+      height: widget.height,
+    );
+
     final imageUrl = widget.imageUrl;
 
     if (imageUrl != null && imageUrl.isNotEmpty) {
