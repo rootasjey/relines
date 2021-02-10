@@ -46,10 +46,14 @@ class _HomeState extends State<Home> {
   int correctAnswers = 0;
   int score = 0;
 
+  int currentFetchRetry = 0;
+  int maxFetchRetry = 3;
+
   final questionEndpoint = "https://api.fig.style/v1/dis/random";
   final answerEndpoint = "https://api.fig.style/v1/dis/check";
   final quoteEndpoint = "https://api.fig.style/v1/quotes/";
   final referenceEndpoint = "https://api.fig.style/v1/references/";
+  final authorEndpoint = "https://api.fig.style/v1/authors/";
 
   GameAnswerResponse answerResponse;
   GameQuestionResponse questionResponse;
@@ -71,6 +75,8 @@ class _HomeState extends State<Home> {
     "EDRwqgBONNg8cAaAhg8q", // La Révolution
     "F2Li6Usbb6EH4qVFU1zD", // Chilling avdventure of Sabrina
   ];
+
+  Map<String, dynamic> responseJsonData;
 
   String quoteName = '';
   String questionType = 'author';
@@ -1268,6 +1274,7 @@ class _HomeState extends State<Home> {
       isLoading = true;
       isCheckingAnswer = false;
       isCurrentQuestionCompleted = false;
+      selectedId = '';
     });
 
     try {
@@ -1281,14 +1288,16 @@ class _HomeState extends State<Home> {
         },
       );
 
-      final Map<String, dynamic> jsonObj = jsonDecode(response.body);
-      questionResponse = GameQuestionResponse.fromJSON(jsonObj['response']);
+      responseJsonData = jsonDecode(response.body);
+      questionResponse =
+          GameQuestionResponse.fromJSON(responseJsonData['response']);
 
       final topicName =
           questionResponse.question.quote.topics.firstOrElse(() => "fun");
 
       setState(() {
         isLoading = false;
+        currentFetchRetry = 0;
 
         questionType = questionResponse.question.guessType;
         quoteName = questionResponse.question.quote.name;
@@ -1296,8 +1305,22 @@ class _HomeState extends State<Home> {
       });
     } catch (error) {
       setState(() => isLoading = false);
+      print('-------------------');
+      debugPrint(responseJsonData.toJSON());
+      print('-------------------');
       debugPrint(error.toString());
+      retryFetch();
     }
+  }
+
+  void retryFetch() {
+    debugPrint("Retry $currentFetchRetry / $maxFetchRetry");
+    if (currentFetchRetry > maxFetchRetry) {
+      return;
+    }
+
+    currentFetchRetry++;
+    fetchQuestion();
   }
 
   void nextQuestion() {
