@@ -12,7 +12,16 @@ class PointInTime {
   });
 
   factory PointInTime.fromJSON(Map<String, dynamic> json) {
-    final date = (json['date'])?.toDate();
+    var date = DateTime.now();
+
+    if (json['date'] != null) {
+      if (json['date']['_seconds']) {
+        date = DateTime.fromMillisecondsSinceEpoch(
+            json['original']['_seconds'] * 1000);
+      } else {
+        date = (json['date']).toDate();
+      }
+    }
 
     return PointInTime(
       beforeJC: json['beforeJC'],
