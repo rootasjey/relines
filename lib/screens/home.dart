@@ -126,11 +126,13 @@ class _HomeState extends State<Home> {
             DesktopAppBar(
               padding: const EdgeInsets.only(left: 65.0),
               onTapIconHeader: () {
-                _scrollController.animateTo(
-                  0,
-                  duration: 250.milliseconds,
-                  curve: Curves.decelerate,
-                );
+                if (_scrollController.offset < 10.0) {
+                  setState(() {
+                    gameState = GameState.stopped;
+                  });
+
+                  return;
+                }
               },
             ),
             body(),
