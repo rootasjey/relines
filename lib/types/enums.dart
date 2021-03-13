@@ -83,6 +83,11 @@ enum HeaderViewType {
   search,
 }
 
+enum ImageCardType {
+  compact,
+  extended,
+}
+
 enum ImageShareColor {
   dark,
   light,

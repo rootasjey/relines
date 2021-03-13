@@ -254,6 +254,7 @@ class _HomeState extends State<Home> {
               name: proposal.name,
               imageUrl: proposal.urls.image,
               selected: selectedId == proposal.id,
+              type: ImageCardType.extended,
               onTap: () {
                 if (hasChosenAnswer) {
                   return;
@@ -976,6 +977,7 @@ class _HomeState extends State<Home> {
               name: proposal.name,
               imageUrl: proposal.urls.image,
               selected: selectedId == proposal.id,
+              type: ImageCardType.extended,
               onTap: () {
                 if (hasChosenAnswer) {
                   return;

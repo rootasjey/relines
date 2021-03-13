@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:relines/utils/date_helper.dart';
 
 class PointInTime {
