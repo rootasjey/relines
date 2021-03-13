@@ -64,7 +64,7 @@ class _AppState extends State<App> {
         stateColors.themeData = theme;
 
         return MaterialApp.router(
-          title: 'Did I Say?',
+          title: 'Relines',
           theme: stateColors.themeData,
           darkTheme: darkTheme,
           debugShowCheckedModeBanner: false,
