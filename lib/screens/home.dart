@@ -412,7 +412,7 @@ class _HomeState extends State<Home> {
                                 text: "$correctAnswers good answers ",
                                 style: TextStyle(
                                   fontSize: 24.0,
-                                  color: Colors.green.shade300,
+                                  color: Colors.yellow.shade800,
                                 ),
                               ),
                               TextSpan(
@@ -422,7 +422,7 @@ class _HomeState extends State<Home> {
                                 text: "$maxQuestions in total.",
                                 style: TextStyle(
                                   fontSize: 24.0,
-                                  color: Colors.blue,
+                                  color: Colors.yellow.shade800,
                                 ),
                               ),
                             ],
