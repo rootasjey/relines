@@ -26,12 +26,6 @@ class _DashboardPageState extends State<DashboardPage> {
   ];
 
   @override
-  void initState() {
-    super.initState();
-    // tryAddAdminPage();
-  }
-
-  @override
   Widget build(context) {
     return AutoRouter(
       builder: (context, child) {
