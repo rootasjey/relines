@@ -1,5 +1,5 @@
-import 'package:disfigstyle/components/desktop_app_bar.dart';
-import 'package:disfigstyle/components/footer.dart';
+import 'package:relines/components/desktop_app_bar.dart';
+import 'package:relines/components/footer.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';

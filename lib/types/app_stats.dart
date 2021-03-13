@@ -1,4 +1,4 @@
-import 'package:disfigstyle/types/app_stats_calls.dart';
+import 'package:relines/types/app_stats_calls.dart';
 
 class AppStats {
   final int usedBy;

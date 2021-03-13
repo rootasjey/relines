@@ -1,4 +1,4 @@
-import 'package:disfigstyle/components/animated_app_icon.dart';
+import 'package:relines/components/animated_app_icon.dart';
 import 'package:flutter/material.dart';
 
 class LoadingAnimation extends StatelessWidget {

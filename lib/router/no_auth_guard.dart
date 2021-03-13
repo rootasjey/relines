@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:disfigstyle/router/app_router.gr.dart';
-import 'package:disfigstyle/state/user.dart';
+import 'package:relines/router/app_router.gr.dart';
+import 'package:relines/state/user.dart';
 
 class NoAuthGuard extends AutoRouteGuard {
   @override

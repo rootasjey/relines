@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:disfigstyle/components/app_icon.dart';
-import 'package:disfigstyle/components/base_page_app_bar.dart';
-import 'package:disfigstyle/components/circle_button.dart';
-import 'package:disfigstyle/state/colors.dart';
-import 'package:disfigstyle/types/enums.dart';
+import 'package:relines/components/app_icon.dart';
+import 'package:relines/components/base_page_app_bar.dart';
+import 'package:relines/components/circle_button.dart';
+import 'package:relines/state/colors.dart';
+import 'package:relines/types/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 

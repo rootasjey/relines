@@ -1,5 +1,5 @@
-import 'package:disfigstyle/types/enums.dart';
-import 'package:disfigstyle/utils/flash_helper.dart';
+import 'package:relines/types/enums.dart';
+import 'package:relines/utils/flash_helper.dart';
 import 'package:flutter/material.dart';
 
 Future showSnack({

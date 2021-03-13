@@ -1,4 +1,4 @@
-import 'package:disfigstyle/types/partial_user_app.dart';
+import 'package:relines/types/partial_user_app.dart';
 
 class RequestAppResponse {
   final bool success;

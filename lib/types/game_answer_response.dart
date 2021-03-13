@@ -1,5 +1,5 @@
-import 'package:disfigstyle/types/answer_correction.dart';
-import 'package:disfigstyle/types/question.dart';
+import 'package:relines/types/answer_correction.dart';
+import 'package:relines/types/question.dart';
 
 class GameAnswerResponse {
   final Question question;

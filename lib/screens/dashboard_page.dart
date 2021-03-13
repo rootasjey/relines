@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:disfigstyle/components/desktop_app_bar.dart';
-import 'package:disfigstyle/router/app_router.gr.dart';
-import 'package:disfigstyle/state/colors.dart';
-import 'package:disfigstyle/state/user.dart';
-import 'package:disfigstyle/types/side_menu_item.dart';
+import 'package:relines/components/desktop_app_bar.dart';
+import 'package:relines/router/app_router.gr.dart';
+import 'package:relines/state/colors.dart';
+import 'package:relines/state/user.dart';
+import 'package:relines/types/side_menu_item.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 

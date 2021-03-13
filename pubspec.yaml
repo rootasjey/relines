@@ -1,5 +1,5 @@
-name: disfigstyle
-description: A new Flutter project.
+name: relines
+description: A quotes game.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -58,11 +58,19 @@ dependencies:
 
 dev_dependencies:
   auto_route_generator: 1.0.0-beta.7
+  flutter_rename_app: 1.0.0
   build_runner:
   flutter_test:
     sdk: flutter
   integration_test:
     sdk: flutter
+
+flutter_rename_app:
+  application_name: Relines
+  dart_package_name: relines
+  application_id: style.android.relines
+  bundle_id: style.ios.relines
+  android_package_name: style.android.relines
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

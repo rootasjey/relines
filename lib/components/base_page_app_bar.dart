@@ -1,5 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:disfigstyle/state/colors.dart';
+import 'package:relines/state/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 

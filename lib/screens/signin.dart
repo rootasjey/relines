@@ -1,15 +1,15 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:disfigstyle/actions/users.dart';
-import 'package:disfigstyle/components/desktop_app_bar.dart';
-import 'package:disfigstyle/components/fade_in_x.dart';
-import 'package:disfigstyle/components/fade_in_y.dart';
-import 'package:disfigstyle/components/loading_animation.dart';
-import 'package:disfigstyle/router/app_router.gr.dart';
-import 'package:disfigstyle/state/colors.dart';
-import 'package:disfigstyle/state/user.dart';
-import 'package:disfigstyle/types/enums.dart';
-import 'package:disfigstyle/utils/app_storage.dart';
-import 'package:disfigstyle/utils/snack.dart';
+import 'package:relines/actions/users.dart';
+import 'package:relines/components/desktop_app_bar.dart';
+import 'package:relines/components/fade_in_x.dart';
+import 'package:relines/components/fade_in_y.dart';
+import 'package:relines/components/loading_animation.dart';
+import 'package:relines/router/app_router.gr.dart';
+import 'package:relines/state/colors.dart';
+import 'package:relines/state/user.dart';
+import 'package:relines/types/enums.dart';
+import 'package:relines/utils/app_storage.dart';
+import 'package:relines/utils/snack.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
 

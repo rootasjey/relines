@@ -1,5 +1,5 @@
-import 'package:disfigstyle/types/author.dart';
-import 'package:disfigstyle/types/reference.dart';
+import 'package:relines/types/author.dart';
+import 'package:relines/types/reference.dart';
 
 class Quote {
   final Author author;

@@ -1,6 +1,6 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
-import 'package:disfigstyle/state/colors.dart';
-import 'package:disfigstyle/utils/app_storage.dart';
+import 'package:relines/state/colors.dart';
+import 'package:relines/utils/app_storage.dart';
 import 'package:flutter/material.dart';
 
 /// Refresh current theme with auto brightness.

@@ -1,5 +1,5 @@
-import 'package:disfigstyle/types/cloud_func_error.dart';
-import 'package:disfigstyle/types/partial_user.dart';
+import 'package:relines/types/cloud_func_error.dart';
+import 'package:relines/types/partial_user.dart';
 
 class UpdateEmailResp {
   bool success;

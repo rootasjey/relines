@@ -1,6 +1,6 @@
-import 'package:disfigstyle/components/desktop_app_bar.dart';
-import 'package:disfigstyle/state/colors.dart';
-import 'package:disfigstyle/utils/constants.dart';
+import 'package:relines/components/desktop_app_bar.dart';
+import 'package:relines/state/colors.dart';
+import 'package:relines/utils/constants.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';

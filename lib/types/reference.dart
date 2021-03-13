@@ -1,6 +1,6 @@
-import 'package:disfigstyle/types/reference_type.dart';
-import 'package:disfigstyle/types/release.dart';
-import 'package:disfigstyle/types/urls.dart';
+import 'package:relines/types/reference_type.dart';
+import 'package:relines/types/release.dart';
+import 'package:relines/types/urls.dart';
 
 class Reference {
   /// When this reference was released.

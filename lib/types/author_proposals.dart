@@ -1,4 +1,4 @@
-import 'package:disfigstyle/types/author.dart';
+import 'package:relines/types/author.dart';
 
 class AuthorProposals {
   final String type;

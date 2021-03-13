@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:disfigstyle/types/app_rights.dart';
-import 'package:disfigstyle/types/app_stats.dart';
-import 'package:disfigstyle/types/app_urls.dart';
-import 'package:disfigstyle/types/partial_user.dart';
-import 'package:disfigstyle/types/app_keys.dart';
+import 'package:relines/types/app_rights.dart';
+import 'package:relines/types/app_stats.dart';
+import 'package:relines/types/app_urls.dart';
+import 'package:relines/types/partial_user.dart';
+import 'package:relines/types/app_keys.dart';
 import 'package:flutter/material.dart';
 
 class UserApp {

@@ -1,6 +1,6 @@
 import 'package:cross_local_storage/cross_local_storage.dart';
-import 'package:disfigstyle/types/enums.dart';
-import 'package:disfigstyle/utils/storage_keys.dart';
+import 'package:relines/types/enums.dart';
+import 'package:relines/utils/storage_keys.dart';
 import 'package:flutter/material.dart';
 
 class AppStorage {

@@ -1,4 +1,4 @@
-import 'package:disfigstyle/types/partial_user.dart';
+import 'package:relines/types/partial_user.dart';
 
 class PartialUserApp {
   final String id;

@@ -1,4 +1,4 @@
-import 'package:disfigstyle/state/colors.dart';
+import 'package:relines/state/colors.dart';
 import 'package:flutter/material.dart';
 
 class CreditItem extends StatefulWidget {

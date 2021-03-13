@@ -1,6 +1,6 @@
-import 'package:disfigstyle/types/from_reference.dart';
-import 'package:disfigstyle/types/point_in_time.dart';
-import 'package:disfigstyle/types/urls.dart';
+import 'package:relines/types/from_reference.dart';
+import 'package:relines/types/point_in_time.dart';
+import 'package:relines/types/urls.dart';
 
 class Author {
   /// Useful if the author is fictional.

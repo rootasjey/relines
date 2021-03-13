@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:disfigstyle/router/app_router.gr.dart';
-import 'package:disfigstyle/state/user.dart';
-import 'package:disfigstyle/types/enums.dart';
-import 'package:disfigstyle/utils/constants.dart';
-import 'package:disfigstyle/utils/snack.dart';
+import 'package:relines/router/app_router.gr.dart';
+import 'package:relines/state/user.dart';
+import 'package:relines/types/enums.dart';
+import 'package:relines/utils/constants.dart';
+import 'package:relines/utils/snack.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';

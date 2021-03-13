@@ -1,4 +1,4 @@
-import 'package:disfigstyle/types/reference.dart';
+import 'package:relines/types/reference.dart';
 
 class ReferenceProposals {
   final String type;

@@ -1,6 +1,6 @@
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:disfigstyle/types/cloud_func_error.dart';
-import 'package:disfigstyle/types/create_account_resp.dart';
+import 'package:relines/types/cloud_func_error.dart';
+import 'package:relines/types/create_account_resp.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

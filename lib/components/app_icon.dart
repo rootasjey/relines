@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:disfigstyle/components/footer.dart';
-import 'package:disfigstyle/router/app_router.gr.dart';
+import 'package:relines/components/footer.dart';
+import 'package:relines/router/app_router.gr.dart';
 import 'package:flutter/material.dart';
 
 class AppIcon extends StatefulWidget {

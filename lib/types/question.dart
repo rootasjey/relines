@@ -1,4 +1,4 @@
-import 'package:disfigstyle/types/quote_question.dart';
+import 'package:relines/types/quote_question.dart';
 
 class Question {
   final String guessType;

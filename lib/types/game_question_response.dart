@@ -1,7 +1,7 @@
-import 'package:disfigstyle/types/author_proposals.dart';
-import 'package:disfigstyle/types/enums.dart';
-import 'package:disfigstyle/types/question.dart';
-import 'package:disfigstyle/types/reference_proposals.dart';
+import 'package:relines/types/author_proposals.dart';
+import 'package:relines/types/enums.dart';
+import 'package:relines/types/question.dart';
+import 'package:relines/types/reference_proposals.dart';
 
 class GameQuestionResponse {
   final Question question;
