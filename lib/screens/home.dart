@@ -15,6 +15,7 @@ import 'package:relines/types/game_question_response.dart';
 import 'package:relines/types/quote.dart';
 import 'package:relines/types/reference.dart';
 import 'package:relines/utils/api_keys.dart';
+import 'package:relines/utils/app_logger.dart';
 import 'package:relines/utils/constants.dart';
 import 'package:relines/utils/snack.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +47,9 @@ class _HomeState extends State<Home> {
   int correctAnswers = 0;
   int score = 0;
 
+  int currentFetchRetry = 0;
+  int maxFetchRetry = 3;
+
   final questionEndpoint = "https://api.fig.style/v1/dis/random";
   final answerEndpoint = "https://api.fig.style/v1/dis/check";
   final quoteEndpoint = "https://api.fig.style/v1/quotes/";
@@ -71,6 +75,8 @@ class _HomeState extends State<Home> {
     "EDRwqgBONNg8cAaAhg8q", // La Révolution
     "F2Li6Usbb6EH4qVFU1zD", // Chilling avdventure of Sabrina
   ];
+
+  Map<String, dynamic> responseJsonData;
 
   String quoteName = '';
   String questionType = 'author';
@@ -1262,6 +1268,7 @@ class _HomeState extends State<Home> {
       isLoading = true;
       isCheckingAnswer = false;
       isCurrentQuestionCompleted = false;
+      selectedId = '';
     });
 
     try {
@@ -1275,14 +1282,16 @@ class _HomeState extends State<Home> {
         },
       );
 
-      final Map<String, dynamic> jsonObj = jsonDecode(response.body);
-      questionResponse = GameQuestionResponse.fromJSON(jsonObj['response']);
+      responseJsonData = jsonDecode(response.body);
+      questionResponse =
+          GameQuestionResponse.fromJSON(responseJsonData['response']);
 
       final topicName =
           questionResponse.question.quote.topics.firstOrElse(() => "fun");
 
       setState(() {
         isLoading = false;
+        currentFetchRetry = 0;
 
         questionType = questionResponse.question.guessType;
         quoteName = questionResponse.question.quote.name;
@@ -1290,7 +1299,9 @@ class _HomeState extends State<Home> {
       });
     } catch (error) {
       setState(() => isLoading = false);
-      debugPrint(error.toString());
+      appLogger.e(responseJsonData.toJSON());
+      appLogger.e(error);
+      retryFetch();
     }
   }
 
@@ -1317,6 +1328,17 @@ class _HomeState extends State<Home> {
       hasChosenAnswer = false;
       gameState = GameState.stopped;
     });
+  }
+
+  void retryFetch() {
+    appLogger.d("Retry $currentFetchRetry / $maxFetchRetry");
+
+    if (currentFetchRetry > maxFetchRetry) {
+      return;
+    }
+
+    currentFetchRetry++;
+    fetchQuestion();
   }
 
   void skipQuestion() async {
