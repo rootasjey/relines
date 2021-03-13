@@ -19,12 +19,19 @@ class GameQuestionResponse {
   factory GameQuestionResponse.fromJSON(Map<String, dynamic> data) {
     final String _type = data['proposals']['type'];
 
-    final _authorProposals =
-        _type == 'author' ? AuthorProposals.fromJSON(data['proposals']) : null;
+    AuthorProposals _authorProposals;
 
-    final _referenceProposals = _type == 'reference'
-        ? ReferenceProposals.fromJSON(data['proposals'])
-        : null;
+    if (_type == 'author') {
+      _authorProposals = AuthorProposals.fromJSON(data['proposals']);
+      _authorProposals.values.shuffle();
+    }
+
+    ReferenceProposals _referenceProposals;
+
+    if (_type == 'reference') {
+      _referenceProposals = ReferenceProposals.fromJSON(data['proposals']);
+      _referenceProposals.values.shuffle();
+    }
 
     return GameQuestionResponse(
       question: Question.fromJSON(data['question']),
