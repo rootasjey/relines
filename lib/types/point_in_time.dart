@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:relines/utils/date_helper.dart';
 
 class PointInTime {
   bool beforeJC;
@@ -13,20 +14,13 @@ class PointInTime {
     this.beforeJC = false,
   });
 
-  factory PointInTime.fromJSON(Map<String, dynamic> json) {
-    DateTime date;
-
-    if (json['date'].runtimeType == Timestamp) {
-      date = (json['date'] as Timestamp)?.toDate();
-    } else if (json['date'] != null && json['date']['_seconds'] != null) {
-      date =
-          DateTime.fromMillisecondsSinceEpoch(json['date']['_seconds'] * 1000);
-    }
+  factory PointInTime.fromJSON(Map<String, dynamic> data) {
+    DateTime date = DateHelper.fromFirestore(data['original']);
 
     return PointInTime(
-      beforeJC: json['beforeJC'],
-      country: json['country'],
-      city: json['city'],
+      beforeJC: data['beforeJC'] ?? false,
+      country: data['country'] ?? '',
+      city: data['city'] ?? '',
       date: date,
     );
   }
