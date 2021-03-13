@@ -445,7 +445,7 @@ class DeleteAccountState extends State<DeleteAccount> {
       }
 
       await stateUser.signOut();
-      stateUser.setUserName('');
+      stateUser.setUsername('');
       appStorage.clearUserAuthData();
 
       // PushNotifications.unlinkAuthUser();

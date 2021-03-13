@@ -5,16 +5,13 @@ import 'package:auto_route/auto_route.dart';
 import 'package:relines/router/auth_guard.dart';
 import 'package:relines/router/no_auth_guard.dart';
 import 'package:relines/screens/about.dart';
-import 'package:relines/screens/app_page.dart';
 import 'package:relines/screens/changelog.dart';
 import 'package:relines/screens/contact.dart';
-import 'package:relines/screens/create_app.dart';
 import 'package:relines/screens/dashboard_page.dart';
-import 'package:relines/screens/deactivate_dev_prog.dart';
 import 'package:relines/screens/delete_account.dart';
+import 'package:relines/screens/update_username.dart';
 import 'package:relines/screens/forgot_password.dart';
 import 'package:relines/screens/home.dart';
-import 'package:relines/screens/my_apps.dart';
 import 'package:relines/screens/settings.dart';
 import 'package:relines/screens/signin.dart';
 import 'package:relines/screens/signup.dart';
@@ -22,7 +19,6 @@ import 'package:relines/screens/tos.dart';
 import 'package:relines/screens/undefined_page.dart';
 import 'package:relines/screens/update_email.dart';
 import 'package:relines/screens/update_password.dart';
-import 'package:relines/screens/update_username.dart';
 
 @MaterialAutoRouter(
   routes: <AutoRoute>[
@@ -35,17 +31,7 @@ import 'package:relines/screens/update_username.dart';
       page: DashboardPage,
       guards: [AuthGuard],
       children: [
-        RedirectRoute(path: '', redirectTo: 'apps'),
-        AutoRoute(
-          path: 'apps',
-          page: EmptyRouterPage,
-          name: 'AppsDeepRoute',
-          children: [
-            AutoRoute(path: '', page: MyApps),
-            AutoRoute(path: ':appId', page: AppPage),
-          ],
-        ),
-        AutoRoute(path: 'create/app', page: CreateApp),
+        RedirectRoute(path: '', redirectTo: 'settings'),
         AutoRoute(
           path: 'settings',
           page: EmptyRouterPage,
@@ -57,13 +43,11 @@ import 'package:relines/screens/update_username.dart';
               name: 'DashboardSettingsRoute',
             ),
             AutoRoute(path: 'delete/account', page: DeleteAccount),
-            AutoRoute(path: 'developers/deactivate', page: DeactivateDevProg),
             AutoRoute(
               path: 'update',
               page: EmptyRouterPage,
               name: 'AccountUpdateDeepRoute',
               children: [
-                // RedirectRoute(path: '', redirectTo: 'email'),
                 MaterialRoute(path: 'email', page: UpdateEmail),
                 MaterialRoute(path: 'password', page: UpdatePassword),
                 MaterialRoute(path: 'username', page: UpdateUsername),

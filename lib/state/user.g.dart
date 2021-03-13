@@ -24,18 +24,33 @@ mixin _$StateUser on StateUserBase, Store {
     });
   }
 
-  final _$canManageQuotesAtom = Atom(name: 'StateUserBase.canManageQuotes');
+  final _$canManageDataAtom = Atom(name: 'StateUserBase.canManageData');
 
   @override
-  bool get canManageQuotes {
-    _$canManageQuotesAtom.reportRead();
-    return super.canManageQuotes;
+  bool get canManageData {
+    _$canManageDataAtom.reportRead();
+    return super.canManageData;
   }
 
   @override
-  set canManageQuotes(bool value) {
-    _$canManageQuotesAtom.reportWrite(value, super.canManageQuotes, () {
-      super.canManageQuotes = value;
+  set canManageData(bool value) {
+    _$canManageDataAtom.reportWrite(value, super.canManageData, () {
+      super.canManageData = value;
+    });
+  }
+
+  final _$emailAtom = Atom(name: 'StateUserBase.email');
+
+  @override
+  String get email {
+    _$emailAtom.reportRead();
+    return super.email;
+  }
+
+  @override
+  set email(String value) {
+    _$emailAtom.reportWrite(value, super.email, () {
+      super.email = value;
     });
   }
 
@@ -182,22 +197,33 @@ mixin _$StateUser on StateUserBase, Store {
   }
 
   @override
-  void setUserName(String name) {
+  void setUsername(String name) {
     final _$actionInfo = _$StateUserBaseActionController.startAction(
-        name: 'StateUserBase.setUserName');
+        name: 'StateUserBase.setUsername');
     try {
-      return super.setUserName(name);
+      return super.setUsername(name);
     } finally {
       _$StateUserBaseActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void setAdminValue(bool value) {
+  void setAllRightsToFalse() {
     final _$actionInfo = _$StateUserBaseActionController.startAction(
-        name: 'StateUserBase.setAdminValue');
+        name: 'StateUserBase.setAllRightsToFalse');
     try {
-      return super.setAdminValue(value);
+      return super.setAllRightsToFalse();
+    } finally {
+      _$StateUserBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setEmail(String value) {
+    final _$actionInfo = _$StateUserBaseActionController.startAction(
+        name: 'StateUserBase.setEmail');
+    try {
+      return super.setEmail(value);
     } finally {
       _$StateUserBaseActionController.endAction(_$actionInfo);
     }
@@ -218,7 +244,8 @@ mixin _$StateUser on StateUserBase, Store {
   String toString() {
     return '''
 avatarUrl: ${avatarUrl},
-canManageQuotes: ${canManageQuotes},
+canManageData: ${canManageData},
+email: ${email},
 lang: ${lang},
 isFirstLaunch: ${isFirstLaunch},
 isUserConnected: ${isUserConnected},

@@ -1203,7 +1203,7 @@ class _HomeState extends State<Home> {
 
     try {
       final response = await http.post(
-        '$answerEndpoint',
+        Uri.parse(answerEndpoint),
         headers: {
           'authorization': ApiKeys.figStyle,
         },
@@ -1260,7 +1260,7 @@ class _HomeState extends State<Home> {
 
     try {
       final response = await http.get(
-        '$questionEndpoint',
+        Uri.parse(questionEndpoint),
         headers: {
           'authorization': ApiKeys.figStyle,
         },
@@ -1358,7 +1358,7 @@ class _HomeState extends State<Home> {
   Future fetchSingleQuote(String quoteId) async {
     try {
       final response = await http.get(
-        '$quoteEndpoint$quoteId',
+        Uri.parse('$quoteEndpoint$quoteId'),
         headers: {
           'authorization': ApiKeys.figStyle,
         },
@@ -1375,7 +1375,7 @@ class _HomeState extends State<Home> {
   Future fetchSingleReference(String referenceId) async {
     try {
       final response = await http.get(
-        '$referenceEndpoint$referenceId',
+        Uri.parse('$referenceEndpoint$referenceId'),
         headers: {
           'authorization': ApiKeys.figStyle,
         },

@@ -1,14 +1,15 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:relines/router/app_router.gr.dart';
 import 'package:relines/types/cloud_func_error.dart';
 import 'package:relines/types/update_email_resp.dart';
+import 'package:relines/utils/app_logger.dart';
 import 'package:relines/utils/app_storage.dart';
+import 'package:auto_route/auto_route.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:mobx/mobx.dart';
 
 part 'user.g.dart';
@@ -22,7 +23,10 @@ abstract class StateUserBase with Store {
   String avatarUrl = '';
 
   @observable
-  bool canManageQuotes = false;
+  bool canManageData = false;
+
+  @observable
+  String email = '';
 
   @observable
   String lang = 'en';
@@ -52,61 +56,30 @@ abstract class StateUserBase with Store {
   Future refreshUserRights() async {
     try {
       if (_userAuth == null || _userAuth.uid == null) {
-        canManageQuotes = false;
+        setAllRightsToFalse();
       }
 
-      final user = await FirebaseFirestore.instance
+      final userSnap = await FirebaseFirestore.instance
           .collection('users')
           .doc(_userAuth.uid)
           .get();
 
-      final userData = user.data();
+      final userData = userSnap.data();
 
-      if (user == null || userData == null) {
-        canManageQuotes = false;
+      if (!userSnap.exists || userData == null) {
+        setAllRightsToFalse();
       }
 
-      final bool canManage = userData['rights']['user:managequotidian'];
-      canManageQuotes = canManage;
-    } on CloudFunctionsException catch (exception) {
-      debugPrint("[code: ${exception.code}] - ${exception.message}");
-      canManageQuotes = false;
+      final Map<String, dynamic> rights = userData['rights'];
+
+      canManageData = rights['user:managedata'];
+      setUsername(userData['name']);
+    } on FirebaseFunctionsException catch (exception) {
+      appLogger.e("[code: ${exception.code}] - ${exception.message}");
+      setAllRightsToFalse();
     } catch (error) {
-      debugPrint(error.toString());
-      canManageQuotes = false;
-    }
-  }
-
-  Future activateDevAccount() async {
-    try {
-      final user = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(_userAuth.uid)
-          .get();
-
-      final userData = user.data();
-      final devData = userData['developer'];
-
-      if (devData == null) {
-        return;
-      }
-
-      final isDevProgActive = devData['isProgramActive'];
-
-      if (isDevProgActive != true) {
-        final callable = CloudFunctions(
-          app: Firebase.app(),
-          region: 'europe-west3',
-        ).getHttpsCallable(
-          functionName: 'developers-activateDevProgram',
-        );
-
-        await callable.call();
-      }
-    } on CloudFunctionsException catch (exception) {
-      debugPrint("[code: ${exception.code}] - ${exception.message}");
-    } catch (error) {
-      debugPrint(error.toString());
+      appLogger.e(error.toString());
+      setAllRightsToFalse();
     }
   }
 
@@ -117,12 +90,10 @@ abstract class StateUserBase with Store {
 
   Future<UpdateEmailResp> deleteAccount(String idToken) async {
     try {
-      final callable = CloudFunctions(
+      final callable = FirebaseFunctions.instanceFor(
         app: Firebase.app(),
         region: 'europe-west3',
-      ).getHttpsCallable(
-        functionName: 'users-deleteAccount',
-      );
+      ).httpsCallable('users-deleteAccount');
 
       final response = await callable.call({
         'idToken': idToken,
@@ -131,8 +102,8 @@ abstract class StateUserBase with Store {
       signOut();
 
       return UpdateEmailResp.fromJSON(response.data);
-    } on CloudFunctionsException catch (exception) {
-      debugPrint("[code: ${exception.code}] - ${exception.message}");
+    } on FirebaseFunctionsException catch (exception) {
+      appLogger.e("[code: ${exception.code}] - ${exception.message}");
 
       return UpdateEmailResp(
         success: false,
@@ -142,7 +113,7 @@ abstract class StateUserBase with Store {
         ),
       );
     } on PlatformException catch (exception) {
-      debugPrint(exception.toString());
+      appLogger.e(exception.toString());
 
       return UpdateEmailResp(
         success: false,
@@ -152,7 +123,7 @@ abstract class StateUserBase with Store {
         ),
       );
     } catch (error) {
-      debugPrint(error.toString());
+      appLogger.e(error.toString());
 
       return UpdateEmailResp(
         success: false,
@@ -190,13 +161,18 @@ abstract class StateUserBase with Store {
   }
 
   @action
-  void setUserName(String name) {
+  void setUsername(String name) {
     username = name;
   }
 
   @action
-  void setAdminValue(bool value) {
-    canManageQuotes = value;
+  void setAllRightsToFalse() {
+    canManageData = false;
+  }
+
+  @action
+  void setEmail(String value) {
+    email = value;
   }
 
   /// Signin user with credentials if FirebaseAuth is null.
@@ -236,9 +212,9 @@ abstract class StateUserBase with Store {
 
       appStorage.setUserName(_userAuth.displayName);
       // PushNotifications.linkAuthUser(_userAuth.uid);
+      setEmail(email);
 
       await refreshUserRights();
-      await activateDevAccount();
 
       return _userAuth;
     } catch (error) {
@@ -261,7 +237,7 @@ abstract class StateUserBase with Store {
 
     if (redirectOnComplete) {
       if (context == null) {
-        debugPrint("Please specify a context value to the"
+        appLogger.e("Please specify a context value to the"
             " [userState.signOut] function.");
         return;
       }
@@ -277,12 +253,10 @@ abstract class StateUserBase with Store {
 
   Future<UpdateEmailResp> updateEmail(String email, String idToken) async {
     try {
-      final callable = CloudFunctions(
+      final callable = FirebaseFunctions.instanceFor(
         app: Firebase.app(),
         region: 'europe-west3',
-      ).getHttpsCallable(
-        functionName: 'users-updateEmail',
-      );
+      ).httpsCallable('users-updateEmail');
 
       final response = await callable.call({
         'newEmail': email,
@@ -293,8 +267,8 @@ abstract class StateUserBase with Store {
       await stateUser.signin(email: email);
 
       return UpdateEmailResp.fromJSON(response.data);
-    } on CloudFunctionsException catch (exception) {
-      debugPrint("[code: ${exception.code}] - ${exception.message}");
+    } on FirebaseFunctionsException catch (exception) {
+      appLogger.e("[code: ${exception.code}] - ${exception.message}");
       return UpdateEmailResp(
         success: false,
         error: CloudFuncError(
@@ -303,7 +277,7 @@ abstract class StateUserBase with Store {
         ),
       );
     } on PlatformException catch (exception) {
-      debugPrint(exception.toString());
+      appLogger.e(exception.toString());
       return UpdateEmailResp(
         success: false,
         error: CloudFuncError(
@@ -312,7 +286,7 @@ abstract class StateUserBase with Store {
         ),
       );
     } catch (error) {
-      debugPrint(error.toString());
+      appLogger.e(error.toString());
 
       return UpdateEmailResp(
         success: false,
@@ -326,12 +300,10 @@ abstract class StateUserBase with Store {
 
   Future<UpdateEmailResp> updateUsername(String newUsername) async {
     try {
-      final callable = CloudFunctions(
+      final callable = FirebaseFunctions.instanceFor(
         app: Firebase.app(),
         region: 'europe-west3',
-      ).getHttpsCallable(
-        functionName: 'users-updateUsername',
-      );
+      ).httpsCallable('users-updateUsername');
 
       final response = await callable.call({
         'newUsername': newUsername,
@@ -340,8 +312,8 @@ abstract class StateUserBase with Store {
       appStorage.setUserName(newUsername);
 
       return UpdateEmailResp.fromJSON(response.data);
-    } on CloudFunctionsException catch (exception) {
-      debugPrint("[code: ${exception.code}] - ${exception.message}");
+    } on FirebaseFunctionsException catch (exception) {
+      appLogger.e("[code: ${exception.code}] - ${exception.message}");
       return UpdateEmailResp(
         success: false,
         error: CloudFuncError(
@@ -350,7 +322,7 @@ abstract class StateUserBase with Store {
         ),
       );
     } on PlatformException catch (exception) {
-      debugPrint(exception.toString());
+      appLogger.e(exception.toString());
 
       return UpdateEmailResp(
         success: false,
@@ -360,7 +332,7 @@ abstract class StateUserBase with Store {
         ),
       );
     } catch (error) {
-      debugPrint(error.toString());
+      appLogger.e(error.toString());
 
       return UpdateEmailResp(
         success: false,

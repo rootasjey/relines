@@ -1,6 +1,5 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:relines/router/app_router.gr.dart';
-import 'package:relines/router/auth_guard.dart';
 import 'package:relines/router/no_auth_guard.dart';
 import 'package:relines/state/colors.dart';
 import 'package:relines/state/topics_colors.dart';
@@ -13,6 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supercharged/supercharged.dart';
+
+import 'router/auth_guard.dart';
 
 void main() async {
   LicenseRegistry.addLicense(() async* {

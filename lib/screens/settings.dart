@@ -191,11 +191,6 @@ class _SettingsState extends State<Settings> {
             beginX: 50.0,
             child: deleteAccountButton(),
           ),
-          FadeInX(
-            delay: 200.milliseconds,
-            beginX: 50.0,
-            child: deactivateDevProgramButton(),
-          ),
         ],
       ),
     );
@@ -358,43 +353,6 @@ class _SettingsState extends State<Settings> {
           appSettings(),
         ]),
       ),
-    );
-  }
-
-  Widget deactivateDevProgramButton() {
-    return Column(
-      children: <Widget>[
-        Container(
-          padding: const EdgeInsets.all(10.0),
-          width: 90.0,
-          height: 90.0,
-          child: Card(
-            elevation: 4.0,
-            child: InkWell(
-              onTap: () => context.router.push(
-                DeactivateDevProgRoute(),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Icon(Icons.remove_circle_outline),
-              ),
-            ),
-          ),
-        ),
-        SizedBox(
-          width: 100.0,
-          child: Opacity(
-            opacity: 0.8,
-            child: Text(
-              'Deactivate dev program',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        )
-      ],
     );
   }
 
@@ -822,7 +780,7 @@ class _SettingsState extends State<Settings> {
       avatarUrl = data['urls']['image'];
       currentUserName = data['name'] ?? '';
 
-      stateUser.setUserName(currentUserName);
+      stateUser.setUsername(currentUserName);
 
       setState(() {
         email = stateUser.userAuth.email ?? '';

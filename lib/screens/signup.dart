@@ -122,7 +122,7 @@ class _SignupState extends State<Signup> {
               isCheckingEmail = true;
             });
 
-            final isWellFormatted = checkEmailFormat(email);
+            final isWellFormatted = UsersActions.checkEmailFormat(email);
 
             if (!isWellFormatted) {
               setState(() {
@@ -139,7 +139,8 @@ class _SignupState extends State<Signup> {
             }
 
             emailTimer = Timer(1.seconds, () async {
-              final isAvailable = await checkEmailAvailability(email);
+              final isAvailable =
+                  await UsersActions.checkEmailAvailability(email);
               if (!isAvailable) {
                 setState(() {
                   isCheckingEmail = false;
@@ -283,7 +284,8 @@ class _SignupState extends State<Signup> {
                   isCheckingName = true;
                 });
 
-                final isWellFormatted = checkUsernameFormat(username);
+                final isWellFormatted =
+                    UsersActions.checkUsernameFormat(username);
 
                 if (!isWellFormatted) {
                   setState(() {
@@ -302,7 +304,8 @@ class _SignupState extends State<Signup> {
                 }
 
                 nameTimer = Timer(1.seconds, () async {
-                  final isAvailable = await checkUsernameAvailability(username);
+                  final isAvailable =
+                      await UsersActions.checkUsernameAvailability(username);
 
                   if (!isAvailable) {
                     setState(() {
@@ -530,7 +533,7 @@ class _SignupState extends State<Signup> {
     password = password.trim();
 
     try {
-      final respCreateAcc = await createAccount(
+      final respCreateAcc = await UsersActions.createAccount(
         email: email,
         username: username,
         password: password,
@@ -593,8 +596,8 @@ class _SignupState extends State<Signup> {
   }
 
   Future<bool> valuesAvailabilityCheck() async {
-    final isEmailOk = await checkEmailAvailability(email);
-    final isNameOk = await checkUsernameAvailability(username);
+    final isEmailOk = await UsersActions.checkEmailAvailability(email);
+    final isNameOk = await UsersActions.checkUsernameAvailability(username);
 
     return isEmailOk && isNameOk;
   }
@@ -630,7 +633,7 @@ class _SignupState extends State<Signup> {
       return false;
     }
 
-    if (!checkEmailFormat(email)) {
+    if (!UsersActions.checkEmailFormat(email)) {
       showSnack(
         context: context,
         message: "The value specified is not a valid email",
@@ -640,7 +643,7 @@ class _SignupState extends State<Signup> {
       return false;
     }
 
-    if (!checkUsernameFormat(username)) {
+    if (!UsersActions.checkUsernameFormat(username)) {
       showSnack(
         context: context,
         message: username.length < 3

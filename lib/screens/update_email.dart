@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:relines/actions/users.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:relines/components/animated_app_icon.dart';
 import 'package:relines/components/fade_in_y.dart';
 import 'package:relines/components/page_app_bar.dart';
@@ -12,8 +13,7 @@ import 'package:relines/state/user.dart';
 import 'package:relines/types/enums.dart';
 import 'package:relines/utils/constants.dart';
 import 'package:relines/utils/snack.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:relines/actions/users.dart';
 import 'package:supercharged/supercharged.dart';
 
 class UpdateEmail extends StatefulWidget {
@@ -280,7 +280,7 @@ class _UpdateEmailState extends State<UpdateEmail> {
                 isCheckingEmail = true;
               });
 
-              final isWellFormatted = checkEmailFormat(email);
+              final isWellFormatted = UsersActions.checkEmailFormat(email);
 
               if (!isWellFormatted) {
                 setState(() {
@@ -297,7 +297,8 @@ class _UpdateEmailState extends State<UpdateEmail> {
               }
 
               emailTimer = Timer(1.seconds, () async {
-                final isAvailable = await checkEmailAvailability(email);
+                final isAvailable =
+                    await UsersActions.checkEmailAvailability(email);
 
                 if (!isAvailable) {
                   setState(() {
@@ -521,7 +522,7 @@ class _UpdateEmailState extends State<UpdateEmail> {
   }
 
   Future<bool> valuesAvailabilityCheck() async {
-    return await checkEmailAvailability(email);
+    return await UsersActions.checkEmailAvailability(email);
   }
 
   bool inputValuesOk() {
@@ -545,7 +546,7 @@ class _UpdateEmailState extends State<UpdateEmail> {
       return false;
     }
 
-    if (!checkEmailFormat(email)) {
+    if (!UsersActions.checkEmailFormat(email)) {
       showSnack(
         context: context,
         message: "The value specified is not a valid email.",
