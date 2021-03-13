@@ -110,7 +110,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           padding: const EdgeInsets.only(
             top: 55.0,
           ),
-          child: FlatButton(
+          child: TextButton(
             onPressed: () => context.router.navigate(HomeRoute()),
             child: Opacity(
               opacity: .6,
@@ -231,12 +231,16 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       beginY: 50.0,
       child: Padding(
         padding: const EdgeInsets.only(top: 80.0),
-        child: RaisedButton(
+        child: ElevatedButton(
           onPressed: sendResetLink,
-          color: stateColors.accent,
-          textColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(5.0)),
+          style: ElevatedButton.styleFrom(
+            primary: stateColors.accent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(5.0)),
+            ),
+            textStyle: TextStyle(
+              color: Colors.white,
+            ),
           ),
           child: Padding(
             padding: const EdgeInsets.all(15.0),
