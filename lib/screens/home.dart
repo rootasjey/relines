@@ -480,7 +480,7 @@ class _HomeState extends State<Home> {
 
   Widget gameTitle() {
     return Text(
-      "Did I Say?",
+      "Relines",
       style: TextStyle(
         fontSize: 60.0,
         fontFamily: GoogleFonts.pacifico().fontFamily,
