@@ -126,23 +126,38 @@ class _HomeState extends State<Home> {
 
           return false;
         },
-        child: CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            DesktopAppBar(
-              padding: const EdgeInsets.only(left: 65.0),
-              onTapIconHeader: () {
-                if (_scrollController.offset < 10.0) {
-                  setState(() {
-                    gameState = GameState.stopped;
-                  });
+        child: Stack(
+          children: [
+            CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                DesktopAppBar(
+                  padding: const EdgeInsets.only(left: 65.0),
+                  onTapIconHeader: () {
+                    if (_scrollController.offset < 10.0) {
+                      setState(() {
+                        gameState = GameState.stopped;
+                      });
 
-                  return;
-                }
-              },
+                      return;
+                    }
+
+                    _scrollController.animateTo(
+                      0,
+                      duration: 250.milliseconds,
+                      curve: Curves.decelerate,
+                    );
+                  },
+                ),
+                body(),
+                footer(),
+              ],
             ),
-            body(),
-            footer(),
+            Positioned(
+              top: 160.0,
+              right: 24.0,
+              child: hud(),
+            ),
           ],
         ),
       ),
@@ -474,10 +489,14 @@ class _HomeState extends State<Home> {
   }
 
   Widget hud() {
+    if (gameState != GameState.running) {
+      return Container();
+    }
+
     return Container(
       width: 180.0,
       child: Card(
-        elevation: 0.0,
+        elevation: 2.0,
         color: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4.0),
@@ -745,7 +764,7 @@ class _HomeState extends State<Home> {
                 text: TextSpan(
                   text:
                       "Each round, you have to guess the author or the reference "
-                      "of the displayed quote. The question type alternate randomly."
+                      "of the displayed quote. The question type alternate randomly. "
                       "For example, on the 1st round, you must guess the author, "
                       "and on the next 2nd round, you must guess the reference.",
                   style: TextStyle(
@@ -1016,46 +1035,37 @@ class _HomeState extends State<Home> {
             constraints: BoxConstraints(
               minHeight: MediaQuery.of(context).size.height,
             ),
-            child: Stack(
+            child: Column(
               children: [
-                Column(
-                  children: [
-                    checkingAnswerBlock(),
-                    answerResultBlock(),
-                    FadeInY(
-                      beginY: 20.0,
-                      delay: 100.milliseconds,
-                      child: quoteBlock(),
-                    ),
-                    FadeInY(
-                      beginY: 20.0,
-                      delay: 300.milliseconds,
-                      child: subtitleBlock(),
-                    ),
-                    FadeInY(
-                      beginY: 20.0,
-                      delay: 600.milliseconds,
-                      child: proposalsBlock(),
-                    ),
-                    FadeInY(
-                      beginY: 20.0,
-                      delay: 900.milliseconds,
-                      child: skipButton(),
-                    ),
-                    FadeInY(
-                      beginY: 20.0,
-                      delay: 1200.milliseconds,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 200.0),
-                        child: basicRules(),
-                      ),
-                    ),
-                  ],
+                checkingAnswerBlock(),
+                answerResultBlock(),
+                FadeInY(
+                  beginY: 20.0,
+                  delay: 100.milliseconds,
+                  child: quoteBlock(),
                 ),
-                Positioned(
-                  top: 0.0,
-                  right: 0.0,
-                  child: hud(),
+                FadeInY(
+                  beginY: 20.0,
+                  delay: 300.milliseconds,
+                  child: subtitleBlock(),
+                ),
+                FadeInY(
+                  beginY: 20.0,
+                  delay: 600.milliseconds,
+                  child: proposalsBlock(),
+                ),
+                FadeInY(
+                  beginY: 20.0,
+                  delay: 900.milliseconds,
+                  child: skipButton(),
+                ),
+                FadeInY(
+                  beginY: 20.0,
+                  delay: 1200.milliseconds,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 200.0),
+                    child: basicRules(),
+                  ),
                 ),
               ],
             ),
@@ -1342,6 +1352,10 @@ class _HomeState extends State<Home> {
   }
 
   void skipQuestion() async {
+    if (isLoading) {
+      return;
+    }
+
     setState(() {
       currentQuestion++;
       hasChosenAnswer = false;
