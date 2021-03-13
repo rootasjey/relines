@@ -58,12 +58,15 @@ dependencies:
 
 dev_dependencies:
   auto_route_generator: 1.0.0-beta.7
-  flutter_rename_app: 1.0.0
   build_runner:
+  flutter_driver:
+    sdk: flutter
+  flutter_rename_app: 1.0.0
   flutter_test:
     sdk: flutter
   integration_test:
     sdk: flutter
+  test: any
 
 flutter_rename_app:
   application_name: Relines
