@@ -14,7 +14,7 @@ class PointInTime {
   });
 
   factory PointInTime.fromJSON(Map<String, dynamic> data) {
-    DateTime date = DateHelper.fromFirestore(data['original']);
+    DateTime date = DateHelper.fromFirestore(data['date']);
 
     return PointInTime(
       beforeJC: data['beforeJC'] ?? false,
