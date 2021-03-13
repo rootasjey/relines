@@ -1273,6 +1273,22 @@ class _HomeState extends State<Home> {
     }
   }
 
+  void fetchPresentationData() async {
+    final quotesFutures = <Future>[];
+    final referencesFutures = <Future>[];
+
+    for (var id in quotesIds) {
+      quotesFutures.add(fetchSingleQuote(id));
+    }
+
+    for (var id in referencesIds) {
+      referencesFutures.add(fetchSingleReference(id));
+    }
+
+    await Future.wait([...quotesFutures, ...referencesFutures]);
+    setState(() {});
+  }
+
   void fetchQuestion() async {
     setState(() {
       isLoading = true;
@@ -1382,22 +1398,6 @@ class _HomeState extends State<Home> {
     });
 
     fetchQuestion();
-  }
-
-  void fetchPresentationData() async {
-    final quotesFutures = <Future>[];
-    final referencesFutures = <Future>[];
-
-    for (var id in quotesIds) {
-      quotesFutures.add(fetchSingleQuote(id));
-    }
-
-    for (var id in referencesIds) {
-      referencesFutures.add(fetchSingleReference(id));
-    }
-
-    await Future.wait([...quotesFutures, ...referencesFutures]);
-    setState(() {});
   }
 
   Future fetchSingleQuote(String quoteId) async {
