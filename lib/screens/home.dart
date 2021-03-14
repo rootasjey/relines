@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:global_configuration/global_configuration.dart';
 import 'package:relines/components/animated_app_icon.dart';
 import 'package:relines/components/desktop_app_bar.dart';
 import 'package:relines/components/fade_in_x.dart';
@@ -14,7 +15,6 @@ import 'package:relines/types/game_answer_response.dart';
 import 'package:relines/types/game_question_response.dart';
 import 'package:relines/types/quote.dart';
 import 'package:relines/types/reference.dart';
-import 'package:relines/utils/api_keys.dart';
 import 'package:relines/utils/app_logger.dart';
 import 'package:relines/utils/constants.dart';
 import 'package:relines/utils/snack.dart';
@@ -1227,7 +1227,7 @@ class _HomeState extends State<Home> {
       final response = await http.post(
         Uri.parse(answerEndpoint),
         headers: {
-          'authorization': ApiKeys.figStyle,
+          'authorization': GlobalConfiguration().getValue<String>("apikey"),
         },
         body: {
           'answerProposalId': proposalId,
@@ -1301,7 +1301,7 @@ class _HomeState extends State<Home> {
       final response = await http.post(
         Uri.parse(questionEndpoint),
         headers: {
-          'authorization': ApiKeys.figStyle,
+          'authorization': GlobalConfiguration().getValue<String>("apikey"),
         },
         body: {
           'previousQuestionsIds': jsonEncode(previousQuestionsIds),
@@ -1405,7 +1405,7 @@ class _HomeState extends State<Home> {
       final response = await http.get(
         Uri.parse('$quoteEndpoint$quoteId'),
         headers: {
-          'authorization': ApiKeys.figStyle,
+          'authorization': GlobalConfiguration().getValue<String>("apikey"),
         },
       );
 
@@ -1422,7 +1422,7 @@ class _HomeState extends State<Home> {
       final response = await http.get(
         Uri.parse('$referenceEndpoint$referenceId'),
         headers: {
-          'authorization': ApiKeys.figStyle,
+          'authorization': GlobalConfiguration().getValue<String>("apikey"),
         },
       );
 
