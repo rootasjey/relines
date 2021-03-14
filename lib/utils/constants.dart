@@ -10,14 +10,14 @@ class Constants {
   static const baseTwitterShareUrl = "https://twitter.com/intent/tweet"
       "?via=fig_style&text=";
 
-  static const baseAuthorUrl = "https://fig.style/#/authors/";
+  static const baseAuthorUrl = "https://fig.style/authors/";
   static const baseQuoteUrl = "https://fig.style/quotes/";
-  static const baseReferenceUrl = "https://fig.style/#/references/";
+  static const baseReferenceUrl = "https://fig.style/references/";
 
   static const cardElevation = 2.0;
   static const developersPortal = 'https://dev.fig.style';
   static const disUrl = "https://dis.fig.style";
-  static const githubUrl = 'https://github.com/rootasjey/dev.fig.style';
+  static const githubUrl = 'https://github.com/rootasjey/relines';
   static const maxMobileWidth = 700.0;
 
   static const playStoreUrl = "https://play.google.com/store/apps/"
