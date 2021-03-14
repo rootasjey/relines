@@ -43,6 +43,7 @@ dependencies:
 
   flutter_mobx: 1.0.1
   flutter_syntax_view: 3.2.2
+  global_configuration: 2.0.0-nullsafety.0
   google_fonts: 2.0.0
   http: 0.13.0
   jiffy: 4.0.0
