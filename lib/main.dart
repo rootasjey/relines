@@ -1,4 +1,5 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:global_configuration/global_configuration.dart';
 import 'package:relines/router/app_router.gr.dart';
 import 'package:relines/router/no_auth_guard.dart';
 import 'package:relines/state/colors.dart';
@@ -24,6 +25,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await appStorage.initialize();
+  await GlobalConfiguration().loadFromPath("config/base.json");
   await Future.wait([_autoLogin(), _initColors()]);
   runApp(App());
 }
