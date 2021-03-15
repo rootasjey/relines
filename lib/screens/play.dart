@@ -10,6 +10,7 @@ import 'package:relines/components/desktop_app_bar.dart';
 import 'package:relines/components/fade_in_x.dart';
 import 'package:relines/components/fade_in_y.dart';
 import 'package:relines/components/footer.dart';
+import 'package:relines/components/hud.dart';
 import 'package:relines/components/image_card.dart';
 import 'package:relines/components/rules.dart';
 import 'package:relines/router/app_router.gr.dart';
@@ -136,7 +137,14 @@ class _PlayState extends State<Play> {
             Positioned(
               top: 160.0,
               right: 24.0,
-              child: hud(),
+              child: Hud(
+                score: score,
+                currentQuestion: currentQuestion,
+                maxQuestions: maxQuestions,
+                onQuit: onQuit,
+                onSkip: onSkipQuestion,
+                isVisible: gameState == GameState.running || !isLoading,
+              ),
             ),
           ],
         ),
@@ -199,7 +207,7 @@ class _PlayState extends State<Play> {
                 spacing: 20.0,
                 children: [
                   OutlinedButton(
-                    onPressed: quitGame,
+                    onPressed: onQuit,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16.0,
@@ -459,89 +467,6 @@ class _PlayState extends State<Play> {
     );
   }
 
-  Widget hud() {
-    if (gameState != GameState.running || isLoading) {
-      return Container();
-    }
-
-    return Container(
-      width: 180.0,
-      child: Card(
-        elevation: 2.0,
-        color: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4.0),
-          side: BorderSide(
-            color: stateColors.primary,
-            width: 2.0,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Wrap(
-                  children: [
-                    Icon(
-                      UniconsLine.award,
-                      color: Colors.yellow.shade800,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 4.0),
-                      child: Text("$score points"),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Wrap(
-                  children: [
-                    Icon(
-                      UniconsLine.question,
-                      color: Colors.green,
-                    ),
-                    Text("question $currentQuestion / $maxQuestions"),
-                  ],
-                ),
-              ),
-              Wrap(
-                alignment: WrapAlignment.start,
-                children: [
-                  TextButton(
-                    onPressed: quitGame,
-                    child: Wrap(
-                      children: [
-                        Text("Quit"),
-                      ],
-                    ),
-                    style: TextButton.styleFrom(
-                      primary: Colors.pink,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: skipQuestion,
-                    child: Wrap(
-                      children: [
-                        Text("Skip"),
-                      ],
-                    ),
-                    style: TextButton.styleFrom(
-                      primary: Colors.orange,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget playView() {
     if (isLoading) {
       return runningLoadingView();
@@ -733,7 +658,7 @@ class _PlayState extends State<Play> {
         top: 16.0,
       ),
       child: TextButton(
-        onPressed: skipQuestion,
+        onPressed: onSkipQuestion,
         child: Text(
           "Skip that one...",
         ),
@@ -884,13 +809,15 @@ class _PlayState extends State<Play> {
     fetchQuestion();
   }
 
-  void quitGame() {
+  void onQuit() {
     setState(() {
       score = 0;
       currentQuestion = 0;
       hasChosenAnswer = false;
       gameState = GameState.stopped;
     });
+
+    context.router.navigate(HomeRoute());
   }
 
   void retryFetch() {
@@ -904,7 +831,7 @@ class _PlayState extends State<Play> {
     fetchQuestion();
   }
 
-  void skipQuestion() async {
+  void onSkipQuestion() async {
     if (isLoading) {
       return;
     }
