@@ -1,8 +1,10 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:relines/router/app_router.gr.dart';
 import 'package:relines/router/no_auth_guard.dart';
 import 'package:relines/state/colors.dart';
+import 'package:relines/state/game.dart';
 import 'package:relines/state/topics_colors.dart';
 import 'package:relines/state/user.dart';
 import 'package:relines/types/topic_color.dart';
@@ -31,6 +33,9 @@ void main() async {
   await appStorage.initialize();
   await GlobalConfiguration().loadFromPath("config/base.json");
   await Future.wait([_autoLogin(), _initColors()]);
+  await EasyLocalization.ensureInitialized();
+
+  Game.setLanguage(appStorage.getLang());
 
   final brightness = BrightnessUtils.getCurrent();
 
@@ -38,9 +43,14 @@ void main() async {
       ? AdaptiveThemeMode.dark
       : AdaptiveThemeMode.light;
 
-  runApp(App(
-    savedThemeMode: savedThemeMode,
-    brightness: brightness,
+  runApp(EasyLocalization(
+    path: 'assets/translations',
+    supportedLocales: [Locale('en'), Locale('fr')],
+    fallbackLocale: Locale('en'),
+    child: App(
+      savedThemeMode: savedThemeMode,
+      brightness: brightness,
+    ),
   ));
 }
 
@@ -140,6 +150,9 @@ class _AppWithThemeState extends State<AppWithTheme> {
       theme: widget.theme,
       darkTheme: widget.darkTheme,
       debugShowCheckedModeBanner: false,
+      locale: context.locale,
+      supportedLocales: context.supportedLocales,
+      localizationsDelegates: context.localizationDelegates,
       routerDelegate: appRouter.delegate(),
       routeInformationParser: appRouter.defaultRouteParser(),
     );

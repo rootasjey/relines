@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:relines/components/desktop_app_bar.dart';
@@ -15,7 +17,7 @@ import 'package:relines/state/colors.dart';
 import 'package:relines/state/game.dart';
 import 'package:relines/types/quote.dart';
 import 'package:relines/types/reference.dart';
-import 'package:flutter/material.dart';
+import 'package:relines/utils/app_storage.dart';
 import 'package:relines/utils/fonts.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
@@ -128,7 +130,7 @@ class _HomeState extends State<Home> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                notStartedHeader(),
+                header(),
                 FadeInY(
                   beginY: 20.0,
                   delay: 600.milliseconds,
@@ -151,6 +153,19 @@ class _HomeState extends State<Home> {
     );
   }
 
+  Widget gameSubtitle() {
+    return Opacity(
+      opacity: 0.6,
+      child: Text(
+        "header_subtitle".tr(),
+        style: TextStyle(
+          fontSize: 24.0,
+          fontWeight: FontWeight.w200,
+        ),
+      ),
+    );
+  }
+
   Widget gameTitle() {
     return Text(
       "Relines",
@@ -160,7 +175,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget notStartedHeader() {
+  Widget header() {
     return Column(
       children: [
         Container(
@@ -206,16 +221,7 @@ class _HomeState extends State<Home> {
           FadeInY(
             beginY: 20.0,
             delay: 300.milliseconds,
-            child: Opacity(
-              opacity: 0.6,
-              child: Text(
-                "This is a quotes game",
-                style: TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.w200,
-                ),
-              ),
-            ),
+            child: gameSubtitle(),
           ),
           FadeInY(
             beginY: 20.0,
@@ -330,7 +336,7 @@ class _HomeState extends State<Home> {
               child: Opacity(
                 opacity: 0.8,
                 child: Text(
-                  "Language",
+                  "language".tr(),
                   style: FontsUtils.mainStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.w500,
@@ -340,7 +346,12 @@ class _HomeState extends State<Home> {
             ),
             LangPopupMenuButton(
               lang: Game.language,
-              onLangChanged: (lang) {
+              onLangChanged: (lang) async {
+                Locale locale = lang == 'fr' ? Locale('fr') : Locale('en');
+
+                await context.setLocale(locale);
+                appStorage.setLang(lang);
+
                 setState(() {
                   Game.setLanguage(lang);
                 });
@@ -457,7 +468,7 @@ class _HomeState extends State<Home> {
           spacing: 8.0,
           children: [
             Text(
-              "Start game",
+              "start_game".tr(),
               style: TextStyle(
                 fontSize: 18.0,
               ),
