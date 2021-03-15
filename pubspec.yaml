@@ -95,6 +95,7 @@ flutter:
     - assets/images/app-icon-90.png
     - assets/images/app-icon-512.png
     - assets/images/app-icon-512-alt.png
+    - assets/images/jeje.jpg
     - assets/images/app-icon-animation.gif
     - assets/images/firebase_cloud_functions_logo.png
     - assets/images/firestore_logo.png

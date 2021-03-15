@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:relines/state/colors.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class Rules extends StatelessWidget {
   @override
@@ -13,7 +14,7 @@ class Rules extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Rules",
+            "rules".tr(),
             style: TextStyle(
               color: stateColors.secondary,
               fontSize: titleFontSize,
@@ -29,11 +30,7 @@ class Rules extends StatelessWidget {
               opacity: 0.6,
               child: RichText(
                 text: TextSpan(
-                  text:
-                      "Each round, you have to guess the author or the reference "
-                      "of the displayed quote. The question type alternate randomly. "
-                      "For example, on the 1st round, you must guess the author, "
-                      "and on the next 2nd round, you must guess the reference.",
+                  text: "rules_1".tr(),
                   style: TextStyle(
                     color: stateColors.foreground,
                     fontSize: textFontSize,
@@ -52,9 +49,7 @@ class Rules extends StatelessWidget {
               opacity: 0.6,
               child: RichText(
                 text: TextSpan(
-                  text: "For each good answer, you earn 10 points. "
-                      "Wrong answers make you loose 5 points."
-                      "1 point is used if you skip one question.",
+                  text: "rules_2".tr(),
                   style: TextStyle(
                     color: stateColors.foreground,
                     fontSize: textFontSize,
@@ -73,29 +68,7 @@ class Rules extends StatelessWidget {
               opacity: 0.6,
               child: RichText(
                 text: TextSpan(
-                  text: "You can choose a game in 5 questions, "
-                      "10 questions or 20 questions.",
-                  style: TextStyle(
-                    color: stateColors.foreground,
-                    fontSize: textFontSize,
-                    fontWeight: FontWeight.w100,
-                  ),
-                  children: [],
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              bottom: 24.0,
-            ),
-            child: Opacity(
-              opacity: 0.6,
-              child: RichText(
-                text: TextSpan(
-                  text: "Save your progress and your games "
-                      "by connecting to your account. Or create one "
-                      "if you didn't already.",
+                  text: "rules_3".tr(),
                   style: TextStyle(
                     color: stateColors.foreground,
                     fontSize: textFontSize,

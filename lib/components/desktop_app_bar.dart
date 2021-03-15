@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class DesktopAppBar extends StatefulWidget {
   final bool automaticallyImplyLeading;
@@ -132,7 +133,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
                       icon: Icon(UniconsLine.bug),
                       label: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text("Signal a bug"),
+                        child: Text("report_bug".tr()),
                       ),
                     ),
                     if (useGroupedDropdown) groupedDropdown(),
@@ -167,7 +168,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
           iconBrightness,
           color: stateColors.foreground.withOpacity(0.6),
         ),
-        tooltip: 'Brightness',
+        tooltip: 'brightness'.tr(),
         onSelected: (value) {
           if (value == 'auto') {
             BrightnessUtils.setAutoBrightness(context);
@@ -210,7 +211,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
               child: ListTile(
                 leading: Icon(Icons.brightness_2),
                 title: Text(
-                  'Dark',
+                  'dark'.tr(),
                   style: TextStyle(
                     color: brightness == Brightness.dark ? primary : basic,
                   ),
@@ -228,7 +229,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
               child: ListTile(
                 leading: Icon(Icons.brightness_5),
                 title: Text(
-                  'Light',
+                  'light'.tr(),
                   style: TextStyle(
                     color: brightness == Brightness.light ? primary : basic,
                   ),
@@ -311,7 +312,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
         child: Center(
           child: OutlinedButton(
             onPressed: () => context.router.root.push(SigninRoute()),
-            child: Text('Sign in'),
+            child: Text('signin'.tr()),
           ),
         ),
       ),
@@ -463,7 +464,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
     return Padding(
       padding: const EdgeInsets.only(right: 60.0),
       child: PopupMenuButton(
-        tooltip: 'Settings',
+        tooltip: 'settings'.tr(),
         icon: Icon(
           Icons.settings,
           color: stateColors.foreground,
@@ -471,7 +472,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
         itemBuilder: (_) => <PopupMenuEntry<AppBarSettings>>[
           PopupMenuItem(
             value: AppBarSettings.allSettings,
-            child: Text('All settings'),
+            child: Text('all_settings'.tr()),
           ),
         ],
         onSelected: (value) {
@@ -503,7 +504,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'SIGN IN',
+              'signin'.tr(),
               style: TextStyle(
                 color: Colors.white,
                 // fontSize: 13.0,
@@ -525,7 +526,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
             horizontal: 8.0,
           ),
           child: Text(
-            'SIGN UP',
+            'signup'.tr(),
           ),
         ),
       ),
@@ -589,23 +590,16 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
           value: SigninRoute(),
           child: ListTile(
             leading: Icon(Icons.perm_identity),
-            title: Text('Sign in'),
+            title: Text('signin'.tr()),
           ),
         ),
         PopupMenuItem(
           value: SignupRoute(),
           child: ListTile(
             leading: Icon(Icons.open_in_browser),
-            title: Text('Sign up'),
+            title: Text('signup'.tr()),
           ),
         ),
-        // PopupMenuItem(
-        //   value: SearchRoute(),
-        //   child: ListTile(
-        //     leading: Icon(Icons.search),
-        //     title: Text('Search'),
-        //   ),
-        // ),
       ],
       onSelected: (pageRouteInfo) {
         context.router.root.navigate(pageRouteInfo);

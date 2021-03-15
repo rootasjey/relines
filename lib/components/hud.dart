@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:relines/state/colors.dart';
 import 'package:unicons/unicons.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class Hud extends StatelessWidget {
   final bool isVisible;
@@ -77,7 +78,7 @@ class Hud extends StatelessWidget {
                     onPressed: onQuit,
                     child: Wrap(
                       children: [
-                        Text("Quit"),
+                        Text("quit".tr()),
                       ],
                     ),
                     style: TextButton.styleFrom(
@@ -88,7 +89,7 @@ class Hud extends StatelessWidget {
                     onPressed: onSkip,
                     child: Wrap(
                       children: [
-                        Text("Skip"),
+                        Text("skip".tr()),
                       ],
                     ),
                     style: TextButton.styleFrom(

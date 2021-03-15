@@ -6,6 +6,7 @@ import 'package:relines/utils/snack.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class Footer extends StatefulWidget {
   final ScrollController pageScrollController;
@@ -57,7 +58,7 @@ class _FooterState extends State<Footer> {
           child: Opacity(
             opacity: 0.5,
             child: Text(
-              'APPS',
+              'apps'.tr().toUpperCase(),
               style: TextStyle(
                 fontSize: 18.0,
               ),
@@ -132,7 +133,7 @@ class _FooterState extends State<Footer> {
           child: Opacity(
             opacity: 0.5,
             child: Text(
-              'DEVELOPERS',
+              'developers'.tr().toUpperCase(),
               style: TextStyle(
                 fontSize: 18.0,
               ),
@@ -140,7 +141,7 @@ class _FooterState extends State<Footer> {
           ),
         ),
         basicButtonLink(
-          textValue: 'Dashboard',
+          textValue: 'dashboard'.tr(),
           onTap: () => launch(Constants.developersPortal),
         ),
         basicButtonLink(
@@ -175,7 +176,7 @@ class _FooterState extends State<Footer> {
           child: Opacity(
             opacity: 0.5,
             child: Text(
-              'RESOURCES',
+              'resources'.tr().toUpperCase(),
               style: TextStyle(
                 fontSize: 18.0,
               ),
@@ -183,21 +184,21 @@ class _FooterState extends State<Footer> {
           ),
         ),
         basicButtonLink(
-          textValue: 'About',
+          textValue: 'about'.tr(),
           onTap: () {
             onBeforeNav();
             context.router.root.push(AboutRoute());
           },
         ),
         basicButtonLink(
-          textValue: 'Contact',
+          textValue: 'contact'.tr(),
           onTap: () {
             onBeforeNav();
             context.router.root.push(ContactRoute());
           },
         ),
         basicButtonLink(
-          textValue: 'Privacy & Terms',
+          textValue: 'tos'.tr(),
           onTap: () {
             onBeforeNav();
             context.router.root.push(TosRoute());
