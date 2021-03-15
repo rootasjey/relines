@@ -595,12 +595,12 @@ class _SettingsState extends State<Settings> {
                 setState(() => isThemeAuto = newValue);
 
                 if (newValue) {
-                  setAutoBrightness(context);
+                  BrightnessUtils.setAutoBrightness(context);
                   return;
                 }
 
                 currentBrightness = appStorage.getBrightness();
-                setBrightness(context, currentBrightness);
+                BrightnessUtils.setBrightness(context, currentBrightness);
               },
             ),
           ),
@@ -616,7 +616,7 @@ class _SettingsState extends State<Settings> {
                   currentBrightness =
                       newValue ? Brightness.light : Brightness.dark;
 
-                  setBrightness(context, currentBrightness);
+                  BrightnessUtils.setBrightness(context, currentBrightness);
                   setState(() {});
                 },
               ),

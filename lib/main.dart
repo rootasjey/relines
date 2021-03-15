@@ -12,6 +12,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:relines/utils/brightness.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:url_strategy/url_strategy.dart';
 
@@ -30,10 +31,29 @@ void main() async {
   await appStorage.initialize();
   await GlobalConfiguration().loadFromPath("config/base.json");
   await Future.wait([_autoLogin(), _initColors()]);
-  runApp(App());
+
+  final brightness = BrightnessUtils.getCurrent();
+
+  final savedThemeMode = brightness == Brightness.dark
+      ? AdaptiveThemeMode.dark
+      : AdaptiveThemeMode.light;
+
+  runApp(App(
+    savedThemeMode: savedThemeMode,
+    brightness: brightness,
+  ));
 }
 
 class App extends StatefulWidget {
+  final AdaptiveThemeMode savedThemeMode;
+  final Brightness brightness;
+
+  const App({
+    Key key,
+    this.savedThemeMode,
+    this.brightness,
+  }) : super(key: key);
+
   @override
   _AppState createState() => _AppState();
 }
@@ -46,8 +66,7 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = getBrightness();
-    stateColors.refreshTheme(brightness);
+    stateColors.refreshTheme(widget.brightness);
 
     return AdaptiveTheme(
       light: ThemeData(
@@ -62,39 +81,68 @@ class _AppState extends State<App> {
         accentColor: Colors.amber,
         fontFamily: GoogleFonts.ptSans().fontFamily,
       ),
-      initial: brightness == Brightness.light
+      initial: widget.brightness == Brightness.light
           ? AdaptiveThemeMode.light
           : AdaptiveThemeMode.dark,
       builder: (theme, darkTheme) {
         stateColors.themeData = theme;
 
-        return MaterialApp.router(
-          title: 'Relines',
-          theme: stateColors.themeData,
+        return AppWithTheme(
+          brightness: widget.brightness,
+          theme: theme,
           darkTheme: darkTheme,
-          debugShowCheckedModeBanner: false,
-          routerDelegate: appRouter.delegate(),
-          routeInformationParser: appRouter.defaultRouteParser(),
         );
       },
     );
   }
+}
 
-  Brightness getBrightness() {
-    final autoBrightness = appStorage.getAutoBrightness();
+/// Because we need a [context] with adaptive theme data available in it.
+class AppWithTheme extends StatefulWidget {
+  final ThemeData theme;
+  final ThemeData darkTheme;
+  final Brightness brightness;
 
-    if (!autoBrightness) {
-      return appStorage.getBrightness();
-    }
+  const AppWithTheme({
+    Key key,
+    @required this.brightness,
+    @required this.darkTheme,
+    @required this.theme,
+  }) : super(key: key);
 
-    Brightness brightness = Brightness.light;
-    final now = DateTime.now();
+  @override
+  _AppWithThemeState createState() => _AppWithThemeState();
+}
 
-    if (now.hour < 6 || now.hour > 17) {
-      brightness = Brightness.dark;
-    }
+class _AppWithThemeState extends State<AppWithTheme> {
+  final appRouter = AppRouter(
+    authGuard: AuthGuard(),
+    noAuthGuard: NoAuthGuard(),
+  );
 
-    return brightness;
+  @override
+  initState() {
+    super.initState();
+    Future.delayed(250.milliseconds, () {
+      if (widget.brightness == Brightness.dark) {
+        AdaptiveTheme.of(context).setDark();
+        return;
+      }
+
+      AdaptiveTheme.of(context).setLight();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      title: 'Relines',
+      theme: widget.theme,
+      darkTheme: widget.darkTheme,
+      debugShowCheckedModeBanner: false,
+      routerDelegate: appRouter.delegate(),
+      routeInformationParser: appRouter.defaultRouteParser(),
+    );
   }
 }
 

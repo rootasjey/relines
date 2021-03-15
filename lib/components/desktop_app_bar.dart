@@ -170,14 +170,14 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
         tooltip: 'Brightness',
         onSelected: (value) {
           if (value == 'auto') {
-            setAutoBrightness(context);
+            BrightnessUtils.setAutoBrightness(context);
             return;
           }
 
           final brightness =
               value == 'dark' ? Brightness.dark : Brightness.light;
 
-          setBrightness(context, brightness);
+          BrightnessUtils.setBrightness(context, brightness);
         },
         itemBuilder: (context) {
           final autoBrightness = appStorage.getAutoBrightness();
