@@ -7,7 +7,6 @@ import 'package:relines/components/loading_animation.dart';
 import 'package:relines/router/app_router.gr.dart';
 import 'package:relines/state/colors.dart';
 import 'package:relines/state/user.dart';
-import 'package:relines/types/enums.dart';
 import 'package:relines/utils/app_storage.dart';
 import 'package:relines/utils/snack.dart';
 import 'package:flutter/material.dart';
@@ -321,20 +320,18 @@ class _SigninState extends State<Signin> {
 
   bool inputValuesOk() {
     if (!UsersActions.checkEmailFormat(email)) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "The value specified is not a valid email",
-        type: SnackType.error,
       );
 
       return false;
     }
 
     if (password.isEmpty) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "Password cannot be empty",
-        type: SnackType.error,
       );
 
       return false;
@@ -357,9 +354,8 @@ class _SigninState extends State<Signin> {
       );
 
       if (userCred == null) {
-        showSnack(
+        Snack.e(
           context: context,
-          type: SnackType.error,
           message: 'The password is incorrect or the user does not exists.',
         );
 
@@ -387,9 +383,8 @@ class _SigninState extends State<Signin> {
 
       setState(() => isSigningIn = false);
 
-      showSnack(
+      Snack.e(
         context: context,
-        type: SnackType.error,
         message: 'The password is incorrect or the user does not exists.',
       );
     }

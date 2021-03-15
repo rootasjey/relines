@@ -9,7 +9,6 @@ import 'package:relines/components/loading_animation.dart';
 import 'package:relines/router/app_router.gr.dart';
 import 'package:relines/state/colors.dart';
 import 'package:relines/state/user.dart';
-import 'package:relines/types/enums.dart';
 import 'package:relines/utils/snack.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
@@ -519,10 +518,9 @@ class _SignupState extends State<Signup> {
         isSigningUp = false;
       });
 
-      showSnack(
+      Snack.e(
         context: context,
         message: 'The email or name entered is not available.',
-        type: SnackType.error,
       );
 
       return;
@@ -544,10 +542,9 @@ class _SignupState extends State<Signup> {
 
         setState(() => isSigningUp = false);
 
-        showSnack(
+        Snack.e(
           context: context,
           message: "[code: ${exception.code}] - ${exception.message}",
-          type: SnackType.error,
         );
 
         return;
@@ -564,9 +561,8 @@ class _SignupState extends State<Signup> {
       });
 
       if (userCred == null) {
-        showSnack(
+        Snack.e(
           context: context,
-          type: SnackType.error,
           message: "There was an issue while connecting to your new account.",
         );
 
@@ -586,11 +582,10 @@ class _SignupState extends State<Signup> {
 
       setState(() => isSigningUp = false);
 
-      showSnack(
+      Snack.e(
         context: context,
         message: "An occurred while creating your account. "
             "Please try again or contact us if the problem persists.",
-        type: SnackType.error,
       );
     }
   }
@@ -604,52 +599,47 @@ class _SignupState extends State<Signup> {
 
   bool inputValuesOk() {
     if (password.isEmpty || confirmPassword.isEmpty) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "Password cannot be empty",
-        type: SnackType.error,
       );
 
       return false;
     }
 
     if (confirmPassword != password) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "Password & confirm passwords don't match",
-        type: SnackType.error,
       );
 
       return false;
     }
 
     if (username.isEmpty) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "Name cannot be empty",
-        type: SnackType.error,
       );
 
       return false;
     }
 
     if (!UsersActions.checkEmailFormat(email)) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "The value specified is not a valid email",
-        type: SnackType.error,
       );
 
       return false;
     }
 
     if (!UsersActions.checkUsernameFormat(username)) {
-      showSnack(
+      Snack.e(
         context: context,
         message: username.length < 3
             ? 'Please use at least 3 characters'
             : 'Please use alpha-numerical (A-Z, 0-9) characters and underscore (_)',
-        type: SnackType.error,
       );
 
       return false;

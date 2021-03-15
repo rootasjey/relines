@@ -1,30 +1,23 @@
 import 'dart:convert';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:global_configuration/global_configuration.dart';
-import 'package:relines/components/animated_app_icon.dart';
+import 'package:http/http.dart' as http;
 import 'package:relines/components/desktop_app_bar.dart';
-import 'package:relines/components/fade_in_x.dart';
 import 'package:relines/components/fade_in_y.dart';
 import 'package:relines/components/footer.dart';
 import 'package:relines/components/image_card.dart';
+import 'package:relines/components/rules.dart';
+import 'package:relines/components/share_game.dart';
+import 'package:relines/router/app_router.gr.dart';
 import 'package:relines/state/colors.dart';
-import 'package:relines/state/topics_colors.dart';
-import 'package:relines/types/author.dart';
-import 'package:relines/types/enums.dart';
-import 'package:relines/types/game_answer_response.dart';
-import 'package:relines/types/game_question_response.dart';
+import 'package:relines/state/game.dart';
 import 'package:relines/types/quote.dart';
 import 'package:relines/types/reference.dart';
-import 'package:relines/utils/app_logger.dart';
-import 'package:relines/utils/constants.dart';
-import 'package:relines/utils/snack.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:relines/utils/fonts.dart';
 import 'package:supercharged/supercharged.dart';
-import 'package:http/http.dart' as http;
 import 'package:unicons/unicons.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -34,37 +27,14 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   bool isLoading = false;
   bool isFabVisible = false;
-  bool hasChosenAnswer = false;
-  bool isCheckingAnswer = false;
-  bool isCurrentQuestionCompleted = false;
-
-  Color accentColor = Colors.blue;
 
   final _scrollController = ScrollController();
 
-  int currentQuestion = 0;
-  int maxQuestions = 10;
-  int correctAnswers = 0;
-  int score = 0;
-
-  int currentFetchRetry = 0;
-  int maxFetchRetry = 3;
-
-  final questionEndpoint = "https://api.fig.style/v1/dis/random";
-  final answerEndpoint = "https://api.fig.style/v1/dis/check";
-  final quoteEndpoint = "https://api.fig.style/v1/quotes/";
-  final referenceEndpoint = "https://api.fig.style/v1/references/";
-
-  GameAnswerResponse answerResponse;
-  GameQuestionResponse questionResponse;
-
-  GameState gameState = GameState.stopped;
-
-  List<Author> authors = [];
-  List<Reference> references = [];
   List<Reference> referencesPresentation = [];
   List<Quote> quotesPresentation = [];
-  List<String> previousQuestionsIds = [];
+
+  final quoteEndpoint = "https://api.fig.style/v1/quotes/";
+  final referenceEndpoint = "https://api.fig.style/v1/references/";
 
   List<String> quotesIds = [
     "0EUE8cUP09nQkO4A70oa",
@@ -75,12 +45,6 @@ class _HomeState extends State<Home> {
     "EDRwqgBONNg8cAaAhg8q", // La Révolution
     "F2Li6Usbb6EH4qVFU1zD", // Chilling avdventure of Sabrina
   ];
-
-  Map<String, dynamic> responseJsonData;
-
-  String quoteName = '';
-  String questionType = 'author';
-  String selectedId = '';
 
   @override
   void initState() {
@@ -134,14 +98,6 @@ class _HomeState extends State<Home> {
                 DesktopAppBar(
                   padding: const EdgeInsets.only(left: 65.0),
                   onTapIconHeader: () {
-                    if (_scrollController.offset < 10.0) {
-                      setState(() {
-                        gameState = GameState.stopped;
-                      });
-
-                      return;
-                    }
-
                     _scrollController.animateTo(
                       0,
                       duration: 250.milliseconds,
@@ -153,317 +109,33 @@ class _HomeState extends State<Home> {
                 footer(),
               ],
             ),
-            Positioned(
-              top: 160.0,
-              right: 24.0,
-              child: hud(),
-            ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget answerResultBlock() {
-    if (!isCurrentQuestionCompleted) {
-      return Container();
-    }
-
-    Widget textMessageWidget = Text("");
-
-    if (answerResponse.isCorrect) {
-      textMessageWidget = Text(
-        "🎉 Yay! This was the correct answer! 🎉",
-        style: TextStyle(
-          fontSize: 16.0,
-          fontWeight: FontWeight.w400,
-        ),
-      );
-    } else {
-      textMessageWidget = RichText(
-        text: TextSpan(
-          text: "🙁  Sorry, this was not the correct answer. It was ",
-          style: TextStyle(
-            fontSize: 16.0,
-            fontWeight: FontWeight.w400,
-            color: stateColors.foreground,
-          ),
-          children: [
-            TextSpan(
-              text: answerResponse.correction.name,
-              style: TextStyle(
-                color: Colors.green,
-                fontSize: 16.0,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Container(
-      width: 600.0,
-      padding: const EdgeInsets.only(bottom: 40.0),
-      child: Card(
-        elevation: 2.0,
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: textMessageWidget,
-              ),
-              Wrap(
-                spacing: 20.0,
-                children: [
-                  OutlinedButton(
-                    onPressed: quitGame,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 12.0,
-                      ),
-                      child: Text("Quit"),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: nextQuestion,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 8.0,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            currentQuestion > maxQuestions
-                                ? "See results"
-                                : "Next question",
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: Icon(UniconsLine.arrow_right),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget authorsRow() {
-    int index = 0;
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: questionResponse.authorProposals.values.map(
-        (proposal) {
-          index++;
-          return FadeInX(
-            beginX: 20.0,
-            delay: Duration(milliseconds: 200 * index),
-            child: ImageCard(
-              name: proposal.name,
-              imageUrl: proposal.urls.image,
-              selected: selectedId == proposal.id,
-              type: ImageCardType.extended,
-              onTap: () {
-                if (hasChosenAnswer) {
-                  return;
-                }
-
-                setState(() {
-                  hasChosenAnswer = true;
-                  selectedId = proposal.id;
-                });
-
-                checkAnswer(proposal.id);
-              },
-            ),
-          );
-        },
-      ).toList(),
     );
   }
 
   Widget body() {
-    if (gameState == GameState.stopped) {
-      return notStartedView();
-    }
-
-    if (gameState == GameState.finished) {
-      return finishedView();
-    }
-
-    return runningGameView();
-  }
-
-  Widget checkingAnswerBlock() {
-    if (isCheckingAnswer) {
-      return Wrap(
-        spacing: 16.0,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          Text(
-            "Checking answer...",
-            style: TextStyle(
-              fontSize: 16.0,
-            ),
-          ),
-          AnimatedAppIcon(size: 70.0),
-        ],
-      );
-    }
-
-    return Container();
-  }
-
-  Widget finishedView() {
     return SliverList(
       delegate: SliverChildListDelegate.fixed([
-        Container(
-          width: 700.0,
-          height: MediaQuery.of(context).size.height,
+        Padding(
           padding: const EdgeInsets.all(80.0),
-          child: Column(
-            children: [
-              gameTitle(),
-              Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  Opacity(
-                    opacity: 0.6,
-                    child: Text(
-                      "Thank you for playing with us!",
-                      style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.w100,
-                        decoration: TextDecoration.underline,
-                        decorationColor:
-                            stateColors.foreground.withOpacity(0.4),
-                        decorationStyle: TextDecorationStyle.solid,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Icon(
-                      UniconsLine.heart,
-                      color: Colors.pink,
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 24.0),
-                child: Wrap(
-                  spacing: 12.0,
-                  children: [
-                    TextButton.icon(
-                      onPressed: () {
-                        setState(() => gameState = GameState.stopped);
-                      },
-                      icon: Icon(UniconsLine.home),
-                      label: Text("Return home"),
-                      style: TextButton.styleFrom(
-                        primary: stateColors.foreground.withOpacity(0.5),
-                      ),
-                    ),
-                    TextButton.icon(
-                      onPressed: startGame,
-                      icon: Icon(UniconsLine.refresh),
-                      label: Text("Play again"),
-                      style: TextButton.styleFrom(
-                        primary: stateColors.foreground.withOpacity(0.5),
-                      ),
-                    ),
-                  ],
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                notStartedHeader(),
+                FadeInY(
+                  beginY: 20.0,
+                  delay: 600.milliseconds,
+                  child: Rules(),
                 ),
-              ),
-              Container(
-                width: 500.0,
-                padding: const EdgeInsets.only(top: 60.0),
-                child: Card(
-                  elevation: 4.0,
-                  color: Colors.transparent,
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Wrap(
-                            spacing: 8.0,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              Icon(
-                                UniconsLine.award,
-                                color: Colors.yellow.shade800,
-                              ),
-                              Text(
-                                "Result",
-                                style: TextStyle(
-                                  color: Colors.yellow.shade800,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        RichText(
-                          text: TextSpan(
-                            text: "You made a total of ",
-                            children: [
-                              TextSpan(
-                                text: "$score points, ",
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                  color: Colors.yellow.shade800,
-                                ),
-                              ),
-                              TextSpan(
-                                text: "you got ",
-                              ),
-                              TextSpan(
-                                text: "$correctAnswers good answers ",
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                  color: Colors.yellow.shade800,
-                                ),
-                              ),
-                              TextSpan(
-                                text: "out of ",
-                              ),
-                              TextSpan(
-                                text: "$maxQuestions in total.",
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                  color: Colors.yellow.shade800,
-                                ),
-                              ),
-                            ],
-                            style: TextStyle(
-                              fontSize: 24.0,
-                              color: stateColors.foreground.withOpacity(0.6),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              shareScoreButtons(),
-            ],
+                ShareGame(),
+              ],
+            ),
           ),
         ),
       ]),
@@ -481,120 +153,9 @@ class _HomeState extends State<Home> {
   Widget gameTitle() {
     return Text(
       "Relines",
-      style: TextStyle(
+      style: FontsUtils.pacificoStyle(
         fontSize: 60.0,
-        fontFamily: GoogleFonts.pacifico().fontFamily,
       ),
-    );
-  }
-
-  Widget hud() {
-    if (gameState != GameState.running) {
-      return Container();
-    }
-
-    return Container(
-      width: 180.0,
-      child: Card(
-        elevation: 2.0,
-        color: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4.0),
-          side: BorderSide(
-            color: stateColors.primary,
-            width: 2.0,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Wrap(
-                  children: [
-                    Icon(
-                      UniconsLine.award,
-                      color: Colors.yellow.shade800,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 4.0),
-                      child: Text("$score points"),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Wrap(
-                  children: [
-                    Icon(
-                      UniconsLine.question,
-                      color: Colors.green,
-                    ),
-                    Text("question $currentQuestion / $maxQuestions"),
-                  ],
-                ),
-              ),
-              Wrap(
-                alignment: WrapAlignment.start,
-                children: [
-                  TextButton(
-                    onPressed: quitGame,
-                    child: Wrap(
-                      children: [
-                        Text("Quit"),
-                      ],
-                    ),
-                    style: TextButton.styleFrom(
-                      primary: Colors.pink,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: skipQuestion,
-                    child: Wrap(
-                      children: [
-                        Text("Skip"),
-                      ],
-                    ),
-                    style: TextButton.styleFrom(
-                      primary: Colors.orange,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget notStartedView() {
-    return SliverList(
-      delegate: SliverChildListDelegate.fixed([
-        Padding(
-          padding: const EdgeInsets.all(80.0),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                notStartedHeader(),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 600.milliseconds,
-                  child: basicRules(),
-                ),
-                shareGameButtons(),
-              ],
-            ),
-          ),
-        ),
-      ]),
     );
   }
 
@@ -736,114 +297,6 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget basicRules() {
-    final titleFontSize = 60.0;
-    final textFontSize = 16.0;
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Rules",
-            style: TextStyle(
-              color: stateColors.secondary,
-              fontSize: titleFontSize,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              top: 16.0,
-              bottom: 24.0,
-            ),
-            child: Opacity(
-              opacity: 0.6,
-              child: RichText(
-                text: TextSpan(
-                  text:
-                      "Each round, you have to guess the author or the reference "
-                      "of the displayed quote. The question type alternate randomly. "
-                      "For example, on the 1st round, you must guess the author, "
-                      "and on the next 2nd round, you must guess the reference.",
-                  style: TextStyle(
-                    color: stateColors.foreground,
-                    fontSize: textFontSize,
-                    fontWeight: FontWeight.w100,
-                  ),
-                  children: [],
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              bottom: 24.0,
-            ),
-            child: Opacity(
-              opacity: 0.6,
-              child: RichText(
-                text: TextSpan(
-                  text: "For each good answer, you earn 10 points. "
-                      "Wrong answers make you loose 5 points."
-                      "1 point is used if you skip one question.",
-                  style: TextStyle(
-                    color: stateColors.foreground,
-                    fontSize: textFontSize,
-                    fontWeight: FontWeight.w100,
-                  ),
-                  children: [],
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              bottom: 24.0,
-            ),
-            child: Opacity(
-              opacity: 0.6,
-              child: RichText(
-                text: TextSpan(
-                  text: "You can choose a game in 5 questions, "
-                      "10 questions or 20 questions.",
-                  style: TextStyle(
-                    color: stateColors.foreground,
-                    fontSize: textFontSize,
-                    fontWeight: FontWeight.w100,
-                  ),
-                  children: [],
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              bottom: 24.0,
-            ),
-            child: Opacity(
-              opacity: 0.6,
-              child: RichText(
-                text: TextSpan(
-                  text: "Save your progress and your games "
-                      "by connecting to your account. Or create one "
-                      "if you didn't already.",
-                  style: TextStyle(
-                    color: stateColors.foreground,
-                    fontSize: textFontSize,
-                    fontWeight: FontWeight.w100,
-                  ),
-                  children: [],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget notStartedButtons() {
     final questionsText = "questions";
 
@@ -861,7 +314,7 @@ class _HomeState extends State<Home> {
               OutlinedButton(
                 onPressed: () {
                   setState(() {
-                    maxQuestions = 5;
+                    stateGame.setMaxQuestions(5);
                   });
                 },
                 child: Padding(
@@ -872,13 +325,13 @@ class _HomeState extends State<Home> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (maxQuestions == 5) Icon(UniconsLine.check),
+                      if (stateGame.maxQuestionsIs(5)) Icon(UniconsLine.check),
                       Text("5 $questionsText"),
                     ],
                   ),
                 ),
                 style: OutlinedButton.styleFrom(
-                  primary: maxQuestions == 5
+                  primary: stateGame.maxQuestionsIs(5)
                       ? stateColors.secondary
                       : Theme.of(context).textTheme.bodyText1.color,
                 ),
@@ -886,7 +339,7 @@ class _HomeState extends State<Home> {
               OutlinedButton(
                 onPressed: () {
                   setState(() {
-                    maxQuestions = 10;
+                    stateGame.setMaxQuestions(10);
                   });
                 },
                 child: Padding(
@@ -897,13 +350,13 @@ class _HomeState extends State<Home> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (maxQuestions == 10) Icon(UniconsLine.check),
+                      if (stateGame.maxQuestionsIs(10)) Icon(UniconsLine.check),
                       Text("10 $questionsText"),
                     ],
                   ),
                 ),
                 style: OutlinedButton.styleFrom(
-                  primary: maxQuestions == 10
+                  primary: stateGame.maxQuestionsIs(10)
                       ? stateColors.secondary
                       : stateColors.foreground,
                 ),
@@ -911,7 +364,7 @@ class _HomeState extends State<Home> {
               OutlinedButton(
                 onPressed: () {
                   setState(() {
-                    maxQuestions = 20;
+                    stateGame.setMaxQuestions(20);
                   });
                 },
                 child: Padding(
@@ -922,13 +375,13 @@ class _HomeState extends State<Home> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (maxQuestions == 5) Icon(UniconsLine.check),
+                      if (stateGame.maxQuestionsIs(20)) Icon(UniconsLine.check),
                       Text("20 $questionsText"),
                     ],
                   ),
                 ),
                 style: OutlinedButton.styleFrom(
-                  primary: maxQuestions == 20
+                  primary: stateGame.maxQuestionsIs(20)
                       ? stateColors.secondary
                       : stateColors.foreground,
                 ),
@@ -937,7 +390,9 @@ class _HomeState extends State<Home> {
           ),
         ),
         ElevatedButton(
-          onPressed: startGame,
+          onPressed: () {
+            context.router.push(PlayRoute());
+          },
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 16.0,
@@ -961,318 +416,6 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget proposalsBlock() {
-    if (questionType == 'author') {
-      return authorsRow();
-    }
-
-    return referencesRow();
-  }
-
-  Widget quoteBlock() {
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: 700.0),
-      child: Opacity(
-        opacity: 0.8,
-        child: Text(
-          quoteName,
-          style: TextStyle(
-            fontSize: 42.0,
-            fontWeight: FontWeight.w300,
-            decoration: TextDecoration.underline,
-            decorationColor: accentColor.withOpacity(0.2),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget referencesRow() {
-    int index = 0;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: questionResponse.referenceProposals.values.map(
-        (proposal) {
-          index++;
-
-          return FadeInX(
-            beginX: 20.0,
-            delay: Duration(milliseconds: 200 * index),
-            child: ImageCard(
-              name: proposal.name,
-              imageUrl: proposal.urls.image,
-              selected: selectedId == proposal.id,
-              type: ImageCardType.extended,
-              onTap: () {
-                if (hasChosenAnswer) {
-                  return;
-                }
-
-                setState(() {
-                  hasChosenAnswer = true;
-                  selectedId = proposal.id;
-                });
-
-                checkAnswer(proposal.id);
-              },
-            ),
-          );
-        },
-      ).toList(),
-    );
-  }
-
-  Widget runningGameView() {
-    if (isLoading) {
-      return runningLoadingView();
-    }
-
-    return SliverList(
-      delegate: SliverChildListDelegate.fixed([
-        Padding(
-          padding: const EdgeInsets.all(80.0),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height,
-            ),
-            child: Column(
-              children: [
-                checkingAnswerBlock(),
-                answerResultBlock(),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 100.milliseconds,
-                  child: quoteBlock(),
-                ),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 300.milliseconds,
-                  child: subtitleBlock(),
-                ),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 600.milliseconds,
-                  child: proposalsBlock(),
-                ),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 900.milliseconds,
-                  child: skipButton(),
-                ),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 1200.milliseconds,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 200.0),
-                    child: basicRules(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ]),
-    );
-  }
-
-  Widget runningLoadingView() {
-    return SliverList(
-      delegate: SliverChildListDelegate.fixed([
-        SizedBox(
-          height: MediaQuery.of(context).size.height - 100.0,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AnimatedAppIcon(),
-              Text(
-                "Loading...",
-                style: TextStyle(
-                  fontSize: 18.0,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ]),
-    );
-  }
-
-  Widget shareGameButtons() {
-    return Wrap(
-      spacing: 24.0,
-      children: [
-        TextButton.icon(
-          onPressed: () {
-            launch("${Constants.baseTwitterShareUrl}This game is fun!"
-                "${Constants.twitterShareHashtags}"
-                "&url=https://dis.fig.style");
-          },
-          icon: Icon(UniconsLine.twitter),
-          label: Text("Share on Twitter"),
-        ),
-        IconButton(
-          tooltip: "Copy link",
-          onPressed: () {
-            Clipboard.setData(
-              ClipboardData(text: Constants.disUrl),
-            );
-
-            showSnack(
-              context: context,
-              type: SnackType.info,
-              message: "Link successfully copied!",
-            );
-          },
-          icon: Icon(UniconsLine.link),
-        ),
-      ],
-    );
-  }
-
-  Widget shareScoreButtons() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 60.0),
-      child: Wrap(
-        spacing: 24.0,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          TextButton.icon(
-            onPressed: () {
-              launch(
-                "${Constants.baseTwitterShareUrl}I made a score of "
-                "$score points, answering right "
-                "to $correctAnswers out of $maxQuestions."
-                "${Constants.twitterShareHashtags}"
-                "&url=https://dis.fig.style",
-              );
-            },
-            icon: Icon(UniconsLine.twitter),
-            label: Text("Share on Twitter"),
-          ),
-          IconButton(
-            tooltip: "Copy result message",
-            onPressed: () {
-              Clipboard.setData(
-                ClipboardData(
-                  text: "I made a score of "
-                      "$score points, answering right "
-                      "to $correctAnswers out of $maxQuestions. "
-                      "Can you do more? (${Constants.disUrl})",
-                ),
-              );
-
-              showSnack(
-                context: context,
-                type: SnackType.info,
-                message: "Link successfully copied!",
-              );
-            },
-            icon: Icon(UniconsLine.link),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget skipButton() {
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: 16.0,
-      ),
-      child: TextButton(
-        onPressed: skipQuestion,
-        child: Text(
-          "Skip that one...",
-        ),
-      ),
-    );
-  }
-
-  Widget subtitleBlock() {
-    String helpText = questionType == 'author'
-        ? "Who, among these 3 authors, said that quote?"
-        : "What's that quote reference?";
-
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: 16.0,
-        bottom: 32.0,
-      ),
-      child: Opacity(
-        opacity: 0.5,
-        child: Text(
-          helpText,
-          style: TextStyle(
-            fontSize: 16.0,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-    );
-  }
-
-  void checkAnswer(String proposalId) async {
-    _scrollController.animateTo(
-      0,
-      curve: Curves.bounceOut,
-      duration: 250.milliseconds,
-    );
-
-    setState(() {
-      isCheckingAnswer = true;
-      previousQuestionsIds.add(proposalId);
-    });
-
-    try {
-      final response = await http.post(
-        Uri.parse(answerEndpoint),
-        headers: {
-          'authorization': GlobalConfiguration().getValue<String>("apikey"),
-        },
-        body: {
-          'answerProposalId': proposalId,
-          'guessType': questionType,
-          'quoteId': questionResponse.question.quote.id,
-        },
-      );
-
-      final Map<String, dynamic> jsonObj = jsonDecode(response.body);
-
-      setState(() {
-        answerResponse = GameAnswerResponse.fromJSON(jsonObj['response']);
-        isCheckingAnswer = false;
-        isCurrentQuestionCompleted = true;
-      });
-
-      if (answerResponse.isCorrect) {
-        setState(() {
-          correctAnswers++;
-          score += 10;
-        });
-        return;
-      }
-
-      setState(() {
-        score -= 5;
-      });
-    } catch (error) {
-      setState(() => isLoading = false);
-      debugPrint(error.toString());
-      debugPrint(
-        "This was the quote to answer: "
-        "${questionResponse.question.quote.id}",
-      );
-      debugPrint(
-        "This was the proposed answer: "
-        "$proposalId",
-      );
-      debugPrint(
-        "This was the guess type: "
-        "$questionType",
-      );
-    }
-  }
-
   void fetchPresentationData() async {
     final quotesFutures = <Future>[];
     final referencesFutures = <Future>[];
@@ -1287,117 +430,6 @@ class _HomeState extends State<Home> {
 
     await Future.wait([...quotesFutures, ...referencesFutures]);
     setState(() {});
-  }
-
-  void fetchQuestion() async {
-    setState(() {
-      isLoading = true;
-      isCheckingAnswer = false;
-      isCurrentQuestionCompleted = false;
-      selectedId = '';
-    });
-
-    try {
-      final response = await http.post(
-        Uri.parse(questionEndpoint),
-        headers: {
-          'authorization': GlobalConfiguration().getValue<String>("apikey"),
-        },
-        body: {
-          'previousQuestionsIds': jsonEncode(previousQuestionsIds),
-        },
-      );
-
-      responseJsonData = jsonDecode(response.body);
-      questionResponse =
-          GameQuestionResponse.fromJSON(responseJsonData['response']);
-
-      final topicName =
-          questionResponse.question.quote.topics.firstOrElse(() => "fun");
-
-      setState(() {
-        isLoading = false;
-        currentFetchRetry = 0;
-
-        questionType = questionResponse.question.guessType;
-        quoteName = questionResponse.question.quote.name;
-        accentColor = appTopicsColors.getColorFor(topicName);
-      });
-    } catch (error) {
-      setState(() => isLoading = false);
-      appLogger.e(responseJsonData.toJSON());
-      appLogger.e(error);
-      retryFetch();
-    }
-  }
-
-  void nextQuestion() {
-    setState(() {
-      currentQuestion++;
-      gameState = currentQuestion > maxQuestions
-          ? GameState.finished
-          : GameState.running;
-      hasChosenAnswer = false;
-    });
-
-    if (gameState == GameState.finished) {
-      return;
-    }
-
-    fetchQuestion();
-  }
-
-  void quitGame() {
-    setState(() {
-      score = 0;
-      currentQuestion = 0;
-      hasChosenAnswer = false;
-      gameState = GameState.stopped;
-    });
-  }
-
-  void retryFetch() {
-    appLogger.d("Retry $currentFetchRetry / $maxFetchRetry");
-
-    if (currentFetchRetry > maxFetchRetry) {
-      return;
-    }
-
-    currentFetchRetry++;
-    fetchQuestion();
-  }
-
-  void skipQuestion() async {
-    if (isLoading) {
-      return;
-    }
-
-    setState(() {
-      currentQuestion++;
-      hasChosenAnswer = false;
-      gameState = currentQuestion > maxQuestions
-          ? GameState.finished
-          : GameState.running;
-      isLoading = false;
-      score -= 1;
-    });
-
-    if (gameState == GameState.finished) {
-      return;
-    }
-
-    fetchQuestion();
-  }
-
-  void startGame() {
-    setState(() {
-      score = 0;
-      currentQuestion = 1;
-      hasChosenAnswer = false;
-      gameState = GameState.running;
-    });
-
-    fetchQuestion();
   }
 
   Future fetchSingleQuote(String quoteId) async {

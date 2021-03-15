@@ -5,7 +5,6 @@ import 'package:relines/components/page_app_bar.dart';
 import 'package:relines/router/app_router.gr.dart';
 import 'package:relines/state/colors.dart';
 import 'package:relines/state/user.dart';
-import 'package:relines/types/enums.dart';
 import 'package:relines/utils/app_storage.dart';
 import 'package:relines/utils/constants.dart';
 import 'package:relines/utils/snack.dart';
@@ -390,31 +389,28 @@ class _UpdatePasswordState extends State<UpdatePassword> {
 
       setState(() => isUpdating = false);
 
-      showSnack(
+      Snack.e(
         context: context,
         message: "Error while updating your password. "
             "Please try again or contact us.",
-        type: SnackType.error,
       );
     }
   }
 
   bool inputValuesOk() {
     if (password.isEmpty) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "Password cannot be empty.",
-        type: SnackType.error,
       );
 
       return false;
     }
 
     if (newPassword.isEmpty) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "New password cannot be empty.",
-        type: SnackType.error,
       );
 
       return false;

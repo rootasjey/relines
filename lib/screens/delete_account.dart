@@ -7,7 +7,6 @@ import 'package:relines/components/fade_in_y.dart';
 import 'package:relines/router/app_router.gr.dart';
 import 'package:relines/state/colors.dart';
 import 'package:relines/state/user.dart';
-import 'package:relines/types/enums.dart';
 import 'package:relines/utils/app_storage.dart';
 import 'package:relines/utils/constants.dart';
 import 'package:relines/utils/snack.dart';
@@ -435,10 +434,9 @@ class DeleteAccountState extends State<DeleteAccount> {
           isDeleting = false;
         });
 
-        showSnack(
+        Snack.e(
           context: context,
           message: "[code: ${exception.code}] - ${exception.message}",
-          type: SnackType.error,
         );
 
         return;
@@ -461,20 +459,18 @@ class DeleteAccountState extends State<DeleteAccount> {
         isDeleting = false;
       });
 
-      showSnack(
+      Snack.e(
         context: context,
         message: (error as PlatformException).message,
-        type: SnackType.error,
       );
     }
   }
 
   bool inputValuesOk() {
     if (password.isEmpty) {
-      showSnack(
+      Snack.e(
         context: context,
         message: "Password cannot be empty.",
-        type: SnackType.error,
       );
 
       return false;

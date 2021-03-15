@@ -7,21 +7,22 @@
 import 'package:auto_route/auto_route.dart' as _i1;
 import 'package:flutter/material.dart' as _i2;
 
-import '../screens/about.dart' as _i6;
-import '../screens/changelog.dart' as _i7;
-import '../screens/contact.dart' as _i8;
-import '../screens/dashboard_page.dart' as _i9;
-import '../screens/delete_account.dart' as _i16;
-import '../screens/forgot_password.dart' as _i10;
+import '../screens/about.dart' as _i7;
+import '../screens/changelog.dart' as _i8;
+import '../screens/contact.dart' as _i9;
+import '../screens/dashboard_page.dart' as _i10;
+import '../screens/delete_account.dart' as _i17;
+import '../screens/forgot_password.dart' as _i11;
 import '../screens/home.dart' as _i5;
-import '../screens/settings.dart' as _i11;
-import '../screens/signin.dart' as _i12;
-import '../screens/signup.dart' as _i13;
-import '../screens/tos.dart' as _i14;
-import '../screens/undefined_page.dart' as _i15;
-import '../screens/update_email.dart' as _i17;
-import '../screens/update_password.dart' as _i18;
-import '../screens/update_username.dart' as _i19;
+import '../screens/play.dart' as _i6;
+import '../screens/settings.dart' as _i12;
+import '../screens/signin.dart' as _i13;
+import '../screens/signup.dart' as _i14;
+import '../screens/tos.dart' as _i15;
+import '../screens/undefined_page.dart' as _i16;
+import '../screens/update_email.dart' as _i18;
+import '../screens/update_password.dart' as _i19;
+import '../screens/update_username.dart' as _i20;
 import 'auth_guard.dart' as _i3;
 import 'no_auth_guard.dart' as _i4;
 
@@ -39,39 +40,42 @@ class AppRouter extends _i1.RootStackRouter {
     HomeRoute.name: (entry) {
       return _i1.MaterialPageX(entry: entry, child: _i5.Home());
     },
+    PlayRoute.name: (entry) {
+      return _i1.MaterialPageX(entry: entry, child: _i6.Play());
+    },
     AboutRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i6.About());
+      return _i1.MaterialPageX(entry: entry, child: _i7.About());
     },
     ChangelogRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i7.Changelog());
+      return _i1.MaterialPageX(entry: entry, child: _i8.Changelog());
     },
     ContactRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i8.Contact());
+      return _i1.MaterialPageX(entry: entry, child: _i9.Contact());
     },
     DashboardPageRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i9.DashboardPage());
+      return _i1.MaterialPageX(entry: entry, child: _i10.DashboardPage());
     },
     ForgotPasswordRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i10.ForgotPassword());
+      return _i1.MaterialPageX(entry: entry, child: _i11.ForgotPassword());
     },
     SettingsRoute.name: (entry) {
       var route = entry.routeData.as<SettingsRoute>();
       return _i1.MaterialPageX(
           entry: entry,
-          child: _i11.Settings(key: route.key, showAppBar: route.showAppBar));
+          child: _i12.Settings(key: route.key, showAppBar: route.showAppBar));
     },
     SigninRoute.name: (entry) {
       var route = entry.routeData.as<SigninRoute>();
       return _i1.MaterialPageX(
           entry: entry,
-          child: _i12.Signin(
+          child: _i13.Signin(
               key: route.key, onSigninResult: route.onSigninResult));
     },
     SignupRoute.name: (entry) {
       var route = entry.routeData.as<SignupRoute>();
       return _i1.MaterialPageX(
           entry: entry,
-          child: _i13.Signup(
+          child: _i14.Signup(
               key: route.key, onSignupResult: route.onSignupResult));
     },
     SignOutRoute.name: (entry) {
@@ -83,10 +87,10 @@ class AppRouter extends _i1.RootStackRouter {
           entry: entry, child: const _i1.EmptyRouterPage());
     },
     TosRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i14.Tos());
+      return _i1.MaterialPageX(entry: entry, child: _i15.Tos());
     },
     UndefinedPageRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i15.UndefinedPage());
+      return _i1.MaterialPageX(entry: entry, child: _i16.UndefinedPage());
     },
     DashboardSettingsDeepRoute.name: (entry) {
       return _i1.MaterialPageX(
@@ -96,23 +100,23 @@ class AppRouter extends _i1.RootStackRouter {
       var route = entry.routeData.as<DashboardSettingsRoute>();
       return _i1.MaterialPageX(
           entry: entry,
-          child: _i11.Settings(key: route.key, showAppBar: route.showAppBar));
+          child: _i12.Settings(key: route.key, showAppBar: route.showAppBar));
     },
     DeleteAccountRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i16.DeleteAccount());
+      return _i1.MaterialPageX(entry: entry, child: _i17.DeleteAccount());
     },
     AccountUpdateDeepRoute.name: (entry) {
       return _i1.MaterialPageX(
           entry: entry, child: const _i1.EmptyRouterPage());
     },
     UpdateEmailRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i17.UpdateEmail());
+      return _i1.MaterialPageX(entry: entry, child: _i18.UpdateEmail());
     },
     UpdatePasswordRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i18.UpdatePassword());
+      return _i1.MaterialPageX(entry: entry, child: _i19.UpdatePassword());
     },
     UpdateUsernameRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i19.UpdateUsername());
+      return _i1.MaterialPageX(entry: entry, child: _i20.UpdateUsername());
     },
     GitHubRoute.name: (entry) {
       return _i1.MaterialPageX(
@@ -124,6 +128,8 @@ class AppRouter extends _i1.RootStackRouter {
   List<_i1.RouteConfig> get routes => [
         _i1.RouteConfig<HomeRoute>(HomeRoute.name,
             path: '/', routeBuilder: (match) => HomeRoute.fromMatch(match)),
+        _i1.RouteConfig<PlayRoute>(PlayRoute.name,
+            path: '/play', routeBuilder: (match) => PlayRoute.fromMatch(match)),
         _i1.RouteConfig<AboutRoute>(AboutRoute.name,
             path: '/about',
             routeBuilder: (match) => AboutRoute.fromMatch(match)),
@@ -220,6 +226,14 @@ class HomeRoute extends _i1.PageRouteInfo {
   HomeRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
 
   static const String name = 'HomeRoute';
+}
+
+class PlayRoute extends _i1.PageRouteInfo {
+  const PlayRoute() : super(name, path: '/play');
+
+  PlayRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
+
+  static const String name = 'PlayRoute';
 }
 
 class AboutRoute extends _i1.PageRouteInfo {

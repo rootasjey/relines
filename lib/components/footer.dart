@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:relines/router/app_router.gr.dart';
 import 'package:relines/state/user.dart';
-import 'package:relines/types/enums.dart';
 import 'package:relines/utils/constants.dart';
 import 'package:relines/utils/snack.dart';
 import 'package:flutter/material.dart';
@@ -219,10 +218,9 @@ class _FooterState extends State<Footer> {
       context.router.root.navigate(HomeRoute());
     }
 
-    showSnack(
+    Snack.s(
       context: context,
       message: 'Your language has been successfully updated.',
-      type: SnackType.success,
     );
   }
 

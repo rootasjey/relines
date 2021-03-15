@@ -26,6 +26,26 @@ class FontsUtils {
     );
   }
 
+  /// Return other text style for this app.
+  static TextStyle pacificoStyle({
+    FontWeight fontWeight = FontWeight.w400,
+    double fontSize = 16.0,
+    Color color,
+  }) {
+    if (color == null) {
+      return GoogleFonts.pacifico(
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+      );
+    }
+
+    return GoogleFonts.pacifico(
+      color: color,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+    );
+  }
+
   /// Return main text style for this app.
   static TextStyle boldTitleStyle() {
     return GoogleFonts.raleway(

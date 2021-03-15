@@ -9,7 +9,6 @@ import 'package:relines/components/sliver_edge_padding.dart';
 import 'package:relines/router/app_router.gr.dart';
 import 'package:relines/state/colors.dart';
 import 'package:relines/state/user.dart';
-import 'package:relines/types/enums.dart';
 import 'package:relines/utils/constants.dart';
 import 'package:relines/utils/snack.dart';
 import 'package:flutter/material.dart';
@@ -428,10 +427,9 @@ class _UpdateUsernameState extends State<UpdateUsername> {
           isUpdating = false;
         });
 
-        showSnack(
+        Snack.e(
           context: context,
           message: "The name $newUserName is not available",
-          type: SnackType.error,
         );
 
         return;
@@ -459,10 +457,9 @@ class _UpdateUsernameState extends State<UpdateUsername> {
           isUpdating = false;
         });
 
-        showSnack(
+        Snack.e(
           context: context,
           message: "[code: ${exception.code}] - ${exception.message}",
-          type: SnackType.error,
         );
 
         return;
@@ -477,10 +474,9 @@ class _UpdateUsernameState extends State<UpdateUsername> {
 
       stateUser.setUsername(currentUsername);
 
-      showSnack(
+      Snack.s(
         context: context,
         message: 'Your username has been successfully updated.',
-        type: SnackType.success,
       );
 
       // Navigator.of(context).pop();
@@ -492,11 +488,10 @@ class _UpdateUsernameState extends State<UpdateUsername> {
         isUpdating = false;
       });
 
-      showSnack(
+      Snack.e(
         context: context,
         message: 'Sorry, there was an error. '
             'Can you try again later or contact us if the issue persists?',
-        type: SnackType.error,
       );
     }
   }

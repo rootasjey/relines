@@ -9,7 +9,6 @@ import 'package:relines/components/page_app_bar.dart';
 import 'package:relines/router/app_router.gr.dart';
 import 'package:relines/state/colors.dart';
 import 'package:relines/state/user.dart';
-import 'package:relines/types/enums.dart';
 import 'package:relines/utils/app_storage.dart';
 import 'package:relines/utils/brightness.dart';
 import 'package:relines/utils/constants.dart';
@@ -829,20 +828,18 @@ class _SettingsState extends State<Settings> {
         isLoadingAvatarUrl = false;
       });
 
-      showSnack(
+      Snack.s(
         context: context,
         message: 'Your image has been successfully updated.',
-        type: SnackType.success,
       );
     } catch (error) {
       debugPrint(error.toString());
 
       setState(() => isLoadingAvatarUrl = false);
 
-      showSnack(
+      Snack.e(
         context: context,
         message: 'Oops, there was an error: ${error.toString()}',
-        type: SnackType.error,
       );
     }
   }

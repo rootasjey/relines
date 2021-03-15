@@ -9,6 +9,7 @@ import 'package:relines/screens/changelog.dart';
 import 'package:relines/screens/contact.dart';
 import 'package:relines/screens/dashboard_page.dart';
 import 'package:relines/screens/delete_account.dart';
+import 'package:relines/screens/play.dart';
 import 'package:relines/screens/update_username.dart';
 import 'package:relines/screens/forgot_password.dart';
 import 'package:relines/screens/home.dart';
@@ -23,6 +24,7 @@ import 'package:relines/screens/update_password.dart';
 @MaterialAutoRouter(
   routes: <AutoRoute>[
     AutoRoute(path: '/', page: Home),
+    AutoRoute(path: '/play', page: Play),
     MaterialRoute(path: '/about', page: About),
     MaterialRoute(path: '/changelog', page: Changelog),
     MaterialRoute(path: '/contact', page: Contact),
