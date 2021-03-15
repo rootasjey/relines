@@ -15,6 +15,7 @@ import 'package:relines/components/image_card.dart';
 import 'package:relines/components/rules.dart';
 import 'package:relines/router/app_router.gr.dart';
 import 'package:relines/state/colors.dart';
+import 'package:relines/state/game.dart';
 import 'package:relines/state/topics_colors.dart';
 import 'package:relines/types/author.dart';
 import 'package:relines/types/enums.dart';
@@ -761,7 +762,7 @@ class _PlayState extends State<Play> {
 
     try {
       final response = await http.post(
-        Uri.parse(questionEndpoint),
+        Uri.parse('$questionEndpoint?lang=${Game.language}'),
         headers: {
           'authorization': GlobalConfiguration().getValue<String>("apikey"),
         },

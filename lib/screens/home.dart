@@ -7,6 +7,7 @@ import 'package:relines/components/desktop_app_bar.dart';
 import 'package:relines/components/fade_in_y.dart';
 import 'package:relines/components/footer.dart';
 import 'package:relines/components/image_card.dart';
+import 'package:relines/components/lang_popup_menu_button.dart';
 import 'package:relines/components/rules.dart';
 import 'package:relines/components/share_game.dart';
 import 'package:relines/router/app_router.gr.dart';
@@ -219,7 +220,7 @@ class _HomeState extends State<Home> {
           FadeInY(
             beginY: 20.0,
             delay: 600.milliseconds,
-            child: notStartedButtons(),
+            child: headerButtons(),
           ),
         ],
       ),
@@ -297,122 +298,174 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget notStartedButtons() {
-    final questionsText = "questions";
-
+  Widget headerButtons() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(
-            top: 16.0,
-            bottom: 16.0,
-          ),
-          child: Wrap(
-            spacing: 16.0,
-            children: [
-              OutlinedButton(
-                onPressed: () {
-                  setState(() {
-                    stateGame.setMaxQuestions(5);
-                  });
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8.0,
-                    vertical: 8.0,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (stateGame.maxQuestionsIs(5)) Icon(UniconsLine.check),
-                      Text("5 $questionsText"),
-                    ],
-                  ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  primary: stateGame.maxQuestionsIs(5)
-                      ? stateColors.secondary
-                      : Theme.of(context).textTheme.bodyText1.color,
-                ),
-              ),
-              OutlinedButton(
-                onPressed: () {
-                  setState(() {
-                    stateGame.setMaxQuestions(10);
-                  });
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8.0,
-                    vertical: 8.0,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (stateGame.maxQuestionsIs(10)) Icon(UniconsLine.check),
-                      Text("10 $questionsText"),
-                    ],
-                  ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  primary: stateGame.maxQuestionsIs(10)
-                      ? stateColors.secondary
-                      : stateColors.foreground,
-                ),
-              ),
-              OutlinedButton(
-                onPressed: () {
-                  setState(() {
-                    stateGame.setMaxQuestions(20);
-                  });
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8.0,
-                    vertical: 8.0,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (stateGame.maxQuestionsIs(20)) Icon(UniconsLine.check),
-                      Text("20 $questionsText"),
-                    ],
-                  ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  primary: stateGame.maxQuestionsIs(20)
-                      ? stateColors.secondary
-                      : stateColors.foreground,
-                ),
-              ),
-            ],
-          ),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            context.router.push(PlayRoute());
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 16.0,
-            ),
-            child: Wrap(
-              spacing: 8.0,
-              children: [
-                Text(
-                  "Start game",
-                  style: TextStyle(
-                    fontSize: 18.0,
-                  ),
-                ),
-                Icon(UniconsLine.arrow_right),
-              ],
-            ),
-          ),
+        maxQuestionsButton(),
+        Wrap(
+          spacing: 12.0,
+          children: [
+            langSelector(),
+            startGameButton(),
+          ],
         ),
       ],
+    );
+  }
+
+  Widget langSelector() {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: 9.0,
+          horizontal: 12.0,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Opacity(
+                opacity: 0.8,
+                child: Text(
+                  "Language",
+                  style: FontsUtils.mainStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+            LangPopupMenuButton(
+              lang: Game.language,
+              onLangChanged: (lang) {
+                setState(() {
+                  Game.setLanguage(lang);
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget maxQuestionsButton() {
+    final questionsText = "questions";
+
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: 16.0,
+        bottom: 16.0,
+      ),
+      child: Wrap(
+        spacing: 16.0,
+        children: [
+          OutlinedButton(
+            onPressed: () {
+              setState(() {
+                Game.setMaxQuestions(5);
+              });
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8.0,
+                vertical: 8.0,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (Game.maxQuestionsIs(5)) Icon(UniconsLine.check),
+                  Text("5 $questionsText"),
+                ],
+              ),
+            ),
+            style: OutlinedButton.styleFrom(
+              primary: Game.maxQuestionsIs(5)
+                  ? stateColors.secondary
+                  : Theme.of(context).textTheme.bodyText1.color,
+            ),
+          ),
+          OutlinedButton(
+            onPressed: () {
+              setState(() {
+                Game.setMaxQuestions(10);
+              });
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8.0,
+                vertical: 8.0,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (Game.maxQuestionsIs(10)) Icon(UniconsLine.check),
+                  Text("10 $questionsText"),
+                ],
+              ),
+            ),
+            style: OutlinedButton.styleFrom(
+              primary: Game.maxQuestionsIs(10)
+                  ? stateColors.secondary
+                  : stateColors.foreground,
+            ),
+          ),
+          OutlinedButton(
+            onPressed: () {
+              setState(() {
+                Game.setMaxQuestions(20);
+              });
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8.0,
+                vertical: 8.0,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (Game.maxQuestionsIs(20)) Icon(UniconsLine.check),
+                  Text("20 $questionsText"),
+                ],
+              ),
+            ),
+            style: OutlinedButton.styleFrom(
+              primary: Game.maxQuestionsIs(20)
+                  ? stateColors.secondary
+                  : stateColors.foreground,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget startGameButton() {
+    return ElevatedButton(
+      onPressed: () {
+        context.router.push(PlayRoute());
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 16.0,
+        ),
+        child: Wrap(
+          spacing: 8.0,
+          children: [
+            Text(
+              "Start game",
+              style: TextStyle(
+                fontSize: 18.0,
+              ),
+            ),
+            Icon(UniconsLine.arrow_right),
+          ],
+        ),
+      ),
     );
   }
 
