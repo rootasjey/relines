@@ -98,6 +98,7 @@ flutter:
     - assets/images/app-icon-animation.gif
     - assets/images/firebase_cloud_functions_logo.png
     - assets/images/firestore_logo.png
+    - assets/translations/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
