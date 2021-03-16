@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:relines/components/desktop_app_bar.dart';
 import 'package:relines/components/fade_in_y.dart';
 import 'package:relines/components/footer.dart';
+import 'package:relines/components/game_title.dart';
 import 'package:relines/components/image_card.dart';
 import 'package:relines/components/lang_popup_menu_button.dart';
 import 'package:relines/components/rules.dart';
@@ -171,15 +172,6 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget gameTitle() {
-    return Text(
-      "Relines",
-      style: FontsUtils.pacificoStyle(
-        fontSize: 60.0,
-      ),
-    );
-  }
-
   Widget header() {
     return Column(
       children: [
@@ -221,7 +213,7 @@ class _HomeState extends State<Home> {
           FadeInY(
             beginY: 20.0,
             delay: 100.milliseconds,
-            child: gameTitle(),
+            child: GameTitle(),
           ),
           FadeInY(
             beginY: 20.0,
