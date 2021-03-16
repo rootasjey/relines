@@ -90,13 +90,12 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/images/algolia_logo.png
-    - assets/images/app-icon-32.png
-    - assets/images/app-icon-64.png
-    - assets/images/app-icon-90.png
-    - assets/images/app-icon-512.png
-    - assets/images/app-icon-512-alt.png
+    - assets/images/app_icon/32.png
+    - assets/images/app_icon/64.png
+    - assets/images/app_icon/128.png
+    - assets/images/app_icon/512.png
+    - assets/images/app_icon/animation.gif
     - assets/images/jeje.jpg
-    - assets/images/app-icon-animation.gif
     - assets/images/firebase_cloud_functions_logo.png
     - assets/images/firestore_logo.png
     - assets/translations/
