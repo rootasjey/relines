@@ -112,7 +112,7 @@ class Results extends StatelessWidget {
             ),
           ),
           TextSpan(
-            text: "result_msg_3",
+            text: "result_msg_3".tr(),
           ),
           TextSpan(
             text: "result_msg_4".tr(
