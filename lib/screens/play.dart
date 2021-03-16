@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:global_configuration/global_configuration.dart';
@@ -161,33 +162,54 @@ class _PlayState extends State<Play> {
     Widget textMessageWidget = Text("");
 
     if (answerResponse.isCorrect) {
-      textMessageWidget = Text(
-        "🎉 Yay! This was the correct answer! 🎉",
-        style: TextStyle(
-          fontSize: 16.0,
-          fontWeight: FontWeight.w400,
-        ),
+      textMessageWidget = Wrap(
+        spacing: 10.0,
+        children: [
+          Icon(
+            UniconsLine.grin,
+            color: stateColors.primary,
+          ),
+          Text(
+            "answer_correct".tr(),
+            style: TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          Icon(
+            UniconsLine.grin,
+            color: stateColors.primary,
+          ),
+        ],
       );
     } else {
-      textMessageWidget = RichText(
-        text: TextSpan(
-          text: "🙁  Sorry, this was not the correct answer. It was ",
-          style: TextStyle(
-            fontSize: 16.0,
-            fontWeight: FontWeight.w400,
-            color: stateColors.foreground,
+      textMessageWidget = Wrap(
+        children: [
+          Icon(
+            UniconsLine.meh,
+            color: stateColors.primary,
           ),
-          children: [
-            TextSpan(
-              text: answerResponse.correction.name,
+          RichText(
+            text: TextSpan(
+              text: "answer_wrong".tr(),
               style: TextStyle(
-                color: Colors.green,
                 fontSize: 16.0,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w400,
+                color: stateColors.foreground,
               ),
+              children: [
+                TextSpan(
+                  text: answerResponse.correction.name,
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       );
     }
 
@@ -214,7 +236,7 @@ class _PlayState extends State<Play> {
                         horizontal: 16.0,
                         vertical: 12.0,
                       ),
-                      child: Text("Quit"),
+                      child: Text("quit".tr()),
                     ),
                   ),
                   ElevatedButton(
@@ -228,9 +250,9 @@ class _PlayState extends State<Play> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            currentQuestion > maxQuestions
-                                ? "See results"
-                                : "Next question",
+                            currentQuestion >= maxQuestions
+                                ? "see_results".tr()
+                                : "next_question".tr(),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
@@ -289,23 +311,23 @@ class _PlayState extends State<Play> {
   }
 
   Widget checkingAnswerBlock() {
-    if (isCheckingAnswer) {
-      return Wrap(
-        spacing: 16.0,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          Text(
-            "Checking answer...",
-            style: TextStyle(
-              fontSize: 16.0,
-            ),
-          ),
-          AnimatedAppIcon(size: 70.0),
-        ],
-      );
+    if (!isCheckingAnswer) {
+      return Container();
     }
 
-    return Container();
+    return Wrap(
+      spacing: 16.0,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Text(
+          "checking_answer".tr(),
+          style: TextStyle(
+            fontSize: 16.0,
+          ),
+        ),
+        AnimatedAppIcon(size: 70.0),
+      ],
+    );
   }
 
   Widget finishedView() {
@@ -324,7 +346,7 @@ class _PlayState extends State<Play> {
                   Opacity(
                     opacity: 0.6,
                     child: Text(
-                      "Thank you for playing with us!",
+                      "thank_you_playing".tr(),
                       style: TextStyle(
                         fontSize: 24.0,
                         fontWeight: FontWeight.w100,
@@ -354,7 +376,7 @@ class _PlayState extends State<Play> {
                         setState(() => gameState = GameState.stopped);
                       },
                       icon: Icon(UniconsLine.home),
-                      label: Text("Return home"),
+                      label: Text("return_home".tr()),
                       style: TextButton.styleFrom(
                         primary: stateColors.foreground.withOpacity(0.5),
                       ),
@@ -362,7 +384,7 @@ class _PlayState extends State<Play> {
                     TextButton.icon(
                       onPressed: initGame,
                       icon: Icon(UniconsLine.refresh),
-                      label: Text("Play again"),
+                      label: Text("play_again".tr()),
                       style: TextButton.styleFrom(
                         primary: stateColors.foreground.withOpacity(0.5),
                       ),
@@ -392,7 +414,7 @@ class _PlayState extends State<Play> {
                                 color: Colors.yellow.shade800,
                               ),
                               Text(
-                                "Result",
+                                "result".tr(),
                                 style: TextStyle(
                                   color: Colors.yellow.shade800,
                                 ),
@@ -402,30 +424,42 @@ class _PlayState extends State<Play> {
                         ),
                         RichText(
                           text: TextSpan(
-                            text: "You made a total of ",
+                            text: "result_msg_1".tr(),
                             children: [
                               TextSpan(
-                                text: "$score points, ",
+                                text: "result_msg_2".tr(
+                                  args: [
+                                    score.toString(),
+                                  ],
+                                ),
                                 style: TextStyle(
                                   fontSize: 24.0,
                                   color: Colors.yellow.shade800,
                                 ),
                               ),
                               TextSpan(
-                                text: "you got ",
+                                text: "result_msg_3",
                               ),
                               TextSpan(
-                                text: "$correctAnswers good answers ",
+                                text: "result_msg_4".tr(
+                                  args: [
+                                    correctAnswers.toString(),
+                                  ],
+                                ),
                                 style: TextStyle(
                                   fontSize: 24.0,
                                   color: Colors.yellow.shade800,
                                 ),
                               ),
                               TextSpan(
-                                text: "out of ",
+                                text: "result_msg_5".tr(),
                               ),
                               TextSpan(
-                                text: "$maxQuestions in total.",
+                                text: "result_msg_6".tr(
+                                  args: [
+                                    maxQuestions.toString(),
+                                  ],
+                                ),
                                 style: TextStyle(
                                   fontSize: 24.0,
                                   color: Colors.yellow.shade800,
@@ -468,9 +502,31 @@ class _PlayState extends State<Play> {
     );
   }
 
+  Widget loadingView() {
+    return SliverList(
+      delegate: SliverChildListDelegate.fixed([
+        SizedBox(
+          height: MediaQuery.of(context).size.height - 100.0,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedAppIcon(),
+              Text(
+                "loading".tr(),
+                style: TextStyle(
+                  fontSize: 18.0,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ]),
+    );
+  }
+
   Widget playView() {
     if (isLoading) {
-      return runningLoadingView();
+      return loadingView();
     }
 
     return SliverList(
@@ -587,28 +643,6 @@ class _PlayState extends State<Play> {
     );
   }
 
-  Widget runningLoadingView() {
-    return SliverList(
-      delegate: SliverChildListDelegate.fixed([
-        SizedBox(
-          height: MediaQuery.of(context).size.height - 100.0,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AnimatedAppIcon(),
-              Text(
-                "Loading...",
-                style: TextStyle(
-                  fontSize: 18.0,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ]),
-    );
-  }
-
   Widget shareScoreButtons() {
     return Padding(
       padding: const EdgeInsets.only(top: 60.0),
@@ -619,31 +653,40 @@ class _PlayState extends State<Play> {
           TextButton.icon(
             onPressed: () {
               launch(
-                "${Constants.baseTwitterShareUrl}I made a score of "
-                "$score points, answering right "
-                "to $correctAnswers out of $maxQuestions."
-                "${Constants.twitterShareHashtags}"
-                "&url=https://dis.fig.style",
+                "share_score_on_twitter_msg".tr(
+                  namedArgs: {
+                    "baseUrl": Constants.baseTwitterShareUrl,
+                    "score": score.toString(),
+                    "correctAnswers": correctAnswers.toString(),
+                    "maxQuestions": maxQuestions.toString(),
+                    "suffix1": Constants.twitterShareHashtags,
+                    "suffix2": Constants.twitterShareUrl,
+                  },
+                ),
               );
             },
             icon: Icon(UniconsLine.twitter),
-            label: Text("Share on Twitter"),
+            label: Text("share_on_twitter".tr()),
           ),
           IconButton(
-            tooltip: "Copy result message",
+            tooltip: "copy_result_msg".tr(),
             onPressed: () {
               Clipboard.setData(
                 ClipboardData(
-                  text: "I made a score of "
-                      "$score points, answering right "
-                      "to $correctAnswers out of $maxQuestions. "
-                      "Can you do more? (${Constants.disUrl})",
+                  text: "share_score_text_msg".tr(
+                    namedArgs: {
+                      "score": score.toString(),
+                      "correctAnswers": correctAnswers.toString(),
+                      "maxQuestions": maxQuestions.toString(),
+                      "url": Constants.webAppUrl,
+                    },
+                  ),
                 ),
               );
 
               Snack.i(
                 context: context,
-                message: "Link successfully copied!",
+                message: "copy_link_success".tr(),
               );
             },
             icon: Icon(UniconsLine.link),
@@ -661,7 +704,7 @@ class _PlayState extends State<Play> {
       child: TextButton(
         onPressed: onSkipQuestion,
         child: Text(
-          "Skip that one...",
+          "skip_full_msg".tr(),
         ),
       ),
     );
@@ -669,8 +712,8 @@ class _PlayState extends State<Play> {
 
   Widget subtitleBlock() {
     String helpText = questionType == 'author'
-        ? "Who, among these 3 authors, said that quote?"
-        : "What's that quote reference?";
+        ? "question_author".tr()
+        : "question_reference".tr();
 
     return Padding(
       padding: const EdgeInsets.only(

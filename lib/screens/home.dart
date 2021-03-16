@@ -39,9 +39,14 @@ class _HomeState extends State<Home> {
   final quoteEndpoint = "https://api.fig.style/v1/quotes/";
   final referenceEndpoint = "https://api.fig.style/v1/references/";
 
-  List<String> quotesIds = [
+  List<String> quoteIdsEn = [
     "0EUE8cUP09nQkO4A70oa",
     "0JWVqrrOcx2iKzJrQL6C",
+  ];
+
+  List<String> quoteIdsFr = [
+    "VkBVvo4a1j0BqFWy6vQs",
+    "ap8Lqe76rxPZrzXGOZMk",
   ];
 
   List<String> referencesIds = [
@@ -355,6 +360,8 @@ class _HomeState extends State<Home> {
                 setState(() {
                   Game.setLanguage(lang);
                 });
+
+                fetchPresentationData();
               },
             ),
           ],
@@ -381,15 +388,15 @@ class _HomeState extends State<Home> {
               });
             },
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8.0,
-                vertical: 8.0,
-              ),
+              padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (Game.maxQuestionsIs(5)) Icon(UniconsLine.check),
-                  Text("5 $questionsText"),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Text("5 $questionsText"),
+                  ),
                 ],
               ),
             ),
@@ -406,15 +413,15 @@ class _HomeState extends State<Home> {
               });
             },
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8.0,
-                vertical: 8.0,
-              ),
+              padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (Game.maxQuestionsIs(10)) Icon(UniconsLine.check),
-                  Text("10 $questionsText"),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Text("10 $questionsText"),
+                  ),
                 ],
               ),
             ),
@@ -431,15 +438,15 @@ class _HomeState extends State<Home> {
               });
             },
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8.0,
-                vertical: 8.0,
-              ),
+              padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (Game.maxQuestionsIs(20)) Icon(UniconsLine.check),
-                  Text("20 $questionsText"),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Text("20 $questionsText"),
+                  ),
                 ],
               ),
             ),
@@ -484,7 +491,12 @@ class _HomeState extends State<Home> {
     final quotesFutures = <Future>[];
     final referencesFutures = <Future>[];
 
-    for (var id in quotesIds) {
+    quotesPresentation.clear();
+    referencesPresentation.clear();
+
+    List<String> quoteIds = Game.language == 'en' ? quoteIdsEn : quoteIdsFr;
+
+    for (var id in quoteIds) {
       quotesFutures.add(fetchSingleQuote(id));
     }
 

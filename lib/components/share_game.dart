@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:relines/utils/constants.dart';
@@ -13,23 +14,29 @@ class ShareGame extends StatelessWidget {
       children: [
         TextButton.icon(
           onPressed: () {
-            launch("${Constants.baseTwitterShareUrl}This game is fun!"
-                "${Constants.twitterShareHashtags}"
-                "&url=https://dis.fig.style");
+            launch(
+              "share_link_on_twitter_msg".tr(
+                args: [
+                  Constants.baseTwitterShareUrl,
+                  Constants.twitterShareHashtags,
+                  Constants.twitterShareUrl,
+                ],
+              ),
+            );
           },
           icon: Icon(UniconsLine.twitter),
-          label: Text("Share on Twitter"),
+          label: Text("share_on_twitter".tr()),
         ),
         IconButton(
-          tooltip: "Copy link",
+          tooltip: "copy_link".tr(),
           onPressed: () {
             Clipboard.setData(
-              ClipboardData(text: Constants.disUrl),
+              ClipboardData(text: Constants.webAppUrl),
             );
 
             Snack.i(
               context: context,
-              message: "Link successfully copied!",
+              message: "copy_link_success".tr(),
             );
           },
           icon: Icon(UniconsLine.link),
