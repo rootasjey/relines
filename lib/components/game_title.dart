@@ -6,7 +6,7 @@ class GameTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       "Relines",
-      style: FontsUtils.mainStyle(
+      style: FontsUtils.pacificoStyle(
         fontSize: 60.0,
       ),
     );
