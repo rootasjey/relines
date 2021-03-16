@@ -137,7 +137,7 @@ class _PlayState extends State<Play> {
                 maxQuestions: maxQuestionsCount,
                 onQuit: onQuit,
                 onSkip: onSkipQuestion,
-                isVisible: gameState == GameState.running || !isLoading,
+                isVisible: gameState == GameState.running && !isLoading,
               ),
             ),
           ],
