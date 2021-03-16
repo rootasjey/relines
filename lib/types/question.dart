@@ -1,8 +1,8 @@
-import 'package:relines/types/quote_question.dart';
+import 'package:relines/types/quote.dart';
 
 class Question {
   final String guessType;
-  final QuoteQuestion quote;
+  final Quote quote;
 
   Question({
     this.quote,
@@ -11,7 +11,7 @@ class Question {
 
   factory Question.fromJSON(Map<String, dynamic> data) {
     return Question(
-      quote: QuoteQuestion.fromJSON(data['quote']),
+      quote: Quote.fromJSON(data['quote']),
       guessType: data['guessType'],
     );
   }

@@ -3,17 +3,14 @@ import 'dart:convert';
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:relines/components/animated_app_icon.dart';
 import 'package:relines/components/desktop_app_bar.dart';
-import 'package:relines/components/fade_in_x.dart';
-import 'package:relines/components/fade_in_y.dart';
 import 'package:relines/components/footer.dart';
 import 'package:relines/components/hud.dart';
-import 'package:relines/components/image_card.dart';
-import 'package:relines/components/rules.dart';
+import 'package:relines/components/playing.dart';
+import 'package:relines/components/results.dart';
 import 'package:relines/router/app_router.gr.dart';
 import 'package:relines/state/colors.dart';
 import 'package:relines/state/game.dart';
@@ -24,12 +21,7 @@ import 'package:relines/types/game_answer_response.dart';
 import 'package:relines/types/game_question_response.dart';
 import 'package:relines/types/reference.dart';
 import 'package:relines/utils/app_logger.dart';
-import 'package:relines/utils/constants.dart';
-import 'package:relines/utils/fonts.dart';
-import 'package:relines/utils/snack.dart';
 import 'package:supercharged/supercharged.dart';
-import 'package:unicons/unicons.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class Play extends StatefulWidget {
   @override
@@ -50,8 +42,8 @@ class _PlayState extends State<Play> {
   final questionEndpoint = "https://api.fig.style/v1/dis/random";
   final answerEndpoint = "https://api.fig.style/v1/dis/check";
 
-  int currentQuestion = 0;
-  int maxQuestions = 10;
+  int currentQuestionIndex = 0;
+  int maxQuestionsCount = 10;
   int correctAnswers = 0;
   int score = 0;
 
@@ -132,7 +124,7 @@ class _PlayState extends State<Play> {
                     );
                   },
                 ),
-                playView(),
+                body(),
                 footer(),
               ],
             ),
@@ -141,8 +133,8 @@ class _PlayState extends State<Play> {
               right: 24.0,
               child: Hud(
                 score: score,
-                currentQuestion: currentQuestion,
-                maxQuestions: maxQuestions,
+                currentQuestion: currentQuestionIndex,
+                maxQuestions: maxQuestionsCount,
                 onQuit: onQuit,
                 onSkip: onSkipQuestion,
                 isVisible: gameState == GameState.running || !isLoading,
@@ -150,346 +142,6 @@ class _PlayState extends State<Play> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget answerResultBlock() {
-    if (!isCurrentQuestionCompleted) {
-      return Container();
-    }
-
-    Widget textMessageWidget = Text("");
-
-    if (answerResponse.isCorrect) {
-      textMessageWidget = Wrap(
-        spacing: 10.0,
-        children: [
-          Icon(
-            UniconsLine.grin,
-            color: stateColors.primary,
-          ),
-          Text(
-            "answer_correct".tr(),
-            style: TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          Icon(
-            UniconsLine.grin,
-            color: stateColors.primary,
-          ),
-        ],
-      );
-    } else {
-      textMessageWidget = Wrap(
-        children: [
-          Icon(
-            UniconsLine.meh,
-            color: stateColors.primary,
-          ),
-          RichText(
-            text: TextSpan(
-              text: "answer_wrong".tr(),
-              style: TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.w400,
-                color: stateColors.foreground,
-              ),
-              children: [
-                TextSpan(
-                  text: answerResponse.correction.name,
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      );
-    }
-
-    return Container(
-      width: 600.0,
-      padding: const EdgeInsets.only(bottom: 40.0),
-      child: Card(
-        elevation: 2.0,
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: textMessageWidget,
-              ),
-              Wrap(
-                spacing: 20.0,
-                children: [
-                  OutlinedButton(
-                    onPressed: onQuit,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 12.0,
-                      ),
-                      child: Text("quit".tr()),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: nextQuestion,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 8.0,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            currentQuestion >= maxQuestions
-                                ? "see_results".tr()
-                                : "next_question".tr(),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: Icon(UniconsLine.arrow_right),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget authorsRow() {
-    int index = 0;
-
-    if (questionResponse.authorProposals == null) {
-      return Container();
-    }
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: questionResponse.authorProposals.values.map(
-        (proposal) {
-          index++;
-          return FadeInX(
-            beginX: 20.0,
-            delay: Duration(milliseconds: 200 * index),
-            child: ImageCard(
-              name: proposal.name,
-              imageUrl: proposal.urls.image,
-              selected: selectedId == proposal.id,
-              type: ImageCardType.extended,
-              onTap: () {
-                if (hasChosenAnswer) {
-                  return;
-                }
-
-                setState(() {
-                  hasChosenAnswer = true;
-                  selectedId = proposal.id;
-                });
-
-                checkAnswer(proposal.id);
-              },
-            ),
-          );
-        },
-      ).toList(),
-    );
-  }
-
-  Widget checkingAnswerBlock() {
-    if (!isCheckingAnswer) {
-      return Container();
-    }
-
-    return Wrap(
-      spacing: 16.0,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        Text(
-          "checking_answer".tr(),
-          style: TextStyle(
-            fontSize: 16.0,
-          ),
-        ),
-        AnimatedAppIcon(size: 70.0),
-      ],
-    );
-  }
-
-  Widget finishedView() {
-    return SliverList(
-      delegate: SliverChildListDelegate.fixed([
-        Container(
-          width: 700.0,
-          height: MediaQuery.of(context).size.height,
-          padding: const EdgeInsets.all(80.0),
-          child: Column(
-            children: [
-              gameTitle(),
-              Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  Opacity(
-                    opacity: 0.6,
-                    child: Text(
-                      "thank_you_playing".tr(),
-                      style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.w100,
-                        decoration: TextDecoration.underline,
-                        decorationColor:
-                            stateColors.foreground.withOpacity(0.4),
-                        decorationStyle: TextDecorationStyle.solid,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Icon(
-                      UniconsLine.heart,
-                      color: Colors.pink,
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 24.0),
-                child: Wrap(
-                  spacing: 12.0,
-                  children: [
-                    TextButton.icon(
-                      onPressed: () {
-                        setState(() => gameState = GameState.stopped);
-                      },
-                      icon: Icon(UniconsLine.home),
-                      label: Text("return_home".tr()),
-                      style: TextButton.styleFrom(
-                        primary: stateColors.foreground.withOpacity(0.5),
-                      ),
-                    ),
-                    TextButton.icon(
-                      onPressed: initGame,
-                      icon: Icon(UniconsLine.refresh),
-                      label: Text("play_again".tr()),
-                      style: TextButton.styleFrom(
-                        primary: stateColors.foreground.withOpacity(0.5),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: 500.0,
-                padding: const EdgeInsets.only(top: 60.0),
-                child: Card(
-                  elevation: 4.0,
-                  color: Colors.transparent,
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Wrap(
-                            spacing: 8.0,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              Icon(
-                                UniconsLine.award,
-                                color: Colors.yellow.shade800,
-                              ),
-                              Text(
-                                "result".tr(),
-                                style: TextStyle(
-                                  color: Colors.yellow.shade800,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        RichText(
-                          text: TextSpan(
-                            text: "result_msg_1".tr(),
-                            children: [
-                              TextSpan(
-                                text: "result_msg_2".tr(
-                                  args: [
-                                    score.toString(),
-                                  ],
-                                ),
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                  color: Colors.yellow.shade800,
-                                ),
-                              ),
-                              TextSpan(
-                                text: "result_msg_3",
-                              ),
-                              TextSpan(
-                                text: "result_msg_4".tr(
-                                  args: [
-                                    correctAnswers.toString(),
-                                  ],
-                                ),
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                  color: Colors.yellow.shade800,
-                                ),
-                              ),
-                              TextSpan(
-                                text: "result_msg_5".tr(),
-                              ),
-                              TextSpan(
-                                text: "result_msg_6".tr(
-                                  args: [
-                                    maxQuestions.toString(),
-                                  ],
-                                ),
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                  color: Colors.yellow.shade800,
-                                ),
-                              ),
-                            ],
-                            style: TextStyle(
-                              fontSize: 24.0,
-                              color: stateColors.foreground.withOpacity(0.6),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              shareScoreButtons(),
-            ],
-          ),
-        ),
-      ]),
-    );
-  }
-
-  Widget gameTitle() {
-    return Text(
-      "Relines",
-      style: FontsUtils.mainStyle(
-        fontSize: 60.0,
       ),
     );
   }
@@ -524,212 +176,47 @@ class _PlayState extends State<Play> {
     );
   }
 
-  Widget playView() {
+  Widget body() {
     if (isLoading) {
       return loadingView();
     }
 
-    return SliverList(
-      delegate: SliverChildListDelegate.fixed([
-        Padding(
-          padding: const EdgeInsets.all(80.0),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height,
-            ),
-            child: Column(
-              children: [
-                checkingAnswerBlock(),
-                answerResultBlock(),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 100.milliseconds,
-                  child: quoteBlock(),
-                ),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 300.milliseconds,
-                  child: subtitleBlock(),
-                ),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 600.milliseconds,
-                  child: proposalsBlock(),
-                ),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 900.milliseconds,
-                  child: skipButton(),
-                ),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 1200.milliseconds,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 200.0),
-                    child: Rules(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ]),
-    );
-  }
-
-  Widget proposalsBlock() {
-    if (questionType == 'author') {
-      return authorsRow();
+    if (gameState == GameState.finished) {
+      return Results(
+        initGame: initGame,
+        onReturnHome: onQuit,
+        score: score,
+        correctAnswers: correctAnswers,
+        maxQuestionsCount: maxQuestionsCount,
+      );
     }
 
-    return referencesRow();
-  }
+    return Playing(
+      isCheckingAnswer: isCheckingAnswer,
+      isCurrentQuestionCompleted: isCurrentQuestionCompleted,
+      accentColor: accentColor,
+      answerResponse: answerResponse,
+      questionResponse: questionResponse,
+      currentQuestionIndex: currentQuestionIndex,
+      maxQuestionsCount: maxQuestionsCount,
+      quoteName: quoteName,
+      questionType: questionType,
+      selectedId: selectedId,
+      onNextQuestion: onNextQuestion,
+      onQuit: onQuit,
+      onSkipQuestion: onSkipQuestion,
+      onPickAnswer: (answerId) {
+        if (hasChosenAnswer) {
+          return;
+        }
 
-  Widget quoteBlock() {
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: 700.0),
-      child: Opacity(
-        opacity: 0.8,
-        child: Text(
-          quoteName,
-          style: TextStyle(
-            fontSize: 42.0,
-            fontWeight: FontWeight.w300,
-            decoration: TextDecoration.underline,
-            decorationColor: accentColor.withOpacity(0.2),
-          ),
-        ),
-      ),
-    );
-  }
+        setState(() {
+          hasChosenAnswer = true;
+          selectedId = answerId;
+        });
 
-  Widget referencesRow() {
-    int index = 0;
-
-    if (questionResponse.referenceProposals == null) {
-      return Container();
-    }
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: questionResponse.referenceProposals.values.map(
-        (proposal) {
-          index++;
-
-          return FadeInX(
-            beginX: 20.0,
-            delay: Duration(milliseconds: 200 * index),
-            child: ImageCard(
-              name: proposal.name,
-              imageUrl: proposal.urls.image,
-              selected: selectedId == proposal.id,
-              type: ImageCardType.extended,
-              onTap: () {
-                if (hasChosenAnswer) {
-                  return;
-                }
-
-                setState(() {
-                  hasChosenAnswer = true;
-                  selectedId = proposal.id;
-                });
-
-                checkAnswer(proposal.id);
-              },
-            ),
-          );
-        },
-      ).toList(),
-    );
-  }
-
-  Widget shareScoreButtons() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 60.0),
-      child: Wrap(
-        spacing: 24.0,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          TextButton.icon(
-            onPressed: () {
-              launch(
-                "share_score_on_twitter_msg".tr(
-                  namedArgs: {
-                    "baseUrl": Constants.baseTwitterShareUrl,
-                    "score": score.toString(),
-                    "correctAnswers": correctAnswers.toString(),
-                    "maxQuestions": maxQuestions.toString(),
-                    "suffix1": Constants.twitterShareHashtags,
-                    "suffix2": Constants.twitterShareUrl,
-                  },
-                ),
-              );
-            },
-            icon: Icon(UniconsLine.twitter),
-            label: Text("share_on_twitter".tr()),
-          ),
-          IconButton(
-            tooltip: "copy_result_msg".tr(),
-            onPressed: () {
-              Clipboard.setData(
-                ClipboardData(
-                  text: "share_score_text_msg".tr(
-                    namedArgs: {
-                      "score": score.toString(),
-                      "correctAnswers": correctAnswers.toString(),
-                      "maxQuestions": maxQuestions.toString(),
-                      "url": Constants.webAppUrl,
-                    },
-                  ),
-                ),
-              );
-
-              Snack.i(
-                context: context,
-                message: "copy_link_success".tr(),
-              );
-            },
-            icon: Icon(UniconsLine.link),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget skipButton() {
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: 16.0,
-      ),
-      child: TextButton(
-        onPressed: onSkipQuestion,
-        child: Text(
-          "skip_full_msg".tr(),
-        ),
-      ),
-    );
-  }
-
-  Widget subtitleBlock() {
-    String helpText = questionType == 'author'
-        ? "question_author".tr()
-        : "question_reference".tr();
-
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: 16.0,
-        bottom: 32.0,
-      ),
-      child: Opacity(
-        opacity: 0.5,
-        child: Text(
-          helpText,
-          style: TextStyle(
-            fontSize: 16.0,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
+        checkAnswer(answerId);
+      },
     );
   }
 
@@ -837,10 +324,10 @@ class _PlayState extends State<Play> {
     }
   }
 
-  void nextQuestion() {
+  void onNextQuestion() {
     setState(() {
-      currentQuestion++;
-      gameState = currentQuestion > maxQuestions
+      currentQuestionIndex++;
+      gameState = currentQuestionIndex > maxQuestionsCount
           ? GameState.finished
           : GameState.running;
       hasChosenAnswer = false;
@@ -856,7 +343,7 @@ class _PlayState extends State<Play> {
   void onQuit() {
     setState(() {
       score = 0;
-      currentQuestion = 0;
+      currentQuestionIndex = 0;
       hasChosenAnswer = false;
       gameState = GameState.stopped;
     });
@@ -881,9 +368,9 @@ class _PlayState extends State<Play> {
     }
 
     setState(() {
-      currentQuestion++;
+      currentQuestionIndex++;
       hasChosenAnswer = false;
-      gameState = currentQuestion > maxQuestions
+      gameState = currentQuestionIndex > maxQuestionsCount
           ? GameState.finished
           : GameState.running;
       isLoading = false;
@@ -900,7 +387,7 @@ class _PlayState extends State<Play> {
   void initGame() {
     setState(() {
       score = 0;
-      currentQuestion = 1;
+      currentQuestionIndex = 1;
       hasChosenAnswer = false;
       gameState = GameState.running;
     });

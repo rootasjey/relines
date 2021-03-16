@@ -1,35 +1,59 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:relines/utils/date_helper.dart';
 
 class Release {
   /// Original release.
   DateTime original;
   bool beforeJC;
 
+  /// True if the Firestore [date] value is null or doesn't exist.
+  /// In this app, the [date] property will never be null (null safety).
+  ///
+  /// This property doesn't exist in Firestore.
+  bool dateEmpty;
+
   Release({
     this.original,
     this.beforeJC = false,
+    this.dateEmpty = true,
   });
 
-  factory Release.fromJSON(Map<String, dynamic> json) {
-    DateTime original;
+  factory Release.empty() {
+    return Release(
+      original: DateTime.now(),
+      beforeJC: false,
+      dateEmpty: true,
+    );
+  }
 
-    if (json['original'] == null) {
-      return Release(
-        original: original,
-        beforeJC: json['beforeJC'],
-      );
+  factory Release.fromJSON(Map<String, dynamic> data) {
+    if (data == null) {
+      return Release.empty();
     }
 
-    if (json['original'].runtimeType != Timestamp) {
-      original = DateTime.fromMillisecondsSinceEpoch(
-          json['original']['_seconds'] * 1000);
-    } else {
-      original = (json['original'] as Timestamp)?.toDate();
-    }
+    DateTime original = DateHelper.fromFirestore(data['original']);
 
     return Release(
       original: original,
-      beforeJC: json['beforeJC'],
+      beforeJC: data['beforeJC'] ?? false,
+      dateEmpty: data['original'] == null,
     );
+  }
+
+  Map<String, dynamic> toJSON({bool dateAsInt = false}) {
+    final Map<String, dynamic> data = Map();
+
+    data['beforeJC'] = beforeJC ?? false;
+
+    if (original == null || dateEmpty) {
+      return data;
+    }
+
+    if (dateAsInt) {
+      data['original'] = original.millisecondsSinceEpoch;
+    } else {
+      data['original'] = original;
+    }
+
+    return data;
   }
 }

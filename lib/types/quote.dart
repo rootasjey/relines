@@ -6,11 +6,11 @@ class Quote {
   final String id;
   String lang;
   String name;
-  final Reference mainReference;
+  final Reference reference;
 
   /// Match the quote's id in the 'quotes' collection.
   final String quoteId;
-  final List<Reference> references;
+
   bool starred;
   List<String> topics;
 
@@ -19,9 +19,8 @@ class Quote {
     this.id,
     this.lang,
     this.name,
-    this.mainReference,
+    this.reference,
     this.quoteId,
-    this.references,
     this.starred = false,
     this.topics,
   });
@@ -32,75 +31,91 @@ class Quote {
       id: '',
       lang: 'en',
       name: '',
-      mainReference: Reference.empty(),
+      reference: Reference.empty(),
       quoteId: '',
-      references: [],
       starred: false,
       topics: [],
     );
   }
 
-  factory Quote.fromJSON(Map<String, dynamic> json) {
-    List<Reference> _references = [];
-    List<String> _topics = [];
-
-    final _author =
-        json['author'] != null ? Author.fromJSON(json['author']) : null;
-
-    final _mainReference = json['mainReference'] != null
-        ? Reference.fromJSON(json['mainReference'])
-        : null;
-
-    if (json['references'] != null) {
-      for (var ref in json['references']) {
-        _references.add(Reference.fromJSON(ref));
-      }
+  factory Quote.fromJSON(Map<String, dynamic> data) {
+    if (data == null) {
+      return Quote.empty();
     }
 
-    if (json['topics'] != null) {
-      if (json['topics'] is Iterable<dynamic>) {
-        for (var tag in json['topics']) {
-          _topics.add(tag);
-        }
-      } else {
-        Map<String, dynamic> mapTopics = json['topics'];
-
-        mapTopics.forEach((key, value) {
-          _topics.add(key);
-        });
-      }
-    }
+    final author = Author.fromJSON(data['author']);
+    final reference = Reference.fromJSON(data['reference']);
+    final topics = parseTopics(data['topics']);
 
     return Quote(
-      author: _author,
-      id: json['id'],
-      lang: json['lang'],
-      name: json['name'],
-      mainReference: _mainReference,
-      quoteId: json['quoteId'] ?? '',
-      references: _references,
-      starred: json['starred'] ?? false,
-      topics: _topics,
+      author: author,
+      id: data['id'] ?? '',
+      lang: data['lang'] ?? 'en',
+      name: data['name'] ?? '',
+      reference: reference,
+      quoteId: data['quoteId'] ?? '',
+      starred: data['starred'] ?? false,
+      topics: topics,
     );
   }
 
-  Map<String, dynamic> toJSON() {
-    Map<String, dynamic> json = Map();
-    List<Map<String, dynamic>> refStr = [];
+  static List<String> parseTopics(dynamic data) {
+    final topics = <String>[];
 
-    for (var ref in references) {
-      refStr.add(ref.toJSON());
+    if (data == null) {
+      return topics;
     }
 
-    json['author'] = author.toJSON();
-    json['id'] = id;
-    json['lang'] = lang;
-    json['name'] = name;
-    json['quoteId'] = quoteId;
-    json['references'] = refStr;
-    json['starred'] = starred;
-    json['topics'] = topics;
+    if (data is Iterable<dynamic>) {
+      for (String tag in data) {
+        topics.add(tag);
+      }
 
-    return json;
+      return topics;
+    }
+
+    Map<String, dynamic> mapTopics = data;
+
+    mapTopics.forEach((key, value) {
+      topics.add(key);
+    });
+
+    return topics;
+  }
+
+  Map<String, dynamic> toJSON({
+    bool withId = false,
+    Author withAuthor,
+    Reference withReference,
+  }) {
+    Map<String, dynamic> data = Map();
+    final Map<String, bool> topicsMap = Map();
+
+    for (var topic in topics) {
+      topicsMap.putIfAbsent(topic, () => true);
+    }
+
+    if (withId) {
+      data['id'] = id;
+    }
+
+    if (withAuthor != null) {
+      data['author'] = withAuthor.toPartialJSON();
+    } else {
+      data['author'] = author.toPartialJSON();
+    }
+
+    if (withReference != null) {
+      data['reference'] = withReference.toPartialJSON();
+    } else {
+      data['reference'] = reference.toPartialJSON();
+    }
+
+    data['lang'] = lang;
+    data['name'] = name;
+    data['topics'] = topicsMap;
+    data['updatedAt'] = DateTime.now();
+
+    return data;
   }
 }

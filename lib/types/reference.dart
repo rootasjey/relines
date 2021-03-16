@@ -1,26 +1,26 @@
+import 'package:relines/types/image_property.dart';
 import 'package:relines/types/reference_type.dart';
 import 'package:relines/types/release.dart';
 import 'package:relines/types/urls.dart';
 
 class Reference {
   /// When this reference was released.
-  final Release release;
-
-  final List<String> links;
+  Release release;
 
   final String id;
+  final ImageProperty image;
   String lang;
   String name;
   String summary;
 
-  final ReferenceType type;
+  ReferenceType type;
 
-  final Urls urls;
+  Urls urls;
 
   Reference({
     this.id = '',
+    this.image,
     this.lang = 'en',
-    this.links,
     this.name = '',
     this.release,
     this.summary = '',
@@ -31,57 +31,80 @@ class Reference {
   factory Reference.empty() {
     return Reference(
       id: '',
+      image: ImageProperty.empty(),
       lang: 'en',
-      links: [],
       name: '',
-      release: Release(),
+      release: Release.empty(),
       summary: '',
       type: ReferenceType(),
-      urls: Urls(),
+      urls: Urls.empty(),
     );
   }
 
-  factory Reference.fromJSON(Map<String, dynamic> json) {
-    final links = <String>[];
+  factory Reference.fromIdName({
+    id: '',
+    name: '',
+  }) {
+    return Reference(
+      id: id,
+      image: ImageProperty.empty(),
+      lang: 'en',
+      name: name,
+      release: Release.empty(),
+      summary: '',
+      type: ReferenceType(),
+      urls: Urls.empty(),
+    );
+  }
 
-    if (json['links'] != null) {
-      for (String ref in json['links']) {
-        links.add(ref);
-      }
+  factory Reference.fromJSON(Map<String, dynamic> data) {
+    if (data == null) {
+      return Reference.empty();
     }
 
-    final urls = json['urls'] != null ? Urls.fromJSON(json['urls']) : Urls();
-
-    final type = json['type'] != null
-        ? ReferenceType.fromJSON(json['type'])
-        : ReferenceType();
-
-    final release =
-        json['release'] != null ? Release.fromJSON(json['release']) : Release();
+    final image = ImageProperty.fromJSON(data['image']);
+    Release release = Release.fromJSON(data['release']);
+    ReferenceType type = ReferenceType.fromJSON(data['type']);
+    final urls = Urls.fromJSON(data['urls']);
 
     return Reference(
-      id: json['id'] ?? '',
-      lang: json['lang'],
-      links: links,
-      name: json['name'] ?? '',
+      id: data['id'] ?? '',
+      image: image,
+      lang: data['lang'],
+      name: data['name'] ?? '',
       release: release,
-      summary: json['summary'],
+      summary: data['summary'] ?? '',
       type: type,
       urls: urls,
     );
   }
 
-  Map<String, dynamic> toJSON() {
-    Map<String, dynamic> json = Map();
+  Map<String, dynamic> toJSON({bool withId = false, bool dateAsInt = false}) {
+    final Map<String, dynamic> data = Map();
 
-    json['id'] = id;
-    json['lang'] = lang;
-    json['links'] = links;
-    json['name'] = name;
-    json['release'] = release;
-    json['summary'] = summary;
-    json['type'] = type;
+    if (withId) {
+      data['id'] = id;
+    }
 
-    return json;
+    data['image'] = image.toJSON();
+    data['lang'] = lang;
+    data['name'] = name;
+    data['release'] = release.toJSON(dateAsInt: dateAsInt);
+    data['summary'] = summary;
+    data['type'] = type.toJSON();
+    data['urls'] = urls.toJSON();
+
+    return data;
+  }
+
+  /// Return a map with only [id] and [name] as properties.
+  /// Useful wwhen converting reference"s data into a published quote.
+  Map<String, dynamic> toPartialJSON() {
+    Map<String, dynamic> data = Map();
+
+    data['id'] = id;
+    data['name'] = name;
+
+    return data;
   }
 }

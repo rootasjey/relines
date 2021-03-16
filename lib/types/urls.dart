@@ -1,8 +1,8 @@
 class Urls {
-  String affiliate;
   String amazon;
   String facebook;
   String image;
+  String imdb;
   String instagram;
   String netflix;
   String primeVideo;
@@ -13,48 +13,88 @@ class Urls {
   String youtube;
 
   Urls({
-    this.affiliate  = '',
-    this.amazon     = '',
-    this.facebook   = '',
-    this.image      = '',
-    this.instagram  = '',
-    this.netflix    = '',
+    this.amazon = '',
+    this.facebook = '',
+    this.image = '',
+    this.imdb = '',
+    this.instagram = '',
+    this.netflix = '',
     this.primeVideo = '',
-    this.twitch     = '',
-    this.twitter    = '',
-    this.website    = '',
-    this.wikipedia  = '',
-    this.youtube    = '',
+    this.twitch = '',
+    this.twitter = '',
+    this.website = '',
+    this.wikipedia = '',
+    this.youtube = '',
   });
 
   bool areLinksEmpty() {
-    return affiliate.isEmpty  &&
-      amazon.isEmpty          &&
-      facebook.isEmpty        &&
-      netflix.isEmpty         &&
-      instagram.isEmpty       &&
-      primeVideo.isEmpty      &&
-      twitch.isEmpty          &&
-      twitter.isEmpty         &&
-      website.isEmpty         &&
-      wikipedia.isEmpty       &&
-      youtube.isEmpty;
+    return amazon.isEmpty &&
+        facebook.isEmpty &&
+        imdb.isEmpty &&
+        instagram.isEmpty &&
+        netflix.isEmpty &&
+        primeVideo.isEmpty &&
+        twitch.isEmpty &&
+        twitter.isEmpty &&
+        website.isEmpty &&
+        wikipedia.isEmpty &&
+        youtube.isEmpty;
   }
 
-  factory Urls.fromJSON(Map<String, dynamic> json) {
+  factory Urls.empty() {
     return Urls(
-      affiliate   : json['affiliate']   ?? '',
-      amazon      : json['amazon']      ?? '',
-      facebook    : json['facebook']    ?? '',
-      image       : json['image']       ?? '',
-      instagram   : json['instagram']   ?? '',
-      netflix     : json['netflix']     ?? '',
-      primeVideo  : json['primeVideo']  ?? '',
-      twitch      : json['twitch']      ?? '',
-      twitter     : json['twitter']     ?? '',
-      website     : json['website']     ?? '',
-      wikipedia   : json['wikipedia']   ?? '',
-      youtube     : json['youtube']     ?? '',
+      amazon: '',
+      facebook: '',
+      image: '',
+      imdb: '',
+      instagram: '',
+      netflix: '',
+      primeVideo: '',
+      twitch: '',
+      twitter: '',
+      website: '',
+      wikipedia: '',
+      youtube: '',
     );
+  }
+
+  factory Urls.fromJSON(Map<String, dynamic> data) {
+    if (data == null) {
+      return Urls.empty();
+    }
+
+    return Urls(
+      amazon: data['amazon'] ?? '',
+      facebook: data['facebook'] ?? '',
+      image: data['image'] ?? '',
+      imdb: data['imdb'] ?? '',
+      instagram: data['instagram'] ?? '',
+      netflix: data['netflix'] ?? '',
+      primeVideo: data['primeVideo'] ?? '',
+      twitch: data['twitch'] ?? '',
+      twitter: data['twitter'] ?? '',
+      website: data['website'] ?? '',
+      wikipedia: data['wikipedia'] ?? '',
+      youtube: data['youtube'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJSON() {
+    final data = Map<String, dynamic>();
+
+    data['amazon'] = amazon;
+    data['facebook'] = facebook;
+    data['image'] = image;
+    data['imdb'] = imdb;
+    data['instagram'] = instagram;
+    data['netflix'] = netflix;
+    data['primeVideo'] = primeVideo;
+    data['twitch'] = twitch;
+    data['twitter'] = twitter;
+    data['website'] = website;
+    data['wikipedia'] = wikipedia;
+    data['youtube'] = youtube;
+
+    return data;
   }
 }
