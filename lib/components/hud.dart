@@ -6,11 +6,14 @@ import 'package:easy_localization/easy_localization.dart';
 
 class Hud extends StatelessWidget {
   final bool isVisible;
+  final bool hasChosenAnswer;
+  final bool isCheckingAnswer;
   final int score;
   final int maxQuestions;
   final int currentQuestion;
   final VoidCallback onQuit;
   final VoidCallback onSkip;
+  final VoidCallback onNextQuestion;
 
   const Hud({
     Key key,
@@ -20,6 +23,9 @@ class Hud extends StatelessWidget {
     @required this.maxQuestions,
     @required this.currentQuestion,
     this.isVisible = true,
+    @required this.hasChosenAnswer,
+    @required this.onNextQuestion,
+    @required this.isCheckingAnswer,
   }) : super(key: key);
 
   @override
@@ -169,40 +175,75 @@ class Hud extends StatelessWidget {
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 4.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextButton(
-                        onPressed: onSkip,
-                        child: Wrap(
-                          children: [
-                            Text("skip".tr()),
-                          ],
-                        ),
-                        style: TextButton.styleFrom(
-                          primary: Colors.orange,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: onQuit,
-                        child: Wrap(
-                          children: [
-                            Text("quit".tr()),
-                          ],
-                        ),
-                        style: TextButton.styleFrom(
-                          primary: Colors.pink,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                actionsButtons(),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget actionsButtons() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (hasChosenAnswer)
+            TextButton(
+              onPressed: () {
+                if (isCheckingAnswer) {
+                  return;
+                }
+
+                onNextQuestion();
+              },
+              child: Wrap(
+                children: [
+                  Text("next_question".tr()),
+                ],
+              ),
+              style: TextButton.styleFrom(
+                primary: Colors.orange,
+              ),
+            ),
+          if (!hasChosenAnswer)
+            TextButton(
+              onPressed: () {
+                if (isCheckingAnswer) {
+                  return;
+                }
+
+                onSkip();
+              },
+              child: Wrap(
+                children: [
+                  Text("skip".tr()),
+                ],
+              ),
+              style: TextButton.styleFrom(
+                primary: Colors.orange,
+              ),
+            ),
+          TextButton(
+            onPressed: () {
+              if (isCheckingAnswer) {
+                return;
+              }
+
+              onQuit();
+            },
+            child: Wrap(
+              children: [
+                Text("quit".tr()),
+              ],
+            ),
+            style: TextButton.styleFrom(
+              primary: Colors.pink,
+            ),
+          ),
+        ],
       ),
     );
   }
