@@ -36,7 +36,7 @@ class AnswerResult extends StatelessWidget {
         children: [
           Icon(
             UniconsLine.grin,
-            color: stateColors.primary,
+            color: stateColors.accent,
           ),
           Text(
             "answer_correct".tr(),
@@ -47,7 +47,7 @@ class AnswerResult extends StatelessWidget {
           ),
           Icon(
             UniconsLine.grin,
-            color: stateColors.primary,
+            color: stateColors.accent,
           ),
         ],
       );
@@ -56,7 +56,7 @@ class AnswerResult extends StatelessWidget {
         children: [
           Icon(
             UniconsLine.meh,
-            color: stateColors.primary,
+            color: stateColors.accent,
           ),
           RichText(
             text: TextSpan(
@@ -100,6 +100,9 @@ class AnswerResult extends StatelessWidget {
                 children: [
                   OutlinedButton(
                     onPressed: onQuit,
+                    style: OutlinedButton.styleFrom(
+                      primary: stateColors.accent,
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16.0,
@@ -110,6 +113,9 @@ class AnswerResult extends StatelessWidget {
                   ),
                   ElevatedButton(
                     onPressed: onNextQuestion,
+                    style: ElevatedButton.styleFrom(
+                      primary: stateColors.accent,
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16.0,

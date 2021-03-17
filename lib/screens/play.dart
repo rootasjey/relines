@@ -315,6 +315,7 @@ class _PlayState extends State<Play> {
         questionType = questionResponse.question.guessType;
         quoteName = questionResponse.question.quote.name;
         accentColor = appTopicsColors.getColorFor(topicName);
+        stateColors.setAccentColor(accentColor);
       });
     } catch (error) {
       setState(() => isLoading = false);

@@ -119,11 +119,14 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
                       child: Text(
                         "Beta",
                         style: TextStyle(
-                          color: Colors.pink,
+                          color: stateColors.accent,
                         ),
                       ),
                     ),
                     TextButton.icon(
+                      style: TextButton.styleFrom(
+                        primary: stateColors.accent,
+                      ),
                       onPressed: () {
                         launch(
                           "https://github.com/rootasjey/dis.fig.style/"
@@ -313,6 +316,9 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
           child: OutlinedButton(
             onPressed: () => context.router.root.push(SigninRoute()),
             child: Text('signin'.tr()),
+            style: OutlinedButton.styleFrom(
+              primary: stateColors.accent,
+            ),
           ),
         ),
       ),

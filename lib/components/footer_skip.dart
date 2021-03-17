@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:relines/state/colors.dart';
 
 class FooterSkip extends StatelessWidget {
   final VoidCallback onSkipQuestion;
@@ -17,6 +18,9 @@ class FooterSkip extends StatelessWidget {
       ),
       child: TextButton(
         onPressed: onSkipQuestion,
+        style: TextButton.styleFrom(
+          primary: stateColors.accent,
+        ),
         child: Text(
           "skip_full_msg".tr(),
         ),

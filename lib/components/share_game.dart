@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:relines/state/colors.dart';
 import 'package:relines/utils/constants.dart';
 import 'package:relines/utils/snack.dart';
 import 'package:unicons/unicons.dart';
@@ -13,6 +14,9 @@ class ShareGame extends StatelessWidget {
       spacing: 24.0,
       children: [
         TextButton.icon(
+          style: TextButton.styleFrom(
+            primary: stateColors.accent,
+          ),
           onPressed: () {
             launch(
               "share_link_on_twitter_msg".tr(

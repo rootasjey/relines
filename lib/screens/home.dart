@@ -458,6 +458,9 @@ class _HomeState extends State<Home> {
       onPressed: () {
         context.router.push(PlayRoute());
       },
+      style: ElevatedButton.styleFrom(
+        primary: stateColors.accent,
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 16.0,

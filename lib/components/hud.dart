@@ -35,7 +35,7 @@ class Hud extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4.0),
           side: BorderSide(
-            color: stateColors.primary,
+            color: stateColors.accent,
             width: 2.0,
           ),
         ),
