@@ -110,7 +110,6 @@ class _PlayState extends State<Play> {
               controller: _scrollController,
               slivers: [
                 DesktopAppBar(
-                  padding: const EdgeInsets.only(left: 65.0),
                   onTapIconHeader: () {
                     if (_scrollController.offset < 10.0) {
                       context.router.navigate(HomeRoute());

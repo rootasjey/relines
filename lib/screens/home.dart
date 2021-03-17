@@ -70,9 +70,6 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final left = size.width < Constants.maxMobileWidth ? 0.0 : 65.0;
-
     return Scaffold(
       floatingActionButton: isFabVisible
           ? FloatingActionButton(
@@ -109,7 +106,6 @@ class _HomeState extends State<Home> {
               controller: _scrollController,
               slivers: [
                 DesktopAppBar(
-                  padding: EdgeInsets.only(left: left),
                   onTapIconHeader: () {
                     _scrollController.animateTo(
                       0,

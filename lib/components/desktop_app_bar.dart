@@ -26,8 +26,6 @@ class DesktopAppBar extends StatefulWidget {
   /// Control left padding of the first dropdown. Default to 32.0;
   final double leftPaddingFirstDropdown;
 
-  final EdgeInsets padding;
-
   final Function onTapIconHeader;
 
   final String title;
@@ -35,7 +33,6 @@ class DesktopAppBar extends StatefulWidget {
   DesktopAppBar({
     this.automaticallyImplyLeading = true,
     this.onTapIconHeader,
-    this.padding = EdgeInsets.zero,
     this.pinned = true,
     this.showAppIcon = true,
     this.showCloseButton = false,
@@ -61,6 +58,9 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
         isNarrow = constrains.crossAxisExtent < Constants.maxMobileWidth;
         useIconButton = constrains.crossAxisExtent < 1000.0;
         useGroupedDropdown = constrains.crossAxisExtent < 800.0;
+
+        final left =
+            constrains.crossAxisExtent < Constants.maxMobileWidth ? 0.0 : 65.0;
 
         bool showUserMenu = !isNarrow;
 
@@ -90,7 +90,9 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
               automaticallyImplyLeading: false,
               actions: showUserMenu ? userSectionWidgets : [],
               title: Padding(
-                padding: widget.padding,
+                padding: EdgeInsets.only(
+                  left: left,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.max,
