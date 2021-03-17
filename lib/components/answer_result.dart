@@ -28,7 +28,7 @@ class AnswerResult extends StatelessWidget {
       return Container();
     }
 
-    Widget textMessageWidget = Text("");
+    Widget textMessageWidget = Text('');
 
     if (answerResponse.isCorrect) {
       textMessageWidget = Wrap(
@@ -41,13 +41,10 @@ class AnswerResult extends StatelessWidget {
           Text(
             "answer_correct".tr(),
             style: TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.w400,
+              fontSize: 24.0,
+              fontWeight: FontWeight.w200,
+              color: stateColors.foreground.withOpacity(0.6),
             ),
-          ),
-          Icon(
-            UniconsLine.grin,
-            color: stateColors.accent,
           ),
         ],
       );
@@ -62,17 +59,17 @@ class AnswerResult extends StatelessWidget {
             text: TextSpan(
               text: "answer_wrong".tr(),
               style: TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.w400,
-                color: stateColors.foreground,
+                fontSize: 24.0,
+                fontWeight: FontWeight.w200,
+                color: stateColors.foreground.withOpacity(0.6),
               ),
               children: [
                 TextSpan(
                   text: answerResponse.correction.name,
                   style: TextStyle(
                     color: Colors.green,
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w800,
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ],
