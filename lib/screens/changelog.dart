@@ -23,72 +23,29 @@ class _ChangelogState extends State<Changelog> {
   initContent() {
     changelogItemsList.addAll([
       itemChangelogTemplate(
-        textTitle: "2.5.0",
-        date: DateTime(2021, 01, 24),
+        textTitle: Constants.appVersion,
+        date: DateTime(2021, 03, 17),
         children: [
-          descriptionRow("• Add routing system (for better navigation)"),
-          descriptionRow("• Update icons"),
-          descriptionRow("• Use better authentication management"
-              " (-> real time updates)"),
-          descriptionRow("• Re-design quote page (web)"),
-          descriptionRow("• Update user dashboard layout (web)"),
-          descriptionRow("• Update footer component and about page (web)"),
+          descriptionRow("• Add internationalization"),
+          descriptionRow("• Upate app's colors"),
+          descriptionRow("• Update app icon"),
+          descriptionRow("• Remove URL hashtag (path URL strategy)"),
+          descriptionRow("• Update hud & rules layout"),
+          descriptionRow("• Add responsive"),
         ],
       ),
       itemChangelogTemplate(
-        textTitle: "2.0.0",
-        date: DateTime(2020, 12, 01),
+        textTitle: "0.10.0",
+        date: DateTime(2021, 02, 06),
         children: [
-          descriptionRow("• Re-design add quote experience"),
-          descriptionRow("• Re-design icon assets"),
-          descriptionRow("• Fix push notifications"),
-          descriptionRow("• Add share image quote"),
-          descriptionRow("• Update quote page & other pages layout"),
-          descriptionRow("• Add search by quotes, authors, references"),
-          descriptionRow("• Add changelog"),
-          descriptionRow("• Add swipe actions on quote tiles"),
-          descriptionRow("• Re-work application icon"),
-          descriptionRow("• Add onboarding"),
-          descriptionRow("• Update first app's page"),
-          descriptionRow("• Use better image preview"),
-          descriptionRow("• Bug fixes and other improvements"),
+          descriptionRow("• Deploy on Firebase"),
         ],
       ),
       itemChangelogTemplate(
-        textTitle: "1.3.0",
-        date: DateTime(2020, 07, 22),
+        textTitle: "0.1.0",
+        date: DateTime(2021, 02, 06),
         children: [
-          descriptionRow(
-              "• Minor UI update: add a top right close button on quotidian page"),
-        ],
-      ),
-      itemChangelogTemplate(
-        textTitle: "1.2.3",
-        date: DateTime(2020, 07, 08),
-        children: [
-          descriptionRow(
-              "• Fix an issue where a draft without topics wouldn't show"),
-          descriptionRow("• Speed up topics animation on add quote page"),
-        ],
-      ),
-      itemChangelogTemplate(
-        textTitle: "1.2.1",
-        date: DateTime(2020, 06, 17),
-        children: [
-          descriptionRow(
-              "• Fix a visual bug where link cards on author page would have a longer height than expected"),
-        ],
-      ),
-      itemChangelogTemplate(
-        textTitle: "1.2.0",
-        date: DateTime(2020, 06, 15),
-        children: [
-          descriptionRow("• Add help center link"),
-          descriptionRow("• Update design"),
-          descriptionRow("• Add inputs format checks for username & email"),
-          descriptionRow("• Add availability checks for email & username"),
-          descriptionRow("• Better error messages"),
-          descriptionRow("• Bug fixes"),
+          descriptionRow("• Initial realease (Vercel)"),
         ],
       ),
     ]);
@@ -224,7 +181,7 @@ class _ChangelogState extends State<Changelog> {
           opacity: 0.6,
           child: InkWell(
             onTap: () =>
-                launch("https://github.com/rootasjey/fig.style/releases"),
+                launch("https://github.com/rootasjey/relines/releases"),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Wrap(
