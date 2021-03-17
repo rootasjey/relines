@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:relines/state/colors.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:relines/utils/fonts.dart';
 
 class Rules extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final titleFontSize = 60.0;
-    final textFontSize = 16.0;
+    final textFontSize = 20.0;
 
-    return Padding(
+    final textStyle = FontsUtils.mainStyle(
+      color: stateColors.foreground,
+      fontSize: textFontSize,
+      fontWeight: FontWeight.w100,
+    );
+
+    return Container(
+      width: 600.0,
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,11 +39,7 @@ class Rules extends StatelessWidget {
               child: RichText(
                 text: TextSpan(
                   text: "rules_1".tr(),
-                  style: TextStyle(
-                    color: stateColors.foreground,
-                    fontSize: textFontSize,
-                    fontWeight: FontWeight.w100,
-                  ),
+                  style: textStyle,
                   children: [],
                 ),
               ),
@@ -50,11 +54,7 @@ class Rules extends StatelessWidget {
               child: RichText(
                 text: TextSpan(
                   text: "rules_2".tr(),
-                  style: TextStyle(
-                    color: stateColors.foreground,
-                    fontSize: textFontSize,
-                    fontWeight: FontWeight.w100,
-                  ),
+                  style: textStyle,
                   children: [],
                 ),
               ),
@@ -69,11 +69,7 @@ class Rules extends StatelessWidget {
               child: RichText(
                 text: TextSpan(
                   text: "rules_3".tr(),
-                  style: TextStyle(
-                    color: stateColors.foreground,
-                    fontSize: textFontSize,
-                    fontWeight: FontWeight.w100,
-                  ),
+                  style: textStyle,
                   children: [],
                 ),
               ),
