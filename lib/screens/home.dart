@@ -19,6 +19,7 @@ import 'package:relines/state/game.dart';
 import 'package:relines/types/quote.dart';
 import 'package:relines/types/reference.dart';
 import 'package:relines/utils/app_storage.dart';
+import 'package:relines/utils/constants.dart';
 import 'package:relines/utils/fonts.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
@@ -69,6 +70,9 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final left = size.width < Constants.maxMobileWidth ? 0.0 : 65.0;
+
     return Scaffold(
       floatingActionButton: isFabVisible
           ? FloatingActionButton(
@@ -105,7 +109,7 @@ class _HomeState extends State<Home> {
               controller: _scrollController,
               slivers: [
                 DesktopAppBar(
-                  padding: const EdgeInsets.only(left: 65.0),
+                  padding: EdgeInsets.only(left: left),
                   onTapIconHeader: () {
                     _scrollController.animateTo(
                       0,
@@ -125,13 +129,19 @@ class _HomeState extends State<Home> {
   }
 
   Widget body() {
+    final size = MediaQuery.of(context).size;
+    final horizontal = size.width < Constants.maxMobileWidth ? 12.0 : 80.0;
+
     return SliverList(
       delegate: SliverChildListDelegate.fixed([
         Padding(
-          padding: const EdgeInsets.all(80.0),
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontal,
+            vertical: 80.0,
+          ),
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height,
+              minHeight: size.height,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -178,39 +188,60 @@ class _HomeState extends State<Home> {
   }
 
   Widget header() {
-    return Column(
-      children: [
-        Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height - 200.0,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 40.0,
+    final size = MediaQuery.of(context).size;
+    final horizontal = size.width < Constants.maxMobileWidth ? 0.0 : 40.0;
+    final bottom = size.width < Constants.maxMobileWidth ? 40.0 : 0.0;
+
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: bottom,
+      ),
+      child: Column(
+        children: [
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: size.height - 200.0,
+              minWidth: size.width,
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: horizontal,
+              ),
+              child: Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                runSpacing: 60.0,
+                children: [
+                  headerLeft(),
+                  headerRight(),
+                ],
+              ),
+            ),
           ),
-          child: Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            children: [
-              headerLeft(),
-              headerRight(),
-            ],
+          IconButton(
+            onPressed: () {
+              _scrollController.animateTo(
+                size.height * 1.0,
+                curve: Curves.bounceOut,
+                duration: 250.milliseconds,
+              );
+            },
+            icon: Icon(UniconsLine.arrow_down),
           ),
-        ),
-        IconButton(
-          onPressed: () {
-            _scrollController.animateTo(
-              MediaQuery.of(context).size.height * 1.0,
-              curve: Curves.bounceOut,
-              duration: 250.milliseconds,
-            );
-          },
-          icon: Icon(UniconsLine.arrow_down),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget headerLeft() {
+    final size = MediaQuery.of(context).size;
+    final right = size.width < Constants.maxMobileWidth ? 0.0 : 32.0;
+    final left = size.width < Constants.maxMobileWidth ? 12.0 : 0.0;
+
     return Padding(
-      padding: const EdgeInsets.only(right: 32.0),
+      padding: EdgeInsets.only(
+        left: left,
+        right: right,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

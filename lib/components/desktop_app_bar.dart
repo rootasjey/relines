@@ -6,6 +6,7 @@ import 'package:relines/state/user.dart';
 import 'package:relines/types/enums.dart';
 import 'package:relines/utils/app_storage.dart';
 import 'package:relines/utils/brightness.dart';
+import 'package:relines/utils/constants.dart';
 import 'package:relines/utils/navigation_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -51,12 +52,13 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
   /// If true, use icon instead of text for PopupMenuButton.
   bool useIconButton = false;
   bool useGroupedDropdown = false;
+  bool isNarrow = false;
 
   @override
   Widget build(BuildContext context) {
     return SliverLayoutBuilder(
       builder: (context, constrains) {
-        final isNarrow = constrains.crossAxisExtent < 600.0;
+        isNarrow = constrains.crossAxisExtent < Constants.maxMobileWidth;
         useIconButton = constrains.crossAxisExtent < 1000.0;
         useGroupedDropdown = constrains.crossAxisExtent < 800.0;
 
@@ -108,7 +110,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
                     if (widget.showAppIcon)
                       AppIcon(
                         size: 30.0,
-                        padding: const EdgeInsets.only(left: 10.0),
+                        padding: const EdgeInsets.only(left: 0.0),
                         onTap: widget.onTapIconHeader,
                       ),
                     Padding(
@@ -123,22 +125,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
                         ),
                       ),
                     ),
-                    TextButton.icon(
-                      style: TextButton.styleFrom(
-                        primary: stateColors.accent,
-                      ),
-                      onPressed: () {
-                        launch(
-                          "https://github.com/rootasjey/dis.fig.style/"
-                          "issues",
-                        );
-                      },
-                      icon: Icon(UniconsLine.bug),
-                      label: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text("report_bug".tr()),
-                      ),
-                    ),
+                    bugButton(),
                     if (useGroupedDropdown) groupedDropdown(),
                     if (widget.showCloseButton) closeButton(),
                   ],
@@ -251,6 +238,39 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
     );
   }
 
+  Widget bugButton() {
+    if (isNarrow) {
+      return IconButton(
+        color: stateColors.accent,
+        onPressed: () {
+          launch(
+            "https://github.com/rootasjey/relines/"
+            "issues",
+          );
+        },
+        icon: Icon(UniconsLine.bug),
+      );
+    }
+    return TextButton.icon(
+      style: TextButton.styleFrom(
+        primary: stateColors.accent,
+      ),
+      onPressed: () {
+        launch(
+          "https://github.com/rootasjey/relines/"
+          "issues",
+        );
+      },
+      icon: Icon(UniconsLine.bug),
+      label: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 8.0,
+        ),
+        child: Text("report_bug".tr()),
+      ),
+    );
+  }
+
   Widget closeButton() {
     return IconButton(
       onPressed: context.router.pop,
@@ -306,7 +326,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
 
   Iterable<Widget> getGuestButtons(bool isNarrow) {
     if (isNarrow) {
-      return [userSigninMenu()];
+      return [userNarrowMenu()];
     }
 
     return [
@@ -588,7 +608,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
     );
   }
 
-  Widget userSigninMenu() {
+  Widget userNarrowMenu() {
     return PopupMenuButton(
       icon: Icon(Icons.more_vert),
       itemBuilder: (context) => <PopupMenuEntry<PageRouteInfo>>[
@@ -600,10 +620,10 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
           ),
         ),
         PopupMenuItem(
-          value: SignupRoute(),
+          value: SettingsRoute(),
           child: ListTile(
-            leading: Icon(Icons.open_in_browser),
-            title: Text('signup'.tr()),
+            leading: Icon(UniconsLine.setting),
+            title: Text('settings'.tr()),
           ),
         ),
       ],
