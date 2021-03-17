@@ -3,6 +3,7 @@ import 'package:relines/components/fade_in_x.dart';
 import 'package:relines/components/image_card.dart';
 import 'package:relines/types/enums.dart';
 import 'package:relines/types/game_question_response.dart';
+import 'package:relines/utils/constants.dart';
 
 class AnswerPicker extends StatelessWidget {
   final String questionType;
@@ -21,74 +22,117 @@ class AnswerPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (questionType == 'author') {
-      return authorsRow();
+      return authorsRow(context);
     }
 
-    return referencesRow();
+    return referencesRow(context);
   }
 
-  Widget authorsRow() {
+  Widget authorsRow(BuildContext context) {
     int index = 0;
 
     if (questionResponse.authorProposals == null) {
       return Container();
     }
 
+    final size = MediaQuery.of(context).size;
+    double height = 320.0;
+    double width = 240.0;
+
+    if (size.width < Constants.maxMobileWidth) {
+      height = 150.0;
+      width = 360.0;
+    }
+
+    final children = questionResponse.authorProposals.values.map(
+      (proposal) {
+        index++;
+        return FadeInX(
+          beginX: 20.0,
+          delay: Duration(milliseconds: 200 * index),
+          child: ImageCard(
+            name: proposal.name,
+            height: height,
+            width: width,
+            imageUrl: proposal.urls.image,
+            selected: selectedId == proposal.id,
+            type: ImageCardType.extended,
+            onTap: () {
+              if (onPickAnswer != null) {
+                onPickAnswer(proposal.id);
+              }
+            },
+          ),
+        );
+      },
+    ).toList();
+
+    if (size.width < Constants.maxMobileWidth) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 24.0),
+        child: Column(
+          children: children,
+        ),
+      );
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: questionResponse.authorProposals.values.map(
-        (proposal) {
-          index++;
-          return FadeInX(
-            beginX: 20.0,
-            delay: Duration(milliseconds: 200 * index),
-            child: ImageCard(
-              name: proposal.name,
-              imageUrl: proposal.urls.image,
-              selected: selectedId == proposal.id,
-              type: ImageCardType.extended,
-              onTap: () {
-                if (onPickAnswer != null) {
-                  onPickAnswer(proposal.id);
-                }
-              },
-            ),
-          );
-        },
-      ).toList(),
+      children: children,
     );
   }
 
-  Widget referencesRow() {
+  Widget referencesRow(BuildContext context) {
     int index = 0;
 
     if (questionResponse.referenceProposals == null) {
       return Container();
     }
 
+    final size = MediaQuery.of(context).size;
+    double height = 320.0;
+    double width = 240.0;
+
+    if (size.width < Constants.maxMobileWidth) {
+      height = 150.0;
+      width = 360.0;
+    }
+
+    final children = questionResponse.referenceProposals.values.map(
+      (proposal) {
+        index++;
+
+        return FadeInX(
+          beginX: 20.0,
+          delay: Duration(milliseconds: 200 * index),
+          child: ImageCard(
+            name: proposal.name,
+            height: height,
+            width: width,
+            imageUrl: proposal.urls.image,
+            selected: selectedId == proposal.id,
+            type: ImageCardType.extended,
+            onTap: () {
+              if (onPickAnswer != null) {
+                onPickAnswer(proposal.id);
+              }
+            },
+          ),
+        );
+      },
+    ).toList();
+
+    if (size.width < Constants.maxMobileWidth) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 24.0),
+        child: Column(
+          children: children,
+        ),
+      );
+    }
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: questionResponse.referenceProposals.values.map(
-        (proposal) {
-          index++;
-
-          return FadeInX(
-            beginX: 20.0,
-            delay: Duration(milliseconds: 200 * index),
-            child: ImageCard(
-              name: proposal.name,
-              imageUrl: proposal.urls.image,
-              selected: selectedId == proposal.id,
-              type: ImageCardType.extended,
-              onTap: () {
-                if (onPickAnswer != null) {
-                  onPickAnswer(proposal.id);
-                }
-              },
-            ),
-          );
-        },
-      ).toList(),
+      children: children,
     );
   }
 }

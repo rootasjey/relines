@@ -12,7 +12,7 @@ class Rules extends StatelessWidget {
     final textStyle = FontsUtils.mainStyle(
       color: stateColors.foreground,
       fontSize: textFontSize,
-      fontWeight: FontWeight.w100,
+      fontWeight: FontWeight.w200,
     );
 
     final subtitleStyle = FontsUtils.mainStyle(
@@ -70,7 +70,7 @@ class Rules extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Opacity(
-              opacity: 0.6,
+              opacity: 0.8,
               child: Text(
                 "rules_1".tr(),
                 style: textStyle,
@@ -82,7 +82,7 @@ class Rules extends StatelessWidget {
               top: 16.0,
             ),
             child: Opacity(
-              opacity: 0.6,
+              opacity: 0.8,
               child: Text(
                 "rules_example".tr(),
                 style: textStyle,
@@ -112,7 +112,7 @@ class Rules extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Opacity(
-              opacity: 0.6,
+              opacity: 0.8,
               child: Text(
                 "rules_2".tr(),
                 style: textStyle,
@@ -142,7 +142,7 @@ class Rules extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Opacity(
-              opacity: 0.6,
+              opacity: 0.8,
               child: Text(
                 "rules_3".tr(),
                 style: textStyle,

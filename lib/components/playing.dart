@@ -9,6 +9,7 @@ import 'package:relines/components/quote_question.dart';
 import 'package:relines/components/rules.dart';
 import 'package:relines/types/game_answer_response.dart';
 import 'package:relines/types/game_question_response.dart';
+import 'package:relines/utils/constants.dart';
 import 'package:supercharged/supercharged.dart';
 
 class Playing extends StatelessWidget {
@@ -52,10 +53,16 @@ class Playing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final horizontal = size.width < Constants.maxMobileWidth ? 24.0 : 80.0;
+
     return SliverList(
       delegate: SliverChildListDelegate.fixed([
         Padding(
-          padding: const EdgeInsets.all(80.0),
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontal,
+            vertical: 80.0,
+          ),
           child: ConstrainedBox(
             constraints: BoxConstraints(
               minHeight: MediaQuery.of(context).size.height,
