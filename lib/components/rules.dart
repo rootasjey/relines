@@ -15,6 +15,12 @@ class Rules extends StatelessWidget {
       fontWeight: FontWeight.w100,
     );
 
+    final subtitleStyle = FontsUtils.mainStyle(
+      color: stateColors.foreground,
+      fontSize: textFontSize,
+      fontWeight: FontWeight.w500,
+    );
+
     return Container(
       width: 600.0,
       padding: const EdgeInsets.all(16.0),
@@ -29,49 +35,117 @@ class Rules extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
+          goal(
+            subtitleStyle: subtitleStyle,
+            textStyle: textStyle,
+          ),
+          score(
+            subtitleStyle: subtitleStyle,
+            textStyle: textStyle,
+          ),
+          options(
+            subtitleStyle: subtitleStyle,
+            textStyle: textStyle,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget goal({
+    @required TextStyle subtitleStyle,
+    @required TextStyle textStyle,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: 24.0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "goal".tr().toUpperCase(),
+            style: subtitleStyle,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Opacity(
+              opacity: 0.6,
+              child: Text(
+                "rules_1".tr(),
+                style: textStyle,
+              ),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(
               top: 16.0,
-              bottom: 24.0,
             ),
             child: Opacity(
               opacity: 0.6,
-              child: RichText(
-                text: TextSpan(
-                  text: "rules_1".tr(),
-                  style: textStyle,
-                  children: [],
-                ),
+              child: Text(
+                "rules_example".tr(),
+                style: textStyle,
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget score({
+    @required TextStyle subtitleStyle,
+    @required TextStyle textStyle,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: 24.0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "score".tr().toUpperCase(),
+            style: subtitleStyle,
+          ),
           Padding(
-            padding: const EdgeInsets.only(
-              bottom: 24.0,
-            ),
+            padding: const EdgeInsets.only(top: 8.0),
             child: Opacity(
               opacity: 0.6,
-              child: RichText(
-                text: TextSpan(
-                  text: "rules_2".tr(),
-                  style: textStyle,
-                  children: [],
-                ),
+              child: Text(
+                "rules_2".tr(),
+                style: textStyle,
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget options({
+    @required TextStyle subtitleStyle,
+    @required TextStyle textStyle,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: 24.0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "options".tr().toUpperCase(),
+            style: subtitleStyle,
+          ),
           Padding(
-            padding: const EdgeInsets.only(
-              bottom: 24.0,
-            ),
+            padding: const EdgeInsets.only(top: 8.0),
             child: Opacity(
               opacity: 0.6,
-              child: RichText(
-                text: TextSpan(
-                  text: "rules_3".tr(),
-                  style: textStyle,
-                  children: [],
-                ),
+              child: Text(
+                "rules_3".tr(),
+                style: textStyle,
               ),
             ),
           ),

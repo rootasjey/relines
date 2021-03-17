@@ -142,7 +142,12 @@ class _HomeState extends State<Home> {
                   delay: 600.milliseconds,
                   child: Rules(),
                 ),
-                ShareGame(),
+                ShareGame(
+                  padding: const EdgeInsets.only(
+                    top: 24.0,
+                    left: 20.0,
+                  ),
+                ),
               ],
             ),
           ),
