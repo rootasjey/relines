@@ -139,7 +139,7 @@ class _AboutState extends State<About> {
                     height: size,
                     width: size,
                     fit: BoxFit.cover,
-                    image: AssetImage('assets/images/app-icon-512-alt.png'),
+                    image: AssetImage('assets/images/app_icon/512.png'),
                     child: InkWell(
                       onTap: openContainer,
                     ),
@@ -148,8 +148,7 @@ class _AboutState extends State<About> {
               },
               openBuilder: (context, callback) {
                 return ImageHero(
-                  imageProvider:
-                      AssetImage('assets/images/app-icon-512-alt.png'),
+                  imageProvider: AssetImage('assets/images/app_icon/512.png'),
                 );
               },
             ),
@@ -362,7 +361,7 @@ class _AboutState extends State<About> {
             child: Padding(
               padding: const EdgeInsets.only(top: 20.0),
               child: Text(
-                "about_me_3",
+                "about_me_3".tr(),
                 style: paragraphStyle,
               ),
             ),
