@@ -388,6 +388,7 @@ class _PlayState extends State<Play> {
   void initGame() {
     setState(() {
       score = 0;
+      maxQuestionsCount = Game.maxQuestions;
       currentQuestionIndex = 1;
       hasChosenAnswer = false;
       gameState = GameState.running;
