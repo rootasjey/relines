@@ -9,7 +9,6 @@ import 'package:relines/components/quote_question.dart';
 import 'package:relines/components/rules.dart';
 import 'package:relines/types/game_answer_response.dart';
 import 'package:relines/types/game_question_response.dart';
-import 'package:relines/utils/constants.dart';
 import 'package:supercharged/supercharged.dart';
 
 class Playing extends StatelessWidget {
@@ -53,73 +52,64 @@ class Playing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final horizontal = size.width < Constants.maxMobileWidth ? 24.0 : 80.0;
-
     return SliverList(
       delegate: SliverChildListDelegate.fixed([
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: horizontal,
-            vertical: 80.0,
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height,
           ),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height,
-            ),
-            child: Column(
-              children: [
-                CheckingAnswer(isCheckingAnswer: isCheckingAnswer),
-                AnswerResult(
-                  isCurrentQuestionCompleted: isCurrentQuestionCompleted,
-                  currentQuestionIndex: currentQuestionIndex,
-                  maxQuestionsCount: maxQuestionsCount,
-                  answerResponse: answerResponse,
-                  onNextQuestion: onNextQuestion,
-                  onQuit: onQuit,
+          child: Column(
+            children: [
+              CheckingAnswer(isCheckingAnswer: isCheckingAnswer),
+              AnswerResult(
+                isCurrentQuestionCompleted: isCurrentQuestionCompleted,
+                currentQuestionIndex: currentQuestionIndex,
+                maxQuestionsCount: maxQuestionsCount,
+                answerResponse: answerResponse,
+                onNextQuestion: onNextQuestion,
+                onQuit: onQuit,
+              ),
+              FadeInY(
+                beginY: 20.0,
+                delay: 100.milliseconds,
+                child: QuoteQuestion(
+                  quoteName: quoteName,
+                  accentColor: accentColor,
                 ),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 100.milliseconds,
-                  child: QuoteQuestion(
-                    quoteName: quoteName,
-                    accentColor: accentColor,
-                  ),
+              ),
+              FadeInY(
+                beginY: 20.0,
+                delay: 300.milliseconds,
+                child: QuestionCaption(
+                  questionType: questionType,
                 ),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 300.milliseconds,
-                  child: QuestionCaption(
-                    questionType: questionType,
-                  ),
+              ),
+              FadeInY(
+                beginY: 20.0,
+                delay: 600.milliseconds,
+                child: AnswerPicker(
+                  questionType: questionType,
+                  questionResponse: questionResponse,
+                  onPickAnswer: onPickAnswer,
+                  selectedId: selectedId,
                 ),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 600.milliseconds,
-                  child: AnswerPicker(
-                    questionType: questionType,
-                    questionResponse: questionResponse,
-                    onPickAnswer: onPickAnswer,
-                    selectedId: selectedId,
-                  ),
+              ),
+              FadeInY(
+                beginY: 20.0,
+                delay: 900.milliseconds,
+                child: FooterSkip(
+                  onSkipQuestion: onSkipQuestion,
                 ),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 900.milliseconds,
-                  child: FooterSkip(
-                    onSkipQuestion: onSkipQuestion,
-                  ),
+              ),
+              FadeInY(
+                beginY: 20.0,
+                delay: 1200.milliseconds,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 200.0),
+                  child: Rules(),
                 ),
-                FadeInY(
-                  beginY: 20.0,
-                  delay: 1200.milliseconds,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 200.0),
-                    child: Rules(),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ]),
