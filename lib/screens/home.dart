@@ -199,6 +199,28 @@ class _HomeState extends State<Home> {
     );
   }
 
+  Widget circleButton({
+    String tooltip,
+    VoidCallback onPressed,
+    Widget icon,
+  }) {
+    return Material(
+      elevation: 2.0,
+      shape: CircleBorder(),
+      clipBehavior: Clip.hardEdge,
+      child: Padding(
+        padding: const EdgeInsets.all(2.0),
+        child: IconButton(
+          tooltip: tooltip,
+          onPressed: onPressed,
+          iconSize: 40.0,
+          color: stateColors.foreground.withOpacity(0.6),
+          icon: icon,
+        ),
+      ),
+    );
+  }
+
   Widget footer() {
     if (kIsWeb) {
       return SliverList(
@@ -261,61 +283,33 @@ class _HomeState extends State<Home> {
             runSpacing: 16.0,
             alignment: WrapAlignment.center,
             children: [
-              Material(
-                elevation: 2.0,
-                shape: CircleBorder(),
-                clipBehavior: Clip.hardEdge,
-                child: IconButton(
-                  tooltip: "GitHub",
-                  onPressed: () {
-                    launch(Constants.githubUrl);
-                  },
-                  iconSize: 40.0,
-                  color: stateColors.foreground.withOpacity(0.6),
-                  icon: Icon(UniconsLine.github_alt),
-                ),
+              circleButton(
+                tooltip: "GitHub",
+                icon: Icon(UniconsLine.github_alt),
+                onPressed: () {
+                  launch(Constants.githubUrl);
+                },
               ),
-              Material(
-                elevation: 2.0,
-                shape: CircleBorder(),
-                clipBehavior: Clip.hardEdge,
-                child: IconButton(
-                  tooltip: "about".tr(),
-                  onPressed: () {
-                    context.router.push(AboutRoute());
-                  },
-                  iconSize: 40.0,
-                  color: stateColors.foreground.withOpacity(0.6),
-                  icon: Icon(UniconsLine.question),
-                ),
+              circleButton(
+                tooltip: "about".tr(),
+                onPressed: () {
+                  context.router.push(AboutRoute());
+                },
+                icon: Icon(UniconsLine.question),
               ),
-              Material(
-                elevation: 2.0,
-                shape: CircleBorder(),
-                clipBehavior: Clip.hardEdge,
-                child: IconButton(
-                  tooltip: "contact".tr(),
-                  onPressed: () {
-                    context.router.push(ContactRoute());
-                  },
-                  iconSize: 40.0,
-                  color: stateColors.foreground.withOpacity(0.6),
-                  icon: Icon(Icons.sms_outlined),
-                ),
+              circleButton(
+                tooltip: "contact".tr(),
+                onPressed: () {
+                  context.router.push(ContactRoute());
+                },
+                icon: Icon(Icons.sms_outlined),
               ),
-              Material(
-                elevation: 2.0,
-                shape: CircleBorder(),
-                clipBehavior: Clip.hardEdge,
-                child: IconButton(
-                  tooltip: "tos".tr(),
-                  onPressed: () {
-                    context.router.push(TosRoute());
-                  },
-                  iconSize: 40.0,
-                  color: stateColors.foreground.withOpacity(0.6),
-                  icon: Icon(Icons.privacy_tip_outlined),
-                ),
+              circleButton(
+                tooltip: "tos".tr(),
+                onPressed: () {
+                  context.router.push(TosRoute());
+                },
+                icon: Icon(Icons.privacy_tip_outlined),
               ),
             ],
           ),
