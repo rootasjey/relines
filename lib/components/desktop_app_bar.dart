@@ -27,12 +27,14 @@ class DesktopAppBar extends StatefulWidget {
   final double leftPaddingFirstDropdown;
 
   final Function onTapIconHeader;
+  final Function onNavBack;
 
   final String title;
 
   DesktopAppBar({
     this.automaticallyImplyLeading = true,
     this.onTapIconHeader,
+    this.onNavBack,
     this.pinned = true,
     this.showAppIcon = true,
     this.showCloseButton = false,
@@ -105,8 +107,8 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
                         ),
                         child: IconButton(
                           color: stateColors.foreground,
-                          onPressed: () => context.router.pop(),
-                          icon: Icon(Icons.arrow_back),
+                          onPressed: widget.onNavBack,
+                          icon: Icon(UniconsLine.arrow_left),
                         ),
                       ),
                     if (widget.showAppIcon)
@@ -506,7 +508,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
         onSelected: (value) {
           switch (value) {
             case AppBarSettings.allSettings:
-              context.router.root.push(SettingsRoute());
+              context.router.root.push(SettingsRoute(showAppBar: true));
               break;
             default:
           }
@@ -622,7 +624,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
           ),
         ),
         PopupMenuItem(
-          value: SettingsRoute(),
+          value: SettingsRoute(showAppBar: true),
           child: ListTile(
             leading: Icon(UniconsLine.setting),
             title: Text('settings'.tr()),
