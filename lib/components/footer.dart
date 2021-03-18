@@ -1,7 +1,11 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/foundation.dart';
+import 'package:relines/components/circle_button.dart';
 import 'package:relines/router/app_router.gr.dart';
+import 'package:relines/state/colors.dart';
 import 'package:relines/state/user.dart';
 import 'package:relines/utils/constants.dart';
+import 'package:relines/utils/fonts.dart';
 import 'package:relines/utils/snack.dart';
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
@@ -26,6 +30,29 @@ class Footer extends StatefulWidget {
 class _FooterState extends State<Footer> {
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) {
+      return SliverList(
+        delegate: SliverChildListDelegate.fixed([
+          footerDesktop(),
+        ]),
+      );
+    }
+
+    return SliverPadding(
+      padding: const EdgeInsets.only(
+        bottom: 400.0,
+        left: 32.0,
+        right: 24.0,
+      ),
+      sliver: SliverList(
+        delegate: SliverChildListDelegate.fixed([
+          footerMobile(),
+        ]),
+      ),
+    );
+  }
+
+  Widget footerDesktop() {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 60.0,
@@ -43,6 +70,80 @@ class _FooterState extends State<Footer> {
           resourcesLinks(),
         ],
       ),
+    );
+  }
+
+  Widget footerMobile() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+            primary: stateColors.accent,
+          ),
+          onPressed: () {
+            launch(
+              "https://github.com/rootasjey/relines/"
+              "issues",
+            );
+          },
+          icon: Icon(UniconsLine.bug),
+          label: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8.0,
+            ),
+            child: Text("report_bug".tr()),
+          ),
+        ),
+        Opacity(
+          opacity: 0.6,
+          child: Text(
+            "v${Constants.appVersion}",
+            style: FontsUtils.mainStyle(
+              fontSize: 20.0,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 80.0),
+          child: Wrap(
+            spacing: 16.0,
+            runSpacing: 16.0,
+            alignment: WrapAlignment.center,
+            children: [
+              CircleButton(
+                tooltip: "GitHub",
+                icon: Icon(UniconsLine.github_alt),
+                onTap: () {
+                  launch(Constants.githubUrl);
+                },
+              ),
+              CircleButton(
+                tooltip: "about".tr(),
+                onTap: () {
+                  context.router.push(AboutRoute());
+                },
+                icon: Icon(UniconsLine.question),
+              ),
+              CircleButton(
+                tooltip: "contact".tr(),
+                onTap: () {
+                  context.router.push(ContactRoute());
+                },
+                icon: Icon(Icons.sms_outlined),
+              ),
+              CircleButton(
+                tooltip: "tos".tr(),
+                onTap: () {
+                  context.router.push(TosRoute());
+                },
+                icon: Icon(Icons.privacy_tip_outlined),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

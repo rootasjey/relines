@@ -124,7 +124,7 @@ class _PlayState extends State<Play> {
                   },
                 ),
                 body(),
-                footer(),
+                Footer(),
               ],
             ),
             Hud(
@@ -141,14 +141,6 @@ class _PlayState extends State<Play> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget footer() {
-    return SliverList(
-      delegate: SliverChildListDelegate.fixed([
-        Footer(),
-      ]),
     );
   }
 

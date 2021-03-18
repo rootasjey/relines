@@ -26,7 +26,6 @@ import 'package:relines/utils/fonts.dart';
 import 'package:relines/utils/language.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -111,7 +110,7 @@ class _HomeState extends State<Home> {
               slivers: [
                 appBar(),
                 body(),
-                footer(),
+                Footer(),
               ],
             ),
             Positioned(
@@ -196,125 +195,6 @@ class _HomeState extends State<Home> {
           ),
         ),
       ]),
-    );
-  }
-
-  Widget circleButton({
-    String tooltip,
-    VoidCallback onPressed,
-    Widget icon,
-  }) {
-    return Material(
-      elevation: 2.0,
-      shape: CircleBorder(),
-      clipBehavior: Clip.hardEdge,
-      child: Padding(
-        padding: const EdgeInsets.all(2.0),
-        child: IconButton(
-          tooltip: tooltip,
-          onPressed: onPressed,
-          iconSize: 40.0,
-          color: stateColors.foreground.withOpacity(0.6),
-          icon: icon,
-        ),
-      ),
-    );
-  }
-
-  Widget footer() {
-    if (kIsWeb) {
-      return SliverList(
-        delegate: SliverChildListDelegate.fixed([
-          Footer(),
-        ]),
-      );
-    }
-
-    return SliverPadding(
-      padding: const EdgeInsets.only(
-        bottom: 400.0,
-        left: 32.0,
-        right: 24.0,
-      ),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate.fixed([
-          footerMobile(),
-        ]),
-      ),
-    );
-  }
-
-  Widget footerMobile() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            primary: stateColors.accent,
-          ),
-          onPressed: () {
-            launch(
-              "https://github.com/rootasjey/relines/"
-              "issues",
-            );
-          },
-          icon: Icon(UniconsLine.bug),
-          label: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8.0,
-            ),
-            child: Text("report_bug".tr()),
-          ),
-        ),
-        Opacity(
-          opacity: 0.6,
-          child: Text(
-            "v${Constants.appVersion}",
-            style: FontsUtils.mainStyle(
-              fontSize: 20.0,
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 80.0),
-          child: Wrap(
-            spacing: 16.0,
-            runSpacing: 16.0,
-            alignment: WrapAlignment.center,
-            children: [
-              circleButton(
-                tooltip: "GitHub",
-                icon: Icon(UniconsLine.github_alt),
-                onPressed: () {
-                  launch(Constants.githubUrl);
-                },
-              ),
-              circleButton(
-                tooltip: "about".tr(),
-                onPressed: () {
-                  context.router.push(AboutRoute());
-                },
-                icon: Icon(UniconsLine.question),
-              ),
-              circleButton(
-                tooltip: "contact".tr(),
-                onPressed: () {
-                  context.router.push(ContactRoute());
-                },
-                icon: Icon(Icons.sms_outlined),
-              ),
-              circleButton(
-                tooltip: "tos".tr(),
-                onPressed: () {
-                  context.router.push(TosRoute());
-                },
-                icon: Icon(Icons.privacy_tip_outlined),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 
