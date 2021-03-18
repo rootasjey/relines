@@ -98,11 +98,11 @@ class _PlayState extends State<Play> {
           }
 
           // FAB visibility
-          if (scrollNotif.metrics.pixels < 50 && isFabVisible) {
-            setState(() => isFabVisible = false);
-          } else if (scrollNotif.metrics.pixels > 50 && !isFabVisible) {
-            setState(() => isFabVisible = true);
-          }
+          // if (scrollNotif.metrics.pixels < 50 && isFabVisible) {
+          //   setState(() => isFabVisible = false);
+          // } else if (scrollNotif.metrics.pixels > 50 && !isFabVisible) {
+          //   setState(() => isFabVisible = true);
+          // }
 
           return false;
         },

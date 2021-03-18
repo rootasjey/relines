@@ -95,11 +95,11 @@ class _HomeState extends State<Home> {
           }
 
           // FAB visibility
-          if (scrollNotif.metrics.pixels < 50 && isFabVisible) {
-            setState(() => isFabVisible = false);
-          } else if (scrollNotif.metrics.pixels > 50 && !isFabVisible) {
-            setState(() => isFabVisible = true);
-          }
+          // if (scrollNotif.metrics.pixels < 50 && isFabVisible) {
+          //   setState(() => isFabVisible = false);
+          // } else if (scrollNotif.metrics.pixels > 50 && !isFabVisible) {
+          //   setState(() => isFabVisible = true);
+          // }
 
           return false;
         },
@@ -165,7 +165,7 @@ class _HomeState extends State<Home> {
 
   Widget body() {
     final size = MediaQuery.of(context).size;
-    final paddingValue = size.width < Constants.maxMobileWidth ? 12.0 : 80.0;
+    final paddingValue = size.width < Constants.maxMobileWidth ? 0.0 : 80.0;
 
     return SliverList(
       delegate: SliverChildListDelegate.fixed([
