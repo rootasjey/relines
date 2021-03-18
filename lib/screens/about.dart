@@ -54,7 +54,7 @@ class _AboutState extends State<About> {
                   curve: Curves.easeOut,
                 );
               },
-              backgroundColor: stateColors.primary,
+              backgroundColor: stateColors.accent,
               foregroundColor: Colors.white,
               child: Icon(Icons.arrow_upward),
             )
