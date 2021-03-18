@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:relines/components/app_icon.dart';
 import 'package:relines/components/base_page_app_bar.dart';
-import 'package:relines/components/circle_button.dart';
 import 'package:relines/state/colors.dart';
 import 'package:relines/types/enums.dart';
 import 'package:flutter/material.dart';
@@ -183,9 +182,12 @@ class _PageAppBarState extends State<PageAppBar> {
           children: [
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: CircleButton(
-                onTap: context.router.pop,
-                icon: Icon(Icons.arrow_back, color: stateColors.foreground),
+              child: IconButton(
+                onPressed: context.router.pop,
+                icon: Icon(
+                  UniconsLine.arrow_left,
+                  color: stateColors.foreground,
+                ),
               ),
             ),
             TextButton.icon(
@@ -262,9 +264,13 @@ class _PageAppBarState extends State<PageAppBar> {
       child: Row(
         children: [
           if (widget.showNavBackIcon)
-            CircleButton(
-                onTap: context.router.pop,
-                icon: Icon(Icons.arrow_back, color: stateColors.foreground)),
+            IconButton(
+              onPressed: context.router.pop,
+              icon: Icon(
+                UniconsLine.arrow_left,
+                color: stateColors.foreground,
+              ),
+            ),
           AppIcon(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             size: 30.0,

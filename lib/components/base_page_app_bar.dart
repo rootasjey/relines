@@ -1,7 +1,9 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:relines/state/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:unicons/unicons.dart';
 
 class BasePageAppBar extends StatefulWidget {
   /// Appbar's expanded height.
@@ -90,9 +92,9 @@ class _BasePageAppBarState extends State<BasePageAppBar> {
             children: <Widget>[
               if (widget.showNavBackIcon) ...[
                 IconButton(
-                  onPressed: () => context.router.pop(),
-                  tooltip: 'Back',
-                  icon: Icon(Icons.arrow_back),
+                  onPressed: context.router.pop,
+                  tooltip: 'back'.tr(),
+                  icon: Icon(UniconsLine.arrow_left),
                 ),
                 Padding(padding: const EdgeInsets.only(right: 45.0)),
               ],
@@ -108,9 +110,6 @@ class _BasePageAppBarState extends State<BasePageAppBar> {
 
   Widget bottomContainer() {
     if (widget.bottom == null) {
-      // return Padding(
-      //   padding: EdgeInsets.zero,
-      // );
       return null;
     }
 
