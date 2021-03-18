@@ -6,7 +6,7 @@ import 'package:relines/utils/fonts.dart';
 class Rules extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final titleFontSize = 60.0;
+    final titleFontSize = 50.0;
     final textFontSize = 20.0;
 
     final textStyle = FontsUtils.mainStyle(
@@ -28,11 +28,11 @@ class Rules extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "rules".tr(),
+            "rules".tr().toUpperCase(),
             style: TextStyle(
-              color: stateColors.secondary,
+              color: stateColors.accent,
               fontSize: titleFontSize,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
             ),
           ),
           goal(
