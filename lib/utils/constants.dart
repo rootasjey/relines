@@ -1,5 +1,5 @@
 class Constants {
-  static const appVersion = '0.50.0';
+  static const appVersion = '0.80.0';
   static const appBuildNumber = 1;
 
   static const appStoreUrl = "https://apps.apple.com/us/app/"
