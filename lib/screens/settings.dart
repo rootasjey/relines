@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:relines/components/desktop_app_bar.dart';
 import 'package:relines/components/fade_in_x.dart';
 import 'package:relines/components/fade_in_y.dart';
@@ -61,10 +62,7 @@ class _SettingsState extends State<Settings> {
     super.initState();
 
     getLocalLang();
-    checkAuth();
-
     isThemeAuto = appStorage.getAutoBrightness();
-
     initBrightness();
 
     showAppBar = widget.showAppBar ?? false;
@@ -90,20 +88,13 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: RefreshIndicator(
-          onRefresh: () async {
-            await checkAuth();
-            return null;
-          },
-          child: NotificationListener<ScrollNotification>(
-            child: CustomScrollView(
-              controller: _pageScrollController,
-              slivers: <Widget>[
-                if (showAppBar) appBar(),
-                body(),
-              ],
-            ),
-          )),
+      body: CustomScrollView(
+        controller: _pageScrollController,
+        slivers: <Widget>[
+          if (showAppBar) appBar(),
+          body(),
+        ],
+      ),
     );
   }
 
@@ -112,15 +103,15 @@ class _SettingsState extends State<Settings> {
 
     if (width < Constants.maxMobileWidth) {
       return PageAppBar(
-        textTitle: "Settings",
-        textSubTitle: "You can change your preferences here",
+        textTitle: "settings".tr(),
+        textSubTitle: "settings_subtitle".tr(),
         showNavBackIcon: true,
         titlePadding: const EdgeInsets.only(top: 8.0),
       );
     }
 
     return DesktopAppBar(
-      title: "Settings",
+      title: "settings".tr(),
       automaticallyImplyLeading: true,
     );
   }
@@ -201,11 +192,11 @@ class _SettingsState extends State<Settings> {
       child: Column(
         children: <Widget>[
           themeSwitcher(),
-          notificationSection(),
           Padding(
-              padding: const EdgeInsets.only(
-            bottom: 100.0,
-          )),
+            padding: const EdgeInsets.only(
+              bottom: 100.0,
+            ),
+          ),
         ],
       ),
     );
@@ -348,7 +339,6 @@ class _SettingsState extends State<Settings> {
                 ],
               ),
             ),
-          accountSettings(),
           appSettings(),
         ]),
       ),
@@ -749,51 +739,6 @@ class _SettingsState extends State<Settings> {
     }
 
     // PushNotifications.deactivate();
-  }
-
-  Future checkAuth() async {
-    setState(() {
-      // isLoadingAvatarUrl = true;
-      isLoadingLang = true;
-    });
-
-    try {
-      if (stateUser.userAuth == null) {
-        stateUser.setUserDisconnected();
-
-        setState(() {
-          // isLoadingAvatarUrl = false;
-          isLoadingLang = false;
-        });
-
-        return;
-      }
-
-      final user = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(stateUser.userAuth.uid)
-          .get();
-
-      final data = user.data();
-
-      avatarUrl = data['urls']['image'];
-      currentUserName = data['name'] ?? '';
-
-      stateUser.setUsername(currentUserName);
-
-      setState(() {
-        email = stateUser.userAuth.email ?? '';
-        // isLoadingAvatarUrl = false;
-        isLoadingLang = false;
-      });
-    } catch (error) {
-      debugPrint(error.toString());
-
-      setState(() {
-        // isLoadingAvatarUrl = false;
-        isLoadingLang = false;
-      });
-    }
   }
 
   void getLocalLang() {
