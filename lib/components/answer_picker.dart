@@ -1,11 +1,14 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:relines/components/fade_in_x.dart';
+import 'package:relines/components/gallery_photo_view_wrapper.dart';
 import 'package:relines/components/image_card.dart';
 import 'package:relines/types/enums.dart';
+import 'package:relines/types/gallery_item.dart';
 import 'package:relines/types/game_question_response.dart';
 import 'package:relines/utils/constants.dart';
 
-class AnswerPicker extends StatelessWidget {
+class AnswerPicker extends StatefulWidget {
   final String questionType;
   final String selectedId;
   final GameQuestionResponse questionResponse;
@@ -20,8 +23,21 @@ class AnswerPicker extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _AnswerPickerState createState() => _AnswerPickerState();
+}
+
+class _AnswerPickerState extends State<AnswerPicker> {
+  List<GalleryItem> galleryItems = [];
+
+  @override
+  void initState() {
+    super.initState();
+    populateGalleryItems();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (questionType == 'author') {
+    if (widget.questionType == 'author') {
       return authorsRow(context);
     }
 
@@ -29,9 +45,7 @@ class AnswerPicker extends StatelessWidget {
   }
 
   Widget authorsRow(BuildContext context) {
-    int index = 0;
-
-    if (questionResponse.authorProposals == null) {
+    if (widget.questionResponse.authorProposals == null) {
       return Container();
     }
 
@@ -44,9 +58,8 @@ class AnswerPicker extends StatelessWidget {
       width = 360.0;
     }
 
-    final children = questionResponse.authorProposals.values.map(
-      (proposal) {
-        index++;
+    final children = widget.questionResponse.authorProposals.values.mapIndexed(
+      (index, proposal) {
         return FadeInX(
           beginX: 20.0,
           delay: Duration(milliseconds: 200 * index),
@@ -54,14 +67,18 @@ class AnswerPicker extends StatelessWidget {
             name: proposal.name,
             height: height,
             width: width,
-            imageUrl: proposal.urls.image,
-            selected: selectedId == proposal.id,
+            index: index,
+            showZoomIcon: true,
             type: ImageCardType.extended,
+            imageUrl: proposal.urls.image,
+            selected: widget.selectedId == proposal.id,
+            padding: const EdgeInsets.only(bottom: 24.0),
             onTap: () {
-              if (onPickAnswer != null) {
-                onPickAnswer(proposal.id);
+              if (widget.onPickAnswer != null) {
+                widget.onPickAnswer(proposal.id);
               }
             },
+            openImage: openImage,
           ),
         );
       },
@@ -83,9 +100,7 @@ class AnswerPicker extends StatelessWidget {
   }
 
   Widget referencesRow(BuildContext context) {
-    int index = 0;
-
-    if (questionResponse.referenceProposals == null) {
+    if (widget.questionResponse.referenceProposals == null) {
       return Container();
     }
 
@@ -98,10 +113,9 @@ class AnswerPicker extends StatelessWidget {
       width = 360.0;
     }
 
-    final children = questionResponse.referenceProposals.values.map(
-      (proposal) {
-        index++;
-
+    final children =
+        widget.questionResponse.referenceProposals.values.mapIndexed(
+      (index, proposal) {
         return FadeInX(
           beginX: 20.0,
           delay: Duration(milliseconds: 200 * index),
@@ -109,14 +123,18 @@ class AnswerPicker extends StatelessWidget {
             name: proposal.name,
             height: height,
             width: width,
-            imageUrl: proposal.urls.image,
-            selected: selectedId == proposal.id,
+            index: index,
+            showZoomIcon: true,
             type: ImageCardType.extended,
+            imageUrl: proposal.urls.image,
+            selected: widget.selectedId == proposal.id,
+            padding: const EdgeInsets.only(bottom: 24.0),
             onTap: () {
-              if (onPickAnswer != null) {
-                onPickAnswer(proposal.id);
+              if (widget.onPickAnswer != null) {
+                widget.onPickAnswer(proposal.id);
               }
             },
+            openImage: openImage,
           ),
         );
       },
@@ -134,5 +152,49 @@ class AnswerPicker extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: children,
     );
+  }
+
+  void openImage(int index) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GalleryPhotoViewWrapper(
+          galleryItems: galleryItems,
+          backgroundDecoration: const BoxDecoration(
+            color: Colors.black,
+          ),
+          initialIndex: index,
+          scrollDirection: Axis.horizontal,
+        ),
+      ),
+    );
+  }
+
+  void populateGalleryItems() {
+    if (widget.questionType == 'author') {
+      final values = widget.questionResponse.authorProposals.values;
+
+      values.forEach((author) {
+        galleryItems.add(
+          GalleryItem(
+            name: author.name,
+            url: author.urls.image,
+          ),
+        );
+      });
+
+      return;
+    }
+
+    final values = widget.questionResponse.referenceProposals.values;
+
+    values.forEach((reference) {
+      galleryItems.add(
+        GalleryItem(
+          name: reference.name,
+          url: reference.urls.image,
+        ),
+      );
+    });
   }
 }
