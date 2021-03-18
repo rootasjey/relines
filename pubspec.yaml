@@ -51,6 +51,7 @@ dependencies:
   logger: 0.9.4
   mobx: 1.2.1+4
   mobx_codegen: 1.1.2
+  modal_bottom_sheet: 2.0.0
   photo_view: 0.11.1
   pretty_json: 1.1.0
   simple_animations: 3.0.1
