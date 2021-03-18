@@ -196,7 +196,7 @@ class Hud extends StatelessWidget {
               },
               child: Wrap(
                 children: [
-                  Text("next_question".tr()),
+                  Text("next".tr()),
                 ],
               ),
               style: TextButton.styleFrom(

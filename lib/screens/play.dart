@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:relines/components/animated_app_icon.dart';
 import 'package:relines/components/desktop_app_bar.dart';
 import 'package:relines/components/footer.dart';
@@ -21,6 +22,7 @@ import 'package:relines/types/game_answer_response.dart';
 import 'package:relines/types/game_question_response.dart';
 import 'package:relines/types/reference.dart';
 import 'package:relines/utils/app_logger.dart';
+import 'package:relines/utils/constants.dart';
 import 'package:supercharged/supercharged.dart';
 
 class Play extends StatefulWidget {
@@ -135,7 +137,7 @@ class _PlayState extends State<Play> {
               hasChosenAnswer: hasChosenAnswer,
               isCheckingAnswer: isCheckingAnswer,
               onNextQuestion: onNextQuestion,
-              onQuit: onQuit,
+              onQuit: confirmQuit,
               onSkip: onSkipQuestion,
             ),
           ],
@@ -193,7 +195,7 @@ class _PlayState extends State<Play> {
       questionType: questionType,
       selectedId: selectedId,
       onNextQuestion: onNextQuestion,
-      onQuit: onQuit,
+      onQuit: confirmQuit,
       onSkipQuestion: onSkipQuestion,
       onPickAnswer: (answerId) {
         if (hasChosenAnswer) {
@@ -272,6 +274,74 @@ class _PlayState extends State<Play> {
     }
   }
 
+  void confirmQuit() {
+    int flex =
+        MediaQuery.of(context).size.width < Constants.maxMobileWidth ? 5 : 3;
+
+    showCustomModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, childSetState) {
+            return Material(
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      title: Text(
+                        'confirm'.tr(),
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      trailing: Icon(
+                        Icons.check,
+                        color: Colors.white,
+                      ),
+                      tileColor: Color(0xfff55c5c),
+                      onTap: () {
+                        context.router.pop();
+                        onQuit();
+                      },
+                    ),
+                    ListTile(
+                      title: Text('cancel'.tr()),
+                      trailing: Icon(Icons.close),
+                      onTap: context.router.pop,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+      containerWidget: (context, animation, child) {
+        return SafeArea(
+          child: Row(
+            children: [
+              Spacer(),
+              Expanded(
+                flex: flex,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Material(
+                    clipBehavior: Clip.antiAlias,
+                    borderRadius: BorderRadius.circular(12.0),
+                    child: child,
+                  ),
+                ),
+              ),
+              Spacer(),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void fetchQuestion() async {
     setState(() {
       isLoading = true;
@@ -339,7 +409,7 @@ class _PlayState extends State<Play> {
       gameState = GameState.stopped;
     });
 
-    context.router.navigate(HomeRoute());
+    context.router.push(HomeRoute());
   }
 
   void retryFetch() {
