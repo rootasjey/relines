@@ -146,34 +146,29 @@ class Hud extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
               alignment: WrapAlignment.spaceAround,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Wrap(
-                    children: [
-                      Icon(
-                        UniconsLine.award,
-                        color: Colors.yellow.shade800,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 4.0),
-                        child: Text("$score points"),
-                      ),
-                    ],
-                  ),
+                Wrap(
+                  children: [
+                    Icon(
+                      UniconsLine.award,
+                      color: Colors.yellow.shade800,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4.0),
+                      child: Text("$score points"),
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Wrap(
-                    children: [
-                      Icon(
-                        UniconsLine.question,
-                        color: Colors.green,
-                      ),
-                      Text("question $currentQuestion / $maxQuestions"),
-                    ],
-                  ),
+                Wrap(
+                  children: [
+                    Icon(
+                      UniconsLine.question,
+                      color: Colors.green,
+                    ),
+                    Text("question $currentQuestion / $maxQuestions"),
+                  ],
                 ),
                 actionsButtons(),
               ],
@@ -186,7 +181,7 @@ class Hud extends StatelessWidget {
 
   Widget actionsButtons() {
     return Padding(
-      padding: const EdgeInsets.only(top: 4.0),
+      padding: const EdgeInsets.only(top: 0.0),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
