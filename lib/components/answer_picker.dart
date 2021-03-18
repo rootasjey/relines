@@ -58,6 +58,10 @@ class _AnswerPickerState extends State<AnswerPicker> {
       width = 360.0;
     }
 
+    if (size.width < 500.0) {
+      width = 340.0;
+    }
+
     final children = widget.questionResponse.authorProposals.values.mapIndexed(
       (index, proposal) {
         return FadeInX(
@@ -68,7 +72,7 @@ class _AnswerPickerState extends State<AnswerPicker> {
             height: height,
             width: width,
             index: index,
-            showZoomIcon: true,
+            showZoomIcon: width > 500.0 && width < Constants.maxMobileWidth,
             type: ImageCardType.extended,
             imageUrl: proposal.urls.image,
             selected: widget.selectedId == proposal.id,
@@ -88,6 +92,7 @@ class _AnswerPickerState extends State<AnswerPicker> {
       return Padding(
         padding: const EdgeInsets.only(top: 24.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: children,
         ),
       );
@@ -113,6 +118,10 @@ class _AnswerPickerState extends State<AnswerPicker> {
       width = 360.0;
     }
 
+    if (size.width < 500.0) {
+      width = 340.0;
+    }
+
     final children =
         widget.questionResponse.referenceProposals.values.mapIndexed(
       (index, proposal) {
@@ -124,7 +133,7 @@ class _AnswerPickerState extends State<AnswerPicker> {
             height: height,
             width: width,
             index: index,
-            showZoomIcon: true,
+            showZoomIcon: width > 500.0 && width < Constants.maxMobileWidth,
             type: ImageCardType.extended,
             imageUrl: proposal.urls.image,
             selected: widget.selectedId == proposal.id,
@@ -144,6 +153,7 @@ class _AnswerPickerState extends State<AnswerPicker> {
       return Padding(
         padding: const EdgeInsets.only(top: 24.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: children,
         ),
       );

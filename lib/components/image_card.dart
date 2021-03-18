@@ -163,14 +163,13 @@ class _ImageCardState extends State<ImageCard> with TickerProviderStateMixin {
   }
 
   Widget extendedLayout() {
-    return Padding(
-      padding: widget.padding,
+    return Material(
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             width: widget.width,
-            padding: const EdgeInsets.only(right: 20.0),
+            padding: widget.padding,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -207,6 +206,7 @@ class _ImageCardState extends State<ImageCard> with TickerProviderStateMixin {
                         : null,
                     child: InkWell(
                       onTap: widget.onTap,
+                      onLongPress: () => widget.openImage(widget.index),
                       onHover: (isHover) {
                         if (isHover) {
                           scaleAnimationController.forward();

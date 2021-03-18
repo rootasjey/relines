@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
-import 'package:relines/components/circle_button.dart';
+import 'package:relines/state/colors.dart';
 import 'package:relines/types/gallery_item.dart';
 import 'package:unicons/unicons.dart';
 
@@ -96,11 +96,17 @@ class _GalleryPhotoViewWrapperState extends State<GalleryPhotoViewWrapper> {
             Positioned(
                 top: 12.0,
                 right: 12.0,
-                child: CircleButton(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                  icon: Icon(UniconsLine.times),
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(2.0),
+                    child: IconButton(
+                      tooltip: "close",
+                      onPressed: Navigator.of(context).pop,
+                      iconSize: 40.0,
+                      color: stateColors.background.withOpacity(0.6),
+                      icon: Icon(UniconsLine.times),
+                    ),
+                  ),
                 )),
           ],
         ),
