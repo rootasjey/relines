@@ -6,6 +6,7 @@ class LangPopupMenuButton extends StatelessWidget {
   final String lang;
   final Function(String) onLangChanged;
   final double opacity;
+  final EdgeInsets margin;
   final EdgeInsets padding;
   final double elevation;
 
@@ -15,23 +16,26 @@ class LangPopupMenuButton extends StatelessWidget {
     @required this.onLangChanged,
     this.elevation = 0.0,
     this.opacity = 1.0,
-    this.padding = const EdgeInsets.only(top: 2.0),
+    this.margin = EdgeInsets.zero,
+    this.padding = const EdgeInsets.all(8.0),
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: padding,
+      padding: margin,
       child: Material(
         elevation: elevation,
+        borderRadius: BorderRadius.circular(4.0),
         child: Opacity(
           opacity: opacity,
           child: PopupMenuButton<String>(
             tooltip: "Change language",
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              // padding: const EdgeInsets.all(8.0),
+              padding: padding,
               child: Text(
-                lang.toUpperCase(),
+                lang,
                 style: TextStyle(
                   color: stateColors.foreground,
                   fontSize: 16.0,
