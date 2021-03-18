@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:collection/collection.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
@@ -21,8 +23,10 @@ import 'package:relines/types/reference.dart';
 import 'package:relines/utils/app_storage.dart';
 import 'package:relines/utils/constants.dart';
 import 'package:relines/utils/fonts.dart';
+import 'package:relines/utils/language.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -105,18 +109,36 @@ class _HomeState extends State<Home> {
             CustomScrollView(
               controller: _scrollController,
               slivers: [
-                DesktopAppBar(
-                  onTapIconHeader: () {
-                    _scrollController.animateTo(
-                      0,
-                      duration: 250.milliseconds,
-                      curve: Curves.decelerate,
-                    );
-                  },
-                ),
+                appBar(),
                 body(),
                 footer(),
               ],
+            ),
+            Positioned(
+              bottom: 0.0,
+              left: 0.0,
+              child: SafeArea(
+                child: Container(
+                  padding: const EdgeInsets.all(12.0),
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    color: stateColors.tileBackground,
+                    border: Border(
+                      top: BorderSide(
+                        color: stateColors.foreground.withOpacity(0.1),
+                        width: 1.0,
+                      ),
+                    ),
+                  ),
+                  child: Wrap(
+                    alignment: WrapAlignment.spaceAround,
+                    children: [
+                      langSelector(),
+                      startGameButton(),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -124,17 +146,32 @@ class _HomeState extends State<Home> {
     );
   }
 
+  Widget appBar() {
+    if (kIsWeb) {
+      return DesktopAppBar(
+        onTapIconHeader: () {
+          _scrollController.animateTo(
+            0,
+            duration: 250.milliseconds,
+            curve: Curves.decelerate,
+          );
+        },
+      );
+    }
+
+    return SliverPadding(
+      padding: const EdgeInsets.only(top: 80.0),
+    );
+  }
+
   Widget body() {
     final size = MediaQuery.of(context).size;
-    final horizontal = size.width < Constants.maxMobileWidth ? 12.0 : 80.0;
+    final paddingValue = size.width < Constants.maxMobileWidth ? 12.0 : 80.0;
 
     return SliverList(
       delegate: SliverChildListDelegate.fixed([
         Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: horizontal,
-            vertical: 80.0,
-          ),
+          padding: EdgeInsets.all(paddingValue),
           child: ConstrainedBox(
             constraints: BoxConstraints(
               minHeight: size.height,
@@ -163,10 +200,127 @@ class _HomeState extends State<Home> {
   }
 
   Widget footer() {
-    return SliverList(
-      delegate: SliverChildListDelegate.fixed([
-        Footer(),
-      ]),
+    if (kIsWeb) {
+      return SliverList(
+        delegate: SliverChildListDelegate.fixed([
+          Footer(),
+        ]),
+      );
+    }
+
+    return SliverPadding(
+      padding: const EdgeInsets.only(
+        bottom: 400.0,
+        left: 32.0,
+        right: 24.0,
+      ),
+      sliver: SliverList(
+        delegate: SliverChildListDelegate.fixed([
+          footerMobile(),
+        ]),
+      ),
+    );
+  }
+
+  Widget footerMobile() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+            primary: stateColors.accent,
+          ),
+          onPressed: () {
+            launch(
+              "https://github.com/rootasjey/relines/"
+              "issues",
+            );
+          },
+          icon: Icon(UniconsLine.bug),
+          label: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8.0,
+            ),
+            child: Text("report_bug".tr()),
+          ),
+        ),
+        Opacity(
+          opacity: 0.6,
+          child: Text(
+            "v${Constants.appVersion}",
+            style: FontsUtils.mainStyle(
+              fontSize: 20.0,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 80.0),
+          child: Wrap(
+            spacing: 16.0,
+            runSpacing: 16.0,
+            alignment: WrapAlignment.center,
+            children: [
+              Material(
+                elevation: 2.0,
+                shape: CircleBorder(),
+                clipBehavior: Clip.hardEdge,
+                child: IconButton(
+                  tooltip: "GitHub",
+                  onPressed: () {
+                    launch(Constants.githubUrl);
+                  },
+                  iconSize: 40.0,
+                  color: stateColors.foreground.withOpacity(0.6),
+                  icon: Icon(UniconsLine.github_alt),
+                ),
+              ),
+              Material(
+                elevation: 2.0,
+                shape: CircleBorder(),
+                clipBehavior: Clip.hardEdge,
+                child: IconButton(
+                  tooltip: "about".tr(),
+                  onPressed: () {
+                    context.router.push(AboutRoute());
+                  },
+                  iconSize: 40.0,
+                  color: stateColors.foreground.withOpacity(0.6),
+                  icon: Icon(UniconsLine.question),
+                ),
+              ),
+              Material(
+                elevation: 2.0,
+                shape: CircleBorder(),
+                clipBehavior: Clip.hardEdge,
+                child: IconButton(
+                  tooltip: "contact".tr(),
+                  onPressed: () {
+                    context.router.push(ContactRoute());
+                  },
+                  iconSize: 40.0,
+                  color: stateColors.foreground.withOpacity(0.6),
+                  icon: Icon(Icons.sms_outlined),
+                ),
+              ),
+              Material(
+                elevation: 2.0,
+                shape: CircleBorder(),
+                clipBehavior: Clip.hardEdge,
+                child: IconButton(
+                  tooltip: "tos".tr(),
+                  onPressed: () {
+                    context.router.push(TosRoute());
+                  },
+                  iconSize: 40.0,
+                  color: stateColors.foreground.withOpacity(0.6),
+                  icon: Icon(Icons.privacy_tip_outlined),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -252,11 +406,11 @@ class _HomeState extends State<Home> {
             delay: 300.milliseconds,
             child: gameSubtitle(),
           ),
-          FadeInY(
-            beginY: 20.0,
-            delay: 600.milliseconds,
-            child: headerButtons(),
-          ),
+          // FadeInY(
+          //   beginY: 20.0,
+          //   delay: 600.milliseconds,
+          //   child: headerButtons(),
+          // ),
         ],
       ),
     );
@@ -267,45 +421,50 @@ class _HomeState extends State<Home> {
       return Container();
     }
 
-    int index = 0;
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          width: 300.0,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: referencesPresentation.map((reference) {
-              index++;
-
-              return FadeInY(
-                beginY: 20.0,
-                delay: 100.milliseconds * index,
-                child: ImageCard(
-                  width: 300.0,
-                  height: 150.0,
-                  name: reference.name,
-                  imageUrl: reference.urls.image,
-                  padding: EdgeInsets.zero,
+          height: 320.0,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: [
+              SizedBox(
+                width: 300.0,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children:
+                      referencesPresentation.mapIndexed((index, reference) {
+                    return FadeInY(
+                      beginY: 20.0,
+                      delay: 100.milliseconds * index,
+                      child: ImageCard(
+                        width: 300.0,
+                        height: 150.0,
+                        name: reference.name,
+                        imageUrl: reference.urls.image,
+                        padding: EdgeInsets.zero,
+                      ),
+                    );
+                  }).toList(),
                 ),
-              );
-            }).toList(),
+              ),
+              SizedBox(
+                width: 150.0,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: quotesPresentation.mapIndexed((index, quote) {
+                    return FadeInY(
+                        beginY: 20.0,
+                        delay: 100.milliseconds * index,
+                        child: miniQuoteCard(quote));
+                  }).toList(),
+                ),
+              ),
+            ],
           ),
         ),
-        SizedBox(
-          width: 150.0,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: quotesPresentation.map((quote) {
-              return FadeInY(
-                  beginY: 20.0,
-                  delay: 100.milliseconds * index,
-                  child: miniQuoteCard(quote));
-            }).toList(),
-          ),
-        ),
+        maxQuestionsButton(),
       ],
     );
   }
@@ -334,151 +493,146 @@ class _HomeState extends State<Home> {
   }
 
   Widget headerButtons() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        maxQuestionsButton(),
-        Wrap(
-          spacing: 12.0,
-          children: [
-            langSelector(),
-            startGameButton(),
-          ],
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.only(top: 24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          maxQuestionsButton(),
+          Wrap(
+            spacing: 12.0,
+            children: [
+              langSelector(),
+              startGameButton(),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
   Widget langSelector() {
-    return Card(
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: 9.0,
-          horizontal: 12.0,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: Opacity(
-                opacity: 0.8,
-                child: Text(
-                  "language".tr(),
-                  style: FontsUtils.mainStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
-            LangPopupMenuButton(
-              lang: Game.language,
-              onLangChanged: (lang) async {
-                Locale locale = lang == 'fr' ? Locale('fr') : Locale('en');
-
-                await context.setLocale(locale);
-                appStorage.setLang(lang);
-
-                setState(() {
-                  Game.setLanguage(lang);
-                });
-
-                fetchPresentationData();
-              },
-            ),
-          ],
-        ),
+    return LangPopupMenuButton(
+      elevation: 2.0,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20.0,
+        vertical: 16.0,
       ),
+      lang: Language.frontend(Game.language),
+      onLangChanged: (lang) async {
+        Locale locale = lang == 'fr' ? Locale('fr') : Locale('en');
+
+        await context.setLocale(locale);
+        appStorage.setLang(lang);
+
+        setState(() {
+          Game.setLanguage(lang);
+        });
+
+        fetchPresentationData();
+      },
     );
   }
 
   Widget maxQuestionsButton() {
-    final questionsText = "questions";
-
     return Padding(
       padding: const EdgeInsets.only(
-        top: 16.0,
+        top: 12.0,
         bottom: 16.0,
       ),
-      child: Wrap(
-        spacing: 16.0,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          OutlinedButton(
-            onPressed: () {
-              setState(() {
-                Game.setMaxQuestions(5);
-              });
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (Game.maxQuestionsIs(5)) Icon(UniconsLine.check),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Text("5 $questionsText"),
-                  ),
-                ],
+          Opacity(
+            opacity: 0.6,
+            child: Text(
+              "Questions",
+              style: FontsUtils.mainStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.w500,
               ),
-            ),
-            style: OutlinedButton.styleFrom(
-              primary: Game.maxQuestionsIs(5)
-                  ? stateColors.secondary
-                  : Theme.of(context).textTheme.bodyText1.color,
             ),
           ),
-          OutlinedButton(
-            onPressed: () {
-              setState(() {
-                Game.setMaxQuestions(10);
-              });
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (Game.maxQuestionsIs(10)) Icon(UniconsLine.check),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Text("10 $questionsText"),
+          Wrap(
+            spacing: 16.0,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              OutlinedButton(
+                onPressed: () {
+                  setState(() {
+                    Game.setMaxQuestions(5);
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (Game.maxQuestionsIs(5)) Icon(UniconsLine.check),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: Text("5"),
+                      ),
+                    ],
                   ),
-                ],
+                ),
+                style: OutlinedButton.styleFrom(
+                  primary: Game.maxQuestionsIs(5)
+                      ? stateColors.secondary
+                      : Theme.of(context).textTheme.bodyText1.color,
+                ),
               ),
-            ),
-            style: OutlinedButton.styleFrom(
-              primary: Game.maxQuestionsIs(10)
-                  ? stateColors.secondary
-                  : stateColors.foreground,
-            ),
-          ),
-          OutlinedButton(
-            onPressed: () {
-              setState(() {
-                Game.setMaxQuestions(20);
-              });
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (Game.maxQuestionsIs(20)) Icon(UniconsLine.check),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Text("20 $questionsText"),
+              OutlinedButton(
+                onPressed: () {
+                  setState(() {
+                    Game.setMaxQuestions(10);
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (Game.maxQuestionsIs(10)) Icon(UniconsLine.check),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: Text("10"),
+                      ),
+                    ],
                   ),
-                ],
+                ),
+                style: OutlinedButton.styleFrom(
+                  primary: Game.maxQuestionsIs(10)
+                      ? stateColors.secondary
+                      : stateColors.foreground,
+                ),
               ),
-            ),
-            style: OutlinedButton.styleFrom(
-              primary: Game.maxQuestionsIs(20)
-                  ? stateColors.secondary
-                  : stateColors.foreground,
-            ),
+              OutlinedButton(
+                onPressed: () {
+                  setState(() {
+                    Game.setMaxQuestions(20);
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (Game.maxQuestionsIs(20)) Icon(UniconsLine.check),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: Text("20"),
+                      ),
+                    ],
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  primary: Game.maxQuestionsIs(20)
+                      ? stateColors.secondary
+                      : stateColors.foreground,
+                ),
+              ),
+            ],
           ),
         ],
       ),
