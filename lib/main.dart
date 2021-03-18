@@ -31,7 +31,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await appStorage.initialize();
-  await GlobalConfiguration().loadFromPath("config/base.json");
+  await GlobalConfiguration().loadFromAsset('base');
   await Future.wait([_autoLogin(), _initColors()]);
   await EasyLocalization.ensureInitialized();
 
