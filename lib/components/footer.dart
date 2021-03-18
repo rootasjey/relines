@@ -92,6 +92,7 @@ class _FooterState extends State<Footer> {
           label: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 8.0,
+              vertical: 12.0,
             ),
             child: Text("report_bug".tr()),
           ),
@@ -110,7 +111,6 @@ class _FooterState extends State<Footer> {
           child: Wrap(
             spacing: 16.0,
             runSpacing: 16.0,
-            alignment: WrapAlignment.center,
             children: [
               CircleButton(
                 tooltip: "GitHub",
@@ -139,6 +139,13 @@ class _FooterState extends State<Footer> {
                   context.router.push(TosRoute());
                 },
                 icon: Icon(Icons.privacy_tip_outlined),
+              ),
+              CircleButton(
+                tooltip: "settings".tr(),
+                onTap: () {
+                  context.router.push(SettingsRoute(showAppBar: true));
+                },
+                icon: Icon(UniconsLine.setting),
               ),
             ],
           ),
