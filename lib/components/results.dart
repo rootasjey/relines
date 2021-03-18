@@ -28,7 +28,7 @@ class Results extends StatelessWidget {
         Container(
           width: 700.0,
           height: MediaQuery.of(context).size.height,
-          padding: const EdgeInsets.all(80.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
               GameTitle(),
@@ -80,7 +80,7 @@ class Results extends StatelessWidget {
       padding: const EdgeInsets.only(top: 60.0),
       child: Card(
         elevation: 4.0,
-        color: Colors.transparent,
+        color: stateColors.tileBackground,
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
@@ -108,7 +108,7 @@ class Results extends StatelessWidget {
             ),
             style: TextStyle(
               fontSize: 24.0,
-              color: Colors.yellow.shade800,
+              color: stateColors.accent,
             ),
           ),
           TextSpan(
@@ -122,7 +122,7 @@ class Results extends StatelessWidget {
             ),
             style: TextStyle(
               fontSize: 24.0,
-              color: Colors.yellow.shade800,
+              color: stateColors.accent,
             ),
           ),
           TextSpan(
@@ -136,7 +136,7 @@ class Results extends StatelessWidget {
             ),
             style: TextStyle(
               fontSize: 24.0,
-              color: Colors.yellow.shade800,
+              color: stateColors.accent,
             ),
           ),
         ],
@@ -157,12 +157,12 @@ class Results extends StatelessWidget {
         children: [
           Icon(
             UniconsLine.award,
-            color: Colors.yellow.shade800,
+            color: stateColors.accent,
           ),
           Text(
             "result".tr(),
             style: TextStyle(
-              color: Colors.yellow.shade800,
+              color: stateColors.accent,
             ),
           ),
         ],
