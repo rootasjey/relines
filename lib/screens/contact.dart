@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:relines/components/desktop_app_bar.dart';
 import 'package:relines/components/footer.dart';
 import 'package:flutter/material.dart';
+import 'package:relines/utils/constants.dart';
 import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -16,7 +18,7 @@ class _ContactState extends State<Contact> {
       body: CustomScrollView(
         slivers: [
           DesktopAppBar(
-            title: "Contact",
+            title: "contact".tr(),
             automaticallyImplyLeading: true,
           ),
           SliverPadding(
@@ -49,10 +51,13 @@ class _ContactState extends State<Contact> {
     String subTitle,
     @required String textTitle,
   }) {
-    final horPadding = MediaQuery.of(context).size.width < 700.0 ? 20 : 80.0;
-    final height = MediaQuery.of(context).size.width < 400.0 ? 400 : 200.0;
-    final double fontSize =
-        MediaQuery.of(context).size.width < 600.0 ? 16.0 : 20.0;
+    double horPadding = 80.0;
+    double height = 200.0;
+    double fontSize = 20.0;
+
+    if (MediaQuery.of(context).size.width < Constants.maxMobileWidth) {
+      horPadding = 12.0;
+    }
 
     return Padding(
       padding: EdgeInsets.symmetric(
