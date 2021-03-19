@@ -63,9 +63,17 @@ dependencies:
 dev_dependencies:
   auto_route_generator: 1.0.0-beta.11
   build_runner:
-  flutter_rename_app: 1.0.0
+  flutter_launcher_icons: 0.9.0
+  flutter_rename_app:
+    git: https://github.com/rootasjey/flutter_rename_app.git
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: "launcher_icon"
+  image_path_android: "assets/images/app_icon/android.png"
+  image_path_ios: "assets/images/app_icon/ios.jpg"
 
 flutter_rename_app:
   application_name: Relines
