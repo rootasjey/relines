@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:relines/components/desktop_app_bar.dart';
 import 'package:relines/state/colors.dart';
 import 'package:relines/utils/constants.dart';
@@ -99,13 +100,8 @@ class _TosState extends State<Tos> {
 
   Widget cookiesBlock() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      titleBlock(
-        text: 'COOKIES',
-      ),
-      textSuperBlock(
-        text:
-            'The application does not use cookies neither for user preferences nor tracking with id advertising.',
-      ),
+      titleBlock(text: 'cookies'.tr().toUpperCase()),
+      textSuperBlock(text: 'cookies_content'.tr()),
     ]);
   }
 
@@ -113,13 +109,8 @@ class _TosState extends State<Tos> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        titleBlock(
-          text: 'ANALYTICS',
-        ),
-        textSuperBlock(
-          text:
-              'The web & mobile apps collect usage data to improve the apps & services. However, personal data is never shared or sell to third parties.',
-        ),
+        titleBlock(text: 'analytics'.tr().toUpperCase()),
+        textSuperBlock(text: 'analytics_content'.tr()),
       ],
     );
   }
@@ -128,13 +119,8 @@ class _TosState extends State<Tos> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        titleBlock(
-          text: 'ADVERTISING',
-        ),
-        textSuperBlock(
-          text:
-              'The web & mobile apps may contain advertising to generate revenues. Advertisers may collect additional data on your navigation and preferences.',
-        ),
+        titleBlock(text: 'avertising'.tr().toUpperCase()),
+        textSuperBlock(text: 'avertising_content'.tr()),
       ],
     );
   }
@@ -143,13 +129,8 @@ class _TosState extends State<Tos> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        titleBlock(
-          text: 'IN-APP PURCHASES',
-        ),
-        textSuperBlock(
-          text:
-              'The apps contain in-app purchases which offer additional features.',
-        ),
+        titleBlock(text: 'iap'.tr()),
+        textSuperBlock(text: 'iap_content'.tr()),
       ],
     );
   }
@@ -163,7 +144,7 @@ class _TosState extends State<Tos> {
           Padding(
             padding: const EdgeInsets.only(bottom: 24.0),
             child: Text(
-              "Terms of service",
+              "tos_title".tr(),
               style: TextStyle(
                 fontSize: 50.0,
                 color: stateColors.accent,
@@ -171,39 +152,32 @@ class _TosState extends State<Tos> {
             ),
           ),
           textSuperBlock(
-            text:
-                "Your privacy is important to us. It is Jeremie Codes' policy to respect your privacy regarding any information we may collect from you across our website, fig.style, and other sites we own and operate including mobile apps.",
+            text: "tos_1".tr(),
           ),
           textSuperBlock(
-            text:
-                "We only ask for personal information when we truly need it to provide a service to you. We collect it by fair and lawful means, with your knowledge and consent. We also let you know why we’re collecting it and how it will be used.",
+            text: "tos_2".tr(),
           ),
           textSuperBlock(
-            text:
-                "We only retain collected information for as long as necessary to provide you with your requested service. What data we store, we’ll protect within commercially acceptable means to prevent loss and theft, as well as unauthorized access, disclosure, copying, use or modification.",
+            text: "tos_3".tr(),
           ),
           textSuperBlock(
-            text:
-                "We don’t share any personally identifying information publicly or with third-parties, except when required to by law.",
+            text: "tos_4".tr(),
           ),
           textSuperBlock(
-            text:
-                "Our website may link to external sites that are not operated by us. Please be aware that we have no control over the content and practices of these sites, and cannot accept responsibility or liability for their respective privacy policies.",
+            text: "tos_5".tr(),
           ),
           textSuperBlock(
-            text:
-                "You are free to refuse our request for your personal information, with the understanding that we may be unable to provide you with some of your desired services.",
+            text: "tos_6".tr(),
           ),
           textSuperBlock(
-            text:
-                "Your continued use of our website will be regarded as acceptance of our practices around privacy and personal information. If you have any questions about how we handle user data and personal information, feel free to contact us.",
+            text: "tos_7".tr(),
           ),
           textSuperBlock(
-            text: "This policy is effective as of 1 May 2020.",
+            text: "tos_8".tr(),
           ),
           Text.rich(
             TextSpan(
-              text: "Privacy Policy created with GetTerms.",
+              text: "tos_created_with".tr(),
               style: TextStyle(
                 decoration: TextDecoration.underline,
               ),
