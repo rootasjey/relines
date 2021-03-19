@@ -46,6 +46,7 @@
   "rules": "Rules",
   "rules_1": "Each round, you have to guess the author or the reference of the displayed quote. The question type alternate randomly.",
   "rules_example": "For example, on the 1st round, you must guess the author, and on the next 2nd round, you must guess the reference.",
+  "rules_long_press": "You can zoom on image card with a long press.",
   "rules_2": "For each good answer, you earn 10 points. Wrong answers make you loose 5 points. 1 point is used if you skip one question.",
   "rules_3": "You can choose a game in 5, 10 or 20 questions.",
   "score": "Score",

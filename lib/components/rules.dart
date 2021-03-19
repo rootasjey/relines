@@ -89,6 +89,18 @@ class Rules extends StatelessWidget {
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 16.0,
+            ),
+            child: Opacity(
+              opacity: 0.8,
+              child: Text(
+                "rules_long_press".tr(),
+                style: textStyle,
+              ),
+            ),
+          ),
         ],
       ),
     );

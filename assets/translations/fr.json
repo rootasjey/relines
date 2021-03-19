@@ -46,6 +46,7 @@
   "rules": "Règles",
   "rules_1": "À chaque manche, vous devez deviner l'auteur ou la référénce de la citation affichée. Le type de question alterne de manière aléatoire (auteur ou référénce).",
   "rules_example": "Par example, à la première manche, vous devez deviner l'auteur, mais à la seconde manche, vous devez deviner la référénce.",
+  "rules_long_press": "Vous pouvez agrandir les images en faisant un appui long sur celles-ci.",
   "rules_2": "Vous gagnerez 10 points pour chaque bonne réponse. Une mauvaise réponse vous fera perdre 5 points. Un saut de question demande 1 point.",
   "rules_3": "Vous avez le choix de faire une partie en 5, 10 ou 20 questions.",
   "score": "Score",
