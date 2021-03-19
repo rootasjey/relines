@@ -31,12 +31,12 @@ class _ContactState extends State<Contact> {
                     twitterBlock(),
                   ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 80.0),
-                  child: Footer(),
-                ),
               ]),
             ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.only(top: 80.0),
+            sliver: Footer(),
           ),
         ],
       ),
