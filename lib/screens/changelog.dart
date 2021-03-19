@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:relines/components/desktop_app_bar.dart';
 import 'package:relines/state/colors.dart';
 import 'package:relines/types/changelog_item.dart';
@@ -64,7 +65,9 @@ class _ChangelogState extends State<Changelog> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          DesktopAppBar(),
+          DesktopAppBar(
+            onNavBack: context.router.pop,
+          ),
           SliverPadding(
             padding: EdgeInsets.symmetric(
               horizontal: horPadding,

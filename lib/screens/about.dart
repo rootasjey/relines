@@ -80,6 +80,7 @@ class _AboutState extends State<About> {
                     title: 'about'.tr(),
                     automaticallyImplyLeading: true,
                     showUserMenu: false,
+                    onNavBack: context.router.pop,
                   ),
                   SliverPadding(
                     padding: const EdgeInsets.only(

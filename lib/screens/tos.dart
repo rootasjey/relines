@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:relines/components/desktop_app_bar.dart';
 import 'package:relines/state/colors.dart';
 import 'package:relines/utils/constants.dart';
@@ -61,6 +62,7 @@ class _TosState extends State<Tos> {
               title: "Privacy Terms",
               automaticallyImplyLeading: true,
               showUserMenu: showUserMenu,
+              onNavBack: context.router.pop,
             ),
             SliverPadding(
               padding: EdgeInsets.symmetric(

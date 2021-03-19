@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:relines/components/desktop_app_bar.dart';
 import 'package:relines/components/footer.dart';
@@ -20,6 +21,7 @@ class _ContactState extends State<Contact> {
           DesktopAppBar(
             title: "contact".tr(),
             automaticallyImplyLeading: true,
+            onNavBack: context.router.pop,
           ),
           SliverPadding(
             padding: const EdgeInsets.only(top: 80.0),
