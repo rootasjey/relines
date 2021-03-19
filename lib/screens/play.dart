@@ -111,15 +111,19 @@ class _PlayState extends State<Play> {
             CustomScrollView(
               controller: _scrollController,
               slivers: [
-                DesktopAppBar(onTapIconHeader: () {
-                  _scrollController.animateTo(
-                    0,
-                    duration: 250.milliseconds,
-                    curve: Curves.decelerate,
-                  );
-                }, onNavBack: () {
-                  confirmQuit();
-                }),
+                DesktopAppBar(
+                  pinned: false,
+                  onTapIconHeader: () {
+                    _scrollController.animateTo(
+                      0,
+                      duration: 250.milliseconds,
+                      curve: Curves.decelerate,
+                    );
+                  },
+                  onNavBack: () {
+                    confirmQuit();
+                  },
+                ),
                 body(),
                 Footer(),
               ],
