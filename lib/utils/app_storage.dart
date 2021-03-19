@@ -66,6 +66,8 @@ class AppStorage {
 
   String getLang() => _localStorage.getString(StorageKeys.lang) ?? 'en';
 
+  int getMaxQuestions() => _localStorage.getInt(StorageKeys.maxQuestions) ?? 10;
+
   bool isQuotidianNotifActive() {
     return _localStorage.getBool('is_quotidian_notif_active') ?? true;
   }
@@ -87,6 +89,9 @@ class AppStorage {
   }
 
   void setLang(String lang) => _localStorage.setString(StorageKeys.lang, lang);
+
+  void setMaxQuestions(int max) =>
+      _localStorage.setInt(StorageKeys.maxQuestions, max);
 
   void setQuotidianNotif(bool active) {
     _localStorage.setBool('is_quotidian_notif_active', active);

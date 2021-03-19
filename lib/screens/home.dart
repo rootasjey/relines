@@ -63,6 +63,8 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
 
+    Game.setMaxQuestions(appStorage.getMaxQuestions());
+
     if (_referencesPresentation.isEmpty || _quotesPresentation.isEmpty) {
       fetchPresentationData();
     }
@@ -436,8 +438,11 @@ class _HomeState extends State<Home> {
             children: [
               OutlinedButton(
                 onPressed: () {
+                  const max = 5;
+                  appStorage.setMaxQuestions(max);
+
                   setState(() {
-                    Game.setMaxQuestions(5);
+                    Game.setMaxQuestions(max);
                   });
                 },
                 child: Padding(
@@ -461,8 +466,11 @@ class _HomeState extends State<Home> {
               ),
               OutlinedButton(
                 onPressed: () {
+                  const max = 10;
+                  appStorage.setMaxQuestions(max);
+
                   setState(() {
-                    Game.setMaxQuestions(10);
+                    Game.setMaxQuestions(max);
                   });
                 },
                 child: Padding(
@@ -486,8 +494,11 @@ class _HomeState extends State<Home> {
               ),
               OutlinedButton(
                 onPressed: () {
+                  const max = 20;
+                  appStorage.setMaxQuestions(max);
+
                   setState(() {
-                    Game.setMaxQuestions(20);
+                    Game.setMaxQuestions(max);
                   });
                 },
                 child: Padding(
