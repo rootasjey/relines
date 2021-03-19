@@ -27,6 +27,9 @@ import 'package:relines/utils/language.dart';
 import 'package:supercharged/supercharged.dart';
 import 'package:unicons/unicons.dart';
 
+List<Reference> _referencesPresentation = [];
+List<Quote> _quotesPresentation = [];
+
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -37,9 +40,6 @@ class _HomeState extends State<Home> {
   bool isFabVisible = false;
 
   final _scrollController = ScrollController();
-
-  List<Reference> referencesPresentation = [];
-  List<Quote> quotesPresentation = [];
 
   final quoteEndpoint = "https://api.fig.style/v1/quotes/";
   final referenceEndpoint = "https://api.fig.style/v1/references/";
@@ -62,7 +62,10 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    fetchPresentationData();
+
+    if (_referencesPresentation.isEmpty || _quotesPresentation.isEmpty) {
+      fetchPresentationData();
+    }
   }
 
   @override
@@ -291,7 +294,7 @@ class _HomeState extends State<Home> {
   }
 
   Widget headerRight() {
-    if (referencesPresentation.isEmpty || quotesPresentation.isEmpty) {
+    if (_referencesPresentation.isEmpty || _quotesPresentation.isEmpty) {
       return Container();
     }
 
@@ -308,7 +311,7 @@ class _HomeState extends State<Home> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children:
-                      referencesPresentation.mapIndexed((index, reference) {
+                      _referencesPresentation.mapIndexed((index, reference) {
                     return FadeInY(
                       beginY: 20.0,
                       delay: 100.milliseconds * index,
@@ -327,7 +330,7 @@ class _HomeState extends State<Home> {
                 width: 150.0,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: quotesPresentation.mapIndexed((index, quote) {
+                  children: _quotesPresentation.mapIndexed((index, quote) {
                     return FadeInY(
                         beginY: 20.0,
                         delay: 100.milliseconds * index,
@@ -546,8 +549,8 @@ class _HomeState extends State<Home> {
     final quotesFutures = <Future>[];
     final referencesFutures = <Future>[];
 
-    quotesPresentation.clear();
-    referencesPresentation.clear();
+    _quotesPresentation.clear();
+    _referencesPresentation.clear();
 
     List<String> quoteIds = Game.language == 'en' ? quoteIdsEn : quoteIdsFr;
 
@@ -574,7 +577,7 @@ class _HomeState extends State<Home> {
 
       final Map<String, dynamic> jsonObj = jsonDecode(response.body);
       final quote = Quote.fromJSON(jsonObj['response']);
-      quotesPresentation.add(quote);
+      _quotesPresentation.add(quote);
     } catch (error) {
       debugPrint(error.toString());
     }
@@ -591,7 +594,7 @@ class _HomeState extends State<Home> {
 
       final Map<String, dynamic> jsonObj = jsonDecode(response.body);
       final reference = Reference.fromJSON(jsonObj['response']);
-      referencesPresentation.add(reference);
+      _referencesPresentation.add(reference);
     } catch (error) {
       debugPrint(error.toString());
     }
