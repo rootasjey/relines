@@ -7,7 +7,7 @@ Relines is a quotes game based on <a href="https://fig.style">fig.style</a> <a h
 </p>
 
 <p align="middle">
-<img src="./screenshots/desktop_home.png" />
+<img src="./screenshots/presentation.png" />
 </p>
 
 
@@ -18,7 +18,6 @@ Relines is a quotes game based on <a href="https://fig.style">fig.style</a> <a h
 ![GitHub Release Date](https://img.shields.io/github/release-date/rootasjey/relines?style=for-the-badge)
 ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/rootasjey/relines/latest?style=for-the-badge)
 ![GitHub last commit](https://img.shields.io/github/last-commit/rootasjey/relines?style=for-the-badge)
-[![Codemagic build status](https://api.codemagic.io/apps/5fd420c277de1a00167ebea4/5fd420c277de1a00167ebea3/status_badge.svg)](https://codemagic.io/apps/5fd420c277de1a00167ebea4/5fd420c277de1a00167ebea3/latest_build)
 
 # Download
 <!-- 
@@ -84,3 +83,9 @@ Mozilla Public License 2.0.
 Please read the [LICENSE](./LICENSE) for more information.
 
 Please [ask](mailto:github@fig.style) if you have any doubt.
+
+# Sreenshots
+
+<p>
+<img src="./screenshots/desktop_home.png" />
+</p>
