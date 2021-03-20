@@ -118,32 +118,7 @@ class _HomeState extends State<Home> {
                 Footer(),
               ],
             ),
-            Positioned(
-              bottom: 0.0,
-              left: 0.0,
-              child: SafeArea(
-                child: Container(
-                  padding: const EdgeInsets.all(12.0),
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    color: stateColors.tileBackground,
-                    border: Border(
-                      top: BorderSide(
-                        color: stateColors.foreground.withOpacity(0.1),
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                  child: Wrap(
-                    alignment: WrapAlignment.spaceAround,
-                    children: [
-                      langSelector(),
-                      startGameButton(),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            bottomBar(),
           ],
         ),
       ),
@@ -200,6 +175,35 @@ class _HomeState extends State<Home> {
           ),
         ),
       ]),
+    );
+  }
+
+  Widget bottomBar() {
+    return Positioned(
+      bottom: 0.0,
+      left: 0.0,
+      child: Container(
+        padding: const EdgeInsets.all(12.0),
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          color: stateColors.tileBackground,
+          border: Border(
+            top: BorderSide(
+              color: stateColors.foreground.withOpacity(0.1),
+              width: 1.0,
+            ),
+          ),
+        ),
+        child: SafeArea(
+          child: Wrap(
+            alignment: WrapAlignment.spaceAround,
+            children: [
+              langSelector(),
+              startGameButton(),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
