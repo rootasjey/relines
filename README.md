@@ -59,7 +59,7 @@ A party has a maximum of 5, 10 or 20 questions.
 If you want to run the app locally:
 
 * Clone the app `gh repo clone rootasjey/relines`
-* Navigate to the created folder= `cd relines`
+* Navigate to the created folder `cd relines`
 * Switch branch to vercel: `git checkout vercel` (branch without Firebase)
 * Get packages: `flutter pub get`
 * Create an account, an app, & get an API key on [dev.fig.style](https://dev.fig.style)
@@ -84,7 +84,7 @@ Please read the [LICENSE](./LICENSE) for more information.
 
 Please [ask](mailto:github@fig.style) if you have any doubt.
 
-# Sreenshots
+# Screenshots
 
 <p>
 <img src="./screenshots/desktop_home.png" />
