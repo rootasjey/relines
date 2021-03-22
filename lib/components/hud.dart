@@ -131,7 +131,6 @@ class Hud extends StatelessWidget {
       bottom: 0.0,
       left: 0.0,
       child: Container(
-        height: 60.0,
         width: MediaQuery.of(context).size.width,
         child: Card(
           elevation: 2.0,
@@ -143,35 +142,38 @@ class Hud extends StatelessWidget {
               width: 2.0,
             ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              alignment: WrapAlignment.spaceAround,
-              children: [
-                Wrap(
-                  children: [
-                    Icon(
-                      UniconsLine.award,
-                      color: Colors.yellow.shade800,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 4.0),
-                      child: Text("$score points"),
-                    ),
-                  ],
-                ),
-                Wrap(
-                  children: [
-                    Icon(
-                      UniconsLine.question,
-                      color: Colors.green,
-                    ),
-                    Text("question $currentQuestion / $maxQuestions"),
-                  ],
-                ),
-                actionsButtons(),
-              ],
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                alignment: WrapAlignment.spaceAround,
+                children: [
+                  Wrap(
+                    children: [
+                      Icon(
+                        UniconsLine.award,
+                        color: Colors.yellow.shade800,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4.0),
+                        child: Text("$score points"),
+                      ),
+                    ],
+                  ),
+                  Wrap(
+                    children: [
+                      Icon(
+                        UniconsLine.question,
+                        color: Colors.green,
+                      ),
+                      Text("question $currentQuestion / $maxQuestions"),
+                    ],
+                  ),
+                  actionsButtons(),
+                ],
+              ),
             ),
           ),
         ),
