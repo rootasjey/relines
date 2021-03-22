@@ -222,7 +222,7 @@ class _HomeState extends State<Home> {
 
   Widget header() {
     final size = MediaQuery.of(context).size;
-    final horizontal = size.width < Constants.maxMobileWidth ? 0.0 : 40.0;
+    final horizontal = size.width < Constants.maxMobileWidth ? 12.0 : 40.0;
     final bottom = size.width < Constants.maxMobileWidth ? 40.0 : 0.0;
 
     return Padding(
@@ -268,7 +268,7 @@ class _HomeState extends State<Home> {
   Widget headerLeft() {
     final size = MediaQuery.of(context).size;
     final right = size.width < Constants.maxMobileWidth ? 0.0 : 32.0;
-    final left = size.width < Constants.maxMobileWidth ? 12.0 : 0.0;
+    final left = size.width < Constants.maxMobileWidth ? 6.0 : 0.0;
 
     return Padding(
       padding: EdgeInsets.only(
