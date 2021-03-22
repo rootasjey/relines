@@ -61,8 +61,6 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
         useIconButton = constrains.crossAxisExtent < 1000.0;
         useGroupedDropdown = constrains.crossAxisExtent < 800.0;
 
-        final tinyWidth = constrains.crossAxisExtent < 400.0;
-
         final left =
             constrains.crossAxisExtent < Constants.maxMobileWidth ? 0.0 : 65.0;
 
@@ -118,19 +116,6 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
                         size: 30.0,
                         padding: const EdgeInsets.only(left: 0.0),
                         onTap: widget.onTapIconHeader,
-                      ),
-                    if (!tinyWidth)
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: 16.0,
-                          right: 32.0,
-                        ),
-                        child: Text(
-                          "Beta",
-                          style: TextStyle(
-                            color: stateColors.accent,
-                          ),
-                        ),
                       ),
                     bugButton(),
                     if (useGroupedDropdown) groupedDropdown(),
