@@ -73,12 +73,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
         return Observer(
           builder: (_) {
             final userSectionWidgets = <Widget>[];
-
-            if (stateUser.isUserConnected) {
-              userSectionWidgets.addAll(getAuthButtons(isNarrow));
-            } else {
-              userSectionWidgets.addAll(getGuestButtons(isNarrow));
-            }
+            userSectionWidgets.addAll(getGuestButtons(isNarrow));
 
             final mustShowNavBack = widget.automaticallyImplyLeading &&
                 context.router.root.stack.length > 1;
@@ -288,53 +283,12 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
     );
   }
 
-  Widget discoverEntry({
-    @required Widget icon,
-    @required PageRouteInfo value,
-    @required String textData,
-  }) {
-    return PopupMenuItem(
-      value: value,
-      child: Row(
-        children: [
-          icon,
-          Padding(padding: const EdgeInsets.only(left: 12.0)),
-          Text(textData),
-        ],
-      ),
-    );
-  }
-
-  List<Widget> getAuthButtons(bool isNarrow) {
-    if (isNarrow) {
-      return [userAvatar(isNarrow: isNarrow)];
-    }
-
-    return [
-      brightnessButton(),
-      userAvatar(),
-    ];
-  }
-
   Iterable<Widget> getGuestButtons(bool isNarrow) {
     if (isNarrow) {
       return [userNarrowMenu()];
     }
 
     return [
-      Padding(
-        padding: const EdgeInsets.only(right: 16.0),
-        child: Center(
-          child: OutlinedButton(
-            onPressed: () => context.router.root.push(SigninRoute()),
-            child: Text('signin'.tr()),
-            style: OutlinedButton.styleFrom(
-              primary: stateColors.accent,
-            ),
-          ),
-        ),
-      ),
-      // searchButton(),
       brightnessButton(),
       settingsButton(),
     ];
@@ -505,52 +459,6 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
     );
   }
 
-  Widget signinButton() {
-    return ElevatedButton(
-      onPressed: () => context.router.root.push(SigninRoute()),
-      style: ElevatedButton.styleFrom(
-        primary: stateColors.primary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(7.0),
-          ),
-        ),
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(15.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'signin'.tr(),
-              style: TextStyle(
-                color: Colors.white,
-                // fontSize: 13.0,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget signupButton() {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: TextButton(
-        onPressed: () => context.router.root.push(SignupRoute()),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 8.0,
-          ),
-          child: Text(
-            'signup'.tr(),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget userAvatar({bool isNarrow = true}) {
     return Padding(
       padding: const EdgeInsets.only(
@@ -585,16 +493,6 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
               ),
             ),
           ),
-          const PopupMenuItem(
-            value: SignOutRoute(),
-            child: ListTile(
-              leading: Icon(UniconsLine.signout),
-              title: Text(
-                'Sign out',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -604,13 +502,6 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
     return PopupMenuButton(
       icon: Icon(Icons.more_vert),
       itemBuilder: (context) => <PopupMenuEntry<PageRouteInfo>>[
-        PopupMenuItem(
-          value: SigninRoute(),
-          child: ListTile(
-            leading: Icon(Icons.perm_identity),
-            title: Text('signin'.tr()),
-          ),
-        ),
         PopupMenuItem(
           value: SettingsRoute(showAppBar: true),
           child: ListTile(
